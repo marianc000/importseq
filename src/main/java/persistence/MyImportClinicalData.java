@@ -10,12 +10,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import org.mskcc.cbio.portal.dao.DaoException;
-import org.mskcc.cbio.portal.dao.DaoPatient;
-import org.mskcc.cbio.portal.dao.DaoSample;
-import org.mskcc.cbio.portal.dao.JdbcUtil;
 import org.mskcc.cbio.portal.model.Sample;
-import org.mskcc.cbio.portal.util.ProgressMonitor;
 
 /**
  *
@@ -23,8 +18,15 @@ import org.mskcc.cbio.portal.util.ProgressMonitor;
  */
 public class MyImportClinicalData {
 
-    String STUDY_NAME = "acc_tcga_chuv2";
-    String TYPE_OF_CANCER_ID = STUDY_NAME.substring(0, STUDY_NAME.indexOf("_"));
+    public MyImportClinicalData(String studyName) {
+        this.studyName = studyName;
+    }
+
+    String studyName;
+
+    String getTypeOfCancerId() {
+        return studyName.substring(0, studyName.indexOf("_"));
+    }
 
     public Integer getCancerStudyId(Connection con, String cancerStudyName) throws SQLException {
 
@@ -43,7 +45,11 @@ public class MyImportClinicalData {
 
     public Integer getGeneticProfileId(Connection con, int cancerStudyId) throws SQLException {
 
-        String sql = "SELECT GENETIC_PROFILE_ID FROM cbioportal.genetic_profile where CANCER_STUDY_ID= ?";
+        String sql = "SELECT GENETIC_PROFILE_ID FROM cbioportal.genetic_profile where CANCER_STUDY_ID= ? and sampledfksflksdf";
+        
+        
+        sdfsdfsd
+                
 
         try (PreparedStatement st = con.prepareStatement(sql)) {
 
@@ -108,7 +114,7 @@ public class MyImportClinicalData {
             pstmt.setString(1, stableSampleId);
             pstmt.setString(2, Sample.Type.PRIMARY_SOLID_TUMOR.toString());
             pstmt.setInt(3, internalPatientId);
-            pstmt.setString(4, TYPE_OF_CANCER_ID);
+            pstmt.setString(4, getTypeOfCancerId());
             pstmt.executeUpdate();
             ResultSet rs = pstmt.getGeneratedKeys();
             if (rs.next()) {
@@ -120,7 +126,7 @@ public class MyImportClinicalData {
         return null;
     }
 
-    private boolean addSample(Connection con, String cancerStudyName, String stablePatientId, String stableSampleId) throws SQLException {
+    public boolean addSample(Connection con, String cancerStudyName, String stablePatientId, String stableSampleId) throws SQLException {
 
         Integer cancerStudyId = getCancerStudyId(con, cancerStudyName);
 

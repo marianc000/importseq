@@ -30,7 +30,12 @@ import org.apache.poi.ss.usermodel.WorkbookFactory;
  */
 public class ExcelAdaptor {
 
-    static String sourceFilePath = "C:\\Projects\\cBioPortal\\data sample\\Mix_cell-line.hg19_coding01.Tab.xlsx";
+    public ExcelAdaptor(String sourceFilePath) throws IOException {
+        this();
+        this.sourceFilePath = sourceFilePath;
+    }
+
+    String sourceFilePath;
     //  static String sourceFilePath = "C:\\Projects\\cBioPortal\\data sample\\H1975.hg19_coding01.TabTest.xlsx";
     static String canonicalMapFileName = "C:\\Projects\\cBioPortal\\isoform_overrides_uniprot.txt";
     static String AA_CHANGE_COLUMN = "AAChange.refGene";
@@ -40,8 +45,8 @@ public class ExcelAdaptor {
     static String SAMPLE_NAME_COLUMN = "chuvFileName";
     List<List<String>> doc;
 
-    Path getOutputFilePath(String sourcePath) {
-        return Paths.get(sourcePath + ".out");
+    public Path getOutputFilePath() {
+        return Paths.get(sourceFilePath + ".out");
     }
 
     void saveDocument(Path path) throws IOException {
@@ -120,7 +125,7 @@ public class ExcelAdaptor {
 
     Map<String, String> exonicFuncRefGene_VariantClassificationMap, sourceTargetHeaders;
 
-    public ExcelAdaptor() throws IOException {
+    private ExcelAdaptor() throws IOException {
         loadCanonicalGeneMap(canonicalMapFileName);
 
         exonicFuncRefGene_VariantClassificationMap = new HashMap<>();
@@ -284,23 +289,24 @@ public class ExcelAdaptor {
         }
     }
 
-    void run(String filePath) throws IOException, InvalidFormatException {
-        loadDocument(filePath);
+    public Path run() throws IOException, InvalidFormatException {
+        loadDocument(sourceFilePath);
+        printDocument();
         filterColumns();
 
         filterAAChangeColumn();
         replaceExonicFunction();
 
         addColumn(VALIDATION_COLUMN, "Not validated");
-        addColumn(SAMPLE_NAME_COLUMN, getSampleName(filePath));
+        addColumn(SAMPLE_NAME_COLUMN, getSampleName(sourceFilePath));
         insertColumn(IGNORED_COLUMN, "");
         insertHeaders();
         printDocument();
-        saveDocument(getOutputFilePath(filePath));
+        saveDocument(getOutputFilePath());
+        return getOutputFilePath();
     }
 
     public static void main(String... args) throws IOException, InvalidFormatException {
-        new ExcelAdaptor().run(sourceFilePath);
-
+        new ExcelAdaptor("C:\\Projects\\cBioPortal\\data sample\\Mix_cell-line.hg19_coding01.Tab.xlsx").run();
     }
 }
