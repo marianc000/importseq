@@ -42,7 +42,7 @@ public class MyImportClinicalDataTest {
 
     @Before
     public void before() throws SQLException {
-        i = new MyImportClinicalData();
+        i = new MyImportClinicalData(STUDY_NAME);
     }
 
     @AfterClass
@@ -83,7 +83,8 @@ public class MyImportClinicalDataTest {
 
     @Test
     public void testTypeOfCancer() throws SQLException {
-        assertEquals(i.TYPE_OF_CANCER_ID, "acc");
+
+        assertEquals(i.getTypeOfCancerId(), "acc");
     }
 
 }

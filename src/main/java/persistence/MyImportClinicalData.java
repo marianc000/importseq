@@ -28,7 +28,7 @@ public class MyImportClinicalData {
         return studyName.substring(0, studyName.indexOf("_"));
     }
 
-    public Integer getCancerStudyId(Connection con, String cancerStudyName) throws SQLException {
+    public int getCancerStudyId(Connection con, String cancerStudyName) throws SQLException {
 
         String sql = "SELECT CANCER_STUDY_ID FROM cbioportal.cancer_study where CANCER_STUDY_IDENTIFIER=?";
 
@@ -37,28 +37,25 @@ public class MyImportClinicalData {
             st.setString(1, cancerStudyName);
             ResultSet rs = st.executeQuery();
             if (rs.next()) {
-                return rs.getInt(1);
+                int cancerStudyId = rs.getInt(1);
+                System.out.println("cancerStudyId: " + cancerStudyId);
+                return cancerStudyId;
             }
-            return null;
+            throw new SQLException("Marian: study id for study name " + cancerStudyName + " not found");
         }
     }
 
-    public Integer getGeneticProfileId(Connection con, int cancerStudyId) throws SQLException {
-
-        String sql = "SELECT GENETIC_PROFILE_ID FROM cbioportal.genetic_profile where CANCER_STUDY_ID= ? and sampledfksflksdf";
-        
-        
-        sdfsdfsd
-                
-
+    public int getGeneticProfileId(Connection con, int cancerStudyId) throws SQLException {
+        String sql = "SELECT GENETIC_PROFILE_ID FROM cbioportal.genetic_profile where CANCER_STUDY_ID= ?";
         try (PreparedStatement st = con.prepareStatement(sql)) {
-
             st.setInt(1, cancerStudyId);
             ResultSet rs = st.executeQuery();
             if (rs.next()) {
-                return rs.getInt(1);
+                int geneticProfileId = rs.getInt(1);
+                System.out.println("geneticProfileId: " + geneticProfileId);
+                return geneticProfileId;
             }
-            return null;
+            throw new SQLException("geneticProfileId for cancerStudyId " + cancerStudyId + " not found");
         }
     }
 
@@ -126,27 +123,26 @@ public class MyImportClinicalData {
         return null;
     }
 
-    public boolean addSample(Connection con, String cancerStudyName, String stablePatientId, String stableSampleId) throws SQLException {
-
-        Integer cancerStudyId = getCancerStudyId(con, cancerStudyName);
+    public Integer addSample(Connection con, int cancerStudyId, String stablePatientId, String stableSampleId) throws SQLException {
 
         Integer internalSampleId;
         Integer internalPatientId;
 
         //check if sample is not already added:
         if (doesSampleIdExistInCancerStudy(con, cancerStudyId, stableSampleId)) {
-            System.out.println("sample already exist, skipping");
-            return false;
+            throw new RuntimeException("sample " + stableSampleId + " for patient" + stablePatientId + " already exist, skipping");
         } else {
             internalPatientId = getPatientInternalId(con, cancerStudyId, stablePatientId);
-            if (internalPatientId == null) {
 
-                //add patient:
+            if (internalPatientId == null) {
+                System.out.println("adding patient:" + stablePatientId);
                 internalPatientId = addPatient(con, cancerStudyId, stablePatientId);
             }
-            // sample is new, so attempt to add to DB
+            System.out.println("internalPatientId: " + internalPatientId);
+
             internalSampleId = addSample(con, cancerStudyId, internalPatientId, stableSampleId);
-            return true;
+            System.out.println("internalSampleId: " + internalSampleId);
+            return internalSampleId;
         }
     }
 }

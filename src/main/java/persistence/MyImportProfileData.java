@@ -19,11 +19,12 @@ public class MyImportProfileData {
 
     public void run(int geneticProfileId, File dataFile) throws IOException, DaoException {
 
-        System.out.println("Reading data from:  " + dataFile.getAbsolutePath());
+        System.out.println("MyImportProfileData: Reading data from:  " + dataFile.getAbsolutePath());
         SpringUtil.initDataSource();
         ImportExtendedMutationData importer = new ImportExtendedMutationData(dataFile, geneticProfileId, null);
 
         importer.importData();
+        System.out.println("<MyImportProfileData");
 
     }
 

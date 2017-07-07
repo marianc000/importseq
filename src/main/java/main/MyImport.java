@@ -9,14 +9,11 @@ import folder.ExcelAdaptor;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.mskcc.cbio.portal.dao.DaoException;
+import persistence.MyAddCaseList;
 import static persistence.MyConnection.getConnection;
 import persistence.MyImportClinicalData;
 import persistence.MyImportProfileData;
@@ -28,31 +25,46 @@ import persistence.MyImportProfileData;
 public class MyImport {
 
     static String STUDY_NAME = "acc_tcga_chuv3";
-    static String sourceFilePath = "C:\\Projects\\cBioPortal\\data sample\\Mix_cell-line.hg19_coding01.Tab.xlsx";
+    String sourceFilePath = "C:\\Projects\\cBioPortal\\data sample\\Mix_cell-line2.hg19_coding01.Tab.xlsx";
 
     String getSampleName(Path path) {
         String fileName = path.getFileName().toString();
-        return fileName.substring(0, fileName.indexOf("."));
+        String sampleName = fileName.substring(0, fileName.indexOf("."));
+        System.out.println("sampleName: " + sampleName);
+        if (sampleName == null || sampleName.isEmpty()) {
+            throw new RuntimeException("Cannot extract a sample name from path " + path);
+        }
+        return sampleName;
     }
 
-    void run() throws IOException, InvalidFormatException, SQLException, DaoException {
-        Path dataFilePath = new ExcelAdaptor("C:\\Projects\\cBioPortal\\data sample\\Mix_cell-line.hg19_coding01.Tab.xlsx").run();
+    void run() throws Exception {
+        Path dataFilePath = new ExcelAdaptor(sourceFilePath).run();
 
         File dataFile = dataFilePath.toFile();
+        System.out.println("dataFile: " + dataFile);
+
         String sampleName = getSampleName(dataFilePath);
+
 // commit switch off autocommit, and then commit
         MyImportClinicalData cd = new MyImportClinicalData(STUDY_NAME);
-        MyImportProfileData pd=new MyImportProfileData();
+        MyImportProfileData pd = new MyImportProfileData();
+        MyAddCaseList cl = new MyAddCaseList();
         try (Connection con = getConnection()) {
             con.setAutoCommit(false);
-            cd.addSample(con, STUDY_NAME, sampleName, sampleName);
-            pd.run(0, dataFile);
+            int cancerStudyId = cd.getCancerStudyId(con, STUDY_NAME);
+            int sampleId = cd.addSample(con, cancerStudyId, sampleName, sampleName);
+            pd.run(cd.getGeneticProfileId(con, cancerStudyId), dataFile);
+            cl.addSampleToList(con, cancerStudyId, sampleId);
             con.commit();
         }
     }
 
-    public static void main(String... args) throws IOException, InvalidFormatException, SQLException {
-        new MyImport().run();
-
+    public static void main(String... args) throws Exception {
+        try {
+            new MyImport().run();
+        } catch (Exception ex) {
+            System.out.println("Exception:" + ex);
+            ex.printStackTrace();
+        }
     }
 }
