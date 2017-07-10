@@ -103,23 +103,31 @@ public class ExcelAdaptor {
         List<String> col = getColumn(AA_CHANGE_COLUMN);
 
         for (int c = 1; c < col.size(); c++) {
-
-            String[] variants = col.get(c).split(Pattern.quote(","));
+            String val = col.get(c);
+           
+            String[] variants = val.split(Pattern.quote(","));
+            String aaChange = null;
             for (String variant : variants) {
                 String[] vals = variant.split(Pattern.quote(":"));
                 if (vals.length == 1) {
-                    col.set(c, "");
+                    aaChange = "";
+                    break;
                 } else {
                     String transcript = vals[1];
                     if (!transcript.startsWith("NM")) {
                         throw new RuntimeException("Transcript name: " + transcript);
                     }
-                    col.set(c, vals[4]);
+                 
                     if (cannonicalTranscripts.contains(transcript)) {
+                        aaChange = vals[4];
                         break;
                     }
                 }
             }
+            if (aaChange == null) {
+                throw new RuntimeException("canonical transcript not found: ");
+            }
+            col.set(c, aaChange);
         }
     }
 
@@ -132,11 +140,10 @@ public class ExcelAdaptor {
         exonicFuncRefGene_VariantClassificationMap.put("nonsynonymous SNV", "Missense_Mutation");
         exonicFuncRefGene_VariantClassificationMap.put("stopgain", "Nonsense_Mutation");
         exonicFuncRefGene_VariantClassificationMap.put(".", "Splice_Site");
-        exonicFuncRefGene_VariantClassificationMap.put("frameshift deletion", "In_Frame_Del");
-        exonicFuncRefGene_VariantClassificationMap.put("nonframeshift deletion", "Missense_Mutation");
+        exonicFuncRefGene_VariantClassificationMap.put("frameshift deletion", "Frame_Shift_Del");
+        exonicFuncRefGene_VariantClassificationMap.put("nonframeshift deletion", "In_Frame_Del");
         exonicFuncRefGene_VariantClassificationMap.put("frameshift insertion", "Frame_Shift_Ins");
         exonicFuncRefGene_VariantClassificationMap.put("nonframeshift insertion", "In_Frame_Ins");
-        exonicFuncRefGene_VariantClassificationMap.put("nonsynonymous SNV", "Missense_Mutation");
         exonicFuncRefGene_VariantClassificationMap.put("nonsynonymous SNV", "Missense_Mutation");
 
         sourceTargetHeaders = new HashMap<String, String>() {
@@ -159,7 +166,7 @@ public class ExcelAdaptor {
 
     }
 
-// 
+// In_Frame_Del
 //"Silent"
 // 
 //"Translation_Start_Site"

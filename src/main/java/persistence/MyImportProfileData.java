@@ -7,6 +7,8 @@ package persistence;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
 import org.mskcc.cbio.portal.dao.DaoException;
 import org.mskcc.cbio.portal.scripts.ImportExtendedMutationData;
 import org.mskcc.cbio.portal.util.SpringUtil;
@@ -17,13 +19,13 @@ import org.mskcc.cbio.portal.util.SpringUtil;
  */
 public class MyImportProfileData {
 
-    public void run(int geneticProfileId, File dataFile) throws IOException, DaoException {
+    public void run(Connection con ,int geneticProfileId, File dataFile, int sampleId  ) throws IOException, DaoException, SQLException {
 
         System.out.println("MyImportProfileData: Reading data from:  " + dataFile.getAbsolutePath());
         SpringUtil.initDataSource();
-        ImportExtendedMutationData importer = new ImportExtendedMutationData(dataFile, geneticProfileId, null);
+        MyImportExtendedMutationData importer = new MyImportExtendedMutationData(dataFile, geneticProfileId, null);
 
-        importer.importData();
+        importer.importData(con,sampleId);
         System.out.println("<MyImportProfileData");
 
     }

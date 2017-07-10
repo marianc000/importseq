@@ -96,11 +96,8 @@ public class MyImportClinicalData {
             pstmt.setInt(2, cancerStudyId);
             pstmt.executeUpdate();
             ResultSet rs = pstmt.getGeneratedKeys();
-            if (rs.next()) {
-
-                return rs.getInt(1);
-            }
-            return null;
+            rs.next();
+            return rs.getInt(1);
         }
     }
 
