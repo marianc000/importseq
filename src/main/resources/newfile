@@ -1,0 +1,125 @@
+>CancerStudyView:processRequest
+>CancerStudyView:processRequest1
+>CancerStudyView:validate
+>CancerStudyView:validate:cancerStudyID: acc_tcga_chuv3
+>XXXXXX  getCancerStudyByStableId: acc_tcga_chuv3
+java.lang.Thread.getStackTrace(Thread.java:1556)
+org.mskcc.cbio.portal.dao.DaoCancerStudy.printStack(DaoCancerStudy.java:347)
+org.mskcc.cbio.portal.dao.DaoCancerStudy.getCancerStudyByStableId(DaoCancerStudy.java:393)
+org.mskcc.cbio.portal.servlet.CancerStudyView.validate(CancerStudyView.java:89)
+org.mskcc.cbio.portal.servlet.CancerStudyView.processRequest(CancerStudyView.java:58)
+org.mskcc.cbio.portal.servlet.CancerStudyView.doGet(CancerStudyView.java:174)
+11:17:48.734    SELECT 1
+
+11:17:48.736    SELECT * FROM  cancer_study where CANCER_STUDY_IDENTIFIER='acc_tcga_chuv3'
+
+<XXXXXX  getCancerStudyByStableId: CancerStudy [studyID=170, name=Adrenocortical Carcinoma (TCGA, Provisional), description=TCGA Adrenocortical Carcinoma; raw data at the <A HREF="https://tcga-data.nci.nih.gov/">NCI</A>., cancerStudyIdentifier=acc_tcga_chuv3, typeOfCancerId=acc, publicStudy=true]
+>XXXXXX  getCancerStudyByStableId: acc_tcga_chuv3
+java.lang.Thread.getStackTrace(Thread.java:1556)
+org.mskcc.cbio.portal.dao.DaoCancerStudy.printStack(DaoCancerStudy.java:347)
+org.mskcc.cbio.portal.dao.DaoCancerStudy.getCancerStudyByStableId(DaoCancerStudy.java:393)
+org.mskcc.cbio.portal.util.internal.AccessControlImpl.isAccessibleCancerStudy(AccessControlImpl.java:123)
+org.mskcc.cbio.portal.servlet.CancerStudyView.validate(CancerStudyView.java:103)
+org.mskcc.cbio.portal.servlet.CancerStudyView.processRequest(CancerStudyView.java:58)
+11:17:48.737    SELECT 1
+
+11:17:48.738    SELECT * FROM  cancer_study where CANCER_STUDY_IDENTIFIER='acc_tcga_chuv3'
+
+<XXXXXX  getCancerStudyByStableId: CancerStudy [studyID=170, name=Adrenocortical Carcinoma (TCGA, Provisional), description=TCGA Adrenocortical Carcinoma; raw data at the <A HREF="https://tcga-data.nci.nih.gov/">NCI</A>., cancerStudyIdentifier=acc_tcga_chuv3, typeOfCancerId=acc, publicStudy=true]
+>CancerStudyView:validate:sampleListId: acc_tcga_chuv3_all
+11:17:48.739    SELECT 1
+
+11:17:48.740    SELECT * FROM sample_list WHERE STABLE_ID = 'acc_tcga_chuv3_all'
+
+11:17:48.741    SELECT * FROM sample_list_list WHERE LIST_ID = 335
+
+>CancerStudyView:processRequest:exception: java.lang.NullPointerException
+java.lang.NullPointerException
+        at org.mskcc.cbio.portal.dao.DaoSampleList.getSampleListList(DaoSampleList.java:260)
+        at org.mskcc.cbio.portal.dao.DaoSampleList.getSampleListByStableId(DaoSampleList.java:59)
+        at org.mskcc.cbio.portal.servlet.CancerStudyView.validate(CancerStudyView.java:121)
+        at org.mskcc.cbio.portal.servlet.CancerStudyView.processRequest(CancerStudyView.java:58)
+        at org.mskcc.cbio.portal.servlet.CancerStudyView.doGet(CancerStudyView.java:174)
+        at javax.servlet.http.HttpServlet.service(HttpServlet.java:635)
+        at javax.servlet.http.HttpServlet.service(HttpServlet.java:742)
+        at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:230)
+        at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:165)
+        at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:52)
+        at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:192)
+        at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:165)
+        at org.mskcc.cbio.portal.util.XssFilter.doFilter(XssFilter.java:65)
+        at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:192)
+        at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:165)
+        at org.springframework.security.web.FilterChainProxy.doFilterInternal(FilterChainProxy.java:186)
+        at org.springframework.security.web.FilterChainProxy.doFilter(FilterChainProxy.java:160)
+        at org.springframework.web.filter.DelegatingFilterProxy.invokeDelegate(DelegatingFilterProxy.java:344)
+        at org.springframework.web.filter.DelegatingFilterProxy.doFilter(DelegatingFilterProxy.java:261)
+        at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:192)
+        at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:165)
+        at org.apache.catalina.filters.CorsFilter.handleNonCORS(CorsFilter.java:419)
+        at org.apache.catalina.filters.CorsFilter.doFilter(CorsFilter.java:169)
+        at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:192)
+        at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:165)
+        at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:198)
+        at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:96)
+        at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:478)
+        at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:140)
+        at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:80)
+        at org.apache.catalina.valves.AbstractAccessLogValve.invoke(AbstractAccessLogValve.java:624)
+        at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:87)
+        at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:341)
+        at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:799)
+        at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:66)
+        at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:861)
+        at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1455)
+        at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:49)
+        at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+        at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+        at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:61)
+        at java.lang.Thread.run(Thread.java:745)
+11-Jul-2017 11:17:48.746 SEVERE [http-nio-8080-exec-6] org.apache.catalina.core.StandardWrapperValve.invoke Servlet.service() for servlet [cancer_study_view] in context with path [/cbioportal-1.5.0] threw exception
+ java.lang.NullPointerException
+        at org.mskcc.cbio.portal.dao.DaoSampleList.getSampleListList(DaoSampleList.java:260)
+        at org.mskcc.cbio.portal.dao.DaoSampleList.getSampleListByStableId(DaoSampleList.java:59)
+        at org.mskcc.cbio.portal.servlet.CancerStudyView.validate(CancerStudyView.java:121)
+        at org.mskcc.cbio.portal.servlet.CancerStudyView.processRequest(CancerStudyView.java:58)
+        at org.mskcc.cbio.portal.servlet.CancerStudyView.doGet(CancerStudyView.java:174)
+        at javax.servlet.http.HttpServlet.service(HttpServlet.java:635)
+        at javax.servlet.http.HttpServlet.service(HttpServlet.java:742)
+        at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:230)
+        at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:165)
+        at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:52)
+        at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:192)
+        at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:165)
+        at org.mskcc.cbio.portal.util.XssFilter.doFilter(XssFilter.java:65)
+        at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:192)
+        at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:165)
+        at org.springframework.security.web.FilterChainProxy.doFilterInternal(FilterChainProxy.java:186)
+        at org.springframework.security.web.FilterChainProxy.doFilter(FilterChainProxy.java:160)
+        at org.springframework.web.filter.DelegatingFilterProxy.invokeDelegate(DelegatingFilterProxy.java:344)
+        at org.springframework.web.filter.DelegatingFilterProxy.doFilter(DelegatingFilterProxy.java:261)
+        at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:192)
+        at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:165)
+        at org.apache.catalina.filters.CorsFilter.handleNonCORS(CorsFilter.java:419)
+        at org.apache.catalina.filters.CorsFilter.doFilter(CorsFilter.java:169)
+        at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:192)
+        at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:165)
+        at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:198)
+        at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:96)
+        at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:478)
+        at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:140)
+        at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:80)
+        at org.apache.catalina.valves.AbstractAccessLogValve.invoke(AbstractAccessLogValve.java:624)
+        at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:87)
+        at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:341)
+        at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:799)
+        at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:66)
+        at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:861)
+        at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1455)
+        at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:49)
+        at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+        at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+        at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:61)
+        at java.lang.Thread.run(Thread.java:745)
+
+
