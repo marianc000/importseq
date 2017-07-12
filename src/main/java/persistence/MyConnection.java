@@ -25,19 +25,16 @@ public class MyConnection {
 
     public static Connection getConnection() throws SQLException {
 
-        if (conn == null) {
-            conn = DriverManager.getConnection(CONNECTION_STRING);
-        }
-
-        return conn;
+     return DriverManager.getConnection(CONNECTION_STRING);
+      
     }
-    public static void closeConnection() throws SQLException {
-
-        if (conn != null) {
-             if (!conn.isClosed()){
-                 conn.close();
-             }
-             conn=null;
-        }
-    }
+//    public static void closeConnection() throws SQLException {
+//
+//        if (conn != null) {
+//             if (!conn.isClosed()){
+//                 conn.close();
+//             }
+//             conn=null;
+//        }
+//    }
 }

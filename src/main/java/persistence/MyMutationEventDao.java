@@ -22,7 +22,7 @@ public class MyMutationEventDao {
     public static ExtendedMutation.MutationEvent getMutationEvent(Connection con,
             long entrezId, String chr, long startPosition, long endPosition,
             String proteinChange, String tumorSeqAllele, String mutationType) throws SQLException {
-        System.out.println(">getMutationEvent");
+        // System.out.println(">getMutationEvent");
         String sql = "SELECT * FROM  mutation_event where ENTREZ_GENE_ID=?"
                 + " and CHR=? and START_POSITION=? and END_POSITION=? and PROTEIN_CHANGE=? and TUMOR_SEQ_ALLELE=? and MUTATION_TYPE=?";
         try (PreparedStatement st = con.prepareStatement(sql)) {
@@ -36,22 +36,23 @@ public class MyMutationEventDao {
             ResultSet rs = st.executeQuery();
 
             if (rs.next()) {
-                ExtendedMutation.MutationEvent event = extractMutationEvent(rs);
-                System.out.println("found mutation event: " + event);
+                ExtendedMutation.MutationEvent event = extractMutationEvent(con, rs);
+                // System.out.println("found mutation event: " + event);
                 return event;
             }
 
-            System.out.println("mutation event not found");
+            // System.out.println("mutation event not found");
             return null;
         }
     }
 
-    static ExtendedMutation.MutationEvent extractMutationEvent(ResultSet rs) throws SQLException {
+    static ExtendedMutation.MutationEvent extractMutationEvent(Connection con, ResultSet rs) throws SQLException {
         ExtendedMutation.MutationEvent event = new ExtendedMutation.MutationEvent();
         event.setMutationEventId(rs.getLong("MUTATION_EVENT_ID"));
-        long entrezId = rs.getLong("mutation_event.ENTREZ_GENE_ID");
-        DaoGeneOptimized aDaoGene = DaoGeneOptimized.getInstance();
-        CanonicalGene gene = aDaoGene.getGene(entrezId);
+        long entrezId = rs.getLong("ENTREZ_GENE_ID");
+        CanonicalGene gene = MyDaoGeneOptimized.getInstance(con).getGene(entrezId);
+        // System.out.println(">extractMutationEvent: gene=" + gene);
+        
         event.setGene(gene);
         event.setChr(rs.getString("CHR"));
         event.setStartPosition(rs.getLong("START_POSITION"));

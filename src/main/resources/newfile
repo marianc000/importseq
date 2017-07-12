@@ -1,359 +1,69 @@
->CancerStudyView:processRequest
->CancerStudyView:processRequest1
->CancerStudyView:validate
->CancerStudyView:validate:cancerStudyID: acc_tcga_chuv3
+>PatientView:processRequest
+16:29:53.761    SELECT 1
+
+>PatientView:validate
 >XXXXXX  getCancerStudyByStableId: acc_tcga_chuv3
 java.lang.Thread.getStackTrace(Thread.java:1556)
-org.mskcc.cbio.portal.dao.DaoCancerStudy.printStack(DaoCancerStudy.java:347)
-org.mskcc.cbio.portal.dao.DaoCancerStudy.getCancerStudyByStableId(DaoCancerStudy.java:393)
-org.mskcc.cbio.portal.servlet.CancerStudyView.validate(CancerStudyView.java:89)
-org.mskcc.cbio.portal.servlet.CancerStudyView.processRequest(CancerStudyView.java:58)
-org.mskcc.cbio.portal.servlet.CancerStudyView.doGet(CancerStudyView.java:174)
-12:28:21.423    SELECT 1
+org.mskcc.cbio.portal.dao.DaoCancerStudy.printStack(DaoCancerStudy.java:327)
+org.mskcc.cbio.portal.dao.DaoCancerStudy.getCancerStudyByStableId(DaoCancerStudy.java:373)
+org.mskcc.cbio.portal.servlet.PatientView.validate(PatientView.java:202)
+org.mskcc.cbio.portal.servlet.PatientView.processRequest(PatientView.java:127)
+org.mskcc.cbio.portal.servlet.PatientView.doGet(PatientView.java:585)
+16:29:53.763    SELECT 1
 
-12:28:21.424    SELECT * FROM  cancer_study where CANCER_STUDY_IDENTIFIER='acc_tcga_chuv3'
+16:29:53.764    SELECT * FROM  cancer_study where CANCER_STUDY_IDENTIFIER='acc_tcga_chuv3'
 
-<XXXXXX  getCancerStudyByStableId: CancerStudy [studyID=170, name=Adrenocortical Carcinoma (TCGA, Provisional),   description=TCGA Adrenocortical Carcinoma; raw data at the <A HREF="https://tcga-data.nci.nih.gov/">NCI</A>.,   cancerStudyIdentifier=acc_tcga_chuv3, typeOfCancerId=acc, publicStudy=true]
+<XXXXXX  getCancerStudyByStableId: CancerStudy [studyID=170, name=Adrenocortical Carcinoma (TCGA, Provisional), description=TCGA Adrenocortical Carcinoma; raw data at the <A HREF="https://tcga-data.nci.nih.gov/">NCI</A>., cancerStudyIdentifier=acc_tcga_chuv3, typeOfCancerId=acc, publicStudy=true]
+>PatientView:validate:cancerStudy: CancerStudy [studyID=170, name=Adrenocortical Carcinoma (TCGA, Provisional), description=TCGA Adrenocortical Carcinoma; raw data at the <A HREF="https://tcga-data.nci.nih.gov/">NCI</A>., cancerStudyIdentifier=acc_tcga_chuv3, typeOfCancerId=acc, publicStudy=true]
+>DaoSample:getSampleByCancerStudyAndSampleIdInDatabase: cancerStudyId:170; stableSampleId: Mix_cell-line32
+16:29:53.765    SELECT * FROM sample s join patient p on s.PATIENT_ID=p.INTERNAL_ID where s.STABLE_ID='Mix_cell-line32' and p.CANCER_STUDY_ID=170
+
+>DaoSample:getSampleByCancerStudyAndSampleIdInDatabase: Sample{internalId=38745, stableId=Mix_cell-line32, sampleType=Primary Solid Tumor, internalPatientId=37970, cancerTypeId=acc}
+>PatientView:validate:_sample: Sample{internalId=38745, stableId=Mix_cell-line32, sampleType=Primary Solid Tumor, internalPatientId=37970, cancerTypeId=acc}
 >XXXXXX  getCancerStudyByStableId: acc_tcga_chuv3
 java.lang.Thread.getStackTrace(Thread.java:1556)
-org.mskcc.cbio.portal.dao.DaoCancerStudy.printStack(DaoCancerStudy.java:347)
-org.mskcc.cbio.portal.dao.DaoCancerStudy.getCancerStudyByStableId(DaoCancerStudy.java:393)
-org.mskcc.cbio.portal.util.internal.AccessControlImpl.isAccessibleCancerStudy(AccessControlImpl.java:123)
-org.mskcc.cbio.portal.servlet.CancerStudyView.validate(CancerStudyView.java:103)
-org.mskcc.cbio.portal.servlet.CancerStudyView.processRequest(CancerStudyView.java:58)
-12:28:21.425    SELECT 1
+org.mskcc.cbio.portal.dao.DaoCancerStudy.printStack(DaoCancerStudy.java:327)
+org.mskcc.cbio.portal.dao.DaoCancerStudy.getCancerStudyByStableId(DaoCancerStudy.java:373)
+org.mskcc.cbio.portal.util.internal.AccessControlImpl.isAccessibleCancerStudy(AccessControlImpl.java:124)
+org.mskcc.cbio.portal.servlet.PatientView.validate(PatientView.java:268)
+org.mskcc.cbio.portal.servlet.PatientView.processRequest(PatientView.java:127)
+16:29:53.766    SELECT 1
 
-12:28:21.426    SELECT * FROM  cancer_study where CANCER_STUDY_IDENTIFIER='acc_tcga_chuv3'
+16:29:53.767    SELECT * FROM  cancer_study where CANCER_STUDY_IDENTIFIER='acc_tcga_chuv3'
 
-<XXXXXX  getCancerStudyByStableId: CancerStudy [studyID=170, name=Adrenocortical Carcinoma (TCGA, Provisional),   description=TCGA Adrenocortical Carcinoma; raw data at the <A HREF="https://tcga-data.nci.nih.gov/">NCI</A>.,   cancerStudyIdentifier=acc_tcga_chuv3, typeOfCancerId=acc, publicStudy=true]
->CancerStudyView:validate:sampleListId: acc_tcga_chuv3_all
-12:28:21.426    SELECT 1
+<XXXXXX  getCancerStudyByStableId: CancerStudy [studyID=170, name=Adrenocortical Carcinoma (TCGA, Provisional), description=TCGA Adrenocortical Carcinoma; raw data at the <A HREF="https://tcga-data.nci.nih.gov/">NCI</A>., cancerStudyIdentifier=acc_tcga_chuv3, typeOfCancerId=acc, publicStudy=true]
+16:29:53.767    SELECT 1
 
-12:28:21.427    SELECT * FROM sample_list WHERE STABLE_ID = 'acc_tcga_chuv3_all'
+16:29:53.768    SELECT EXISTS (SELECT 1 FROM `copy_number_seg` WHERE `CANCER_STUDY_ID`=170)
 
-12:28:21.428    SELECT * FROM sample_list_list WHERE LIST_ID = 335
+>DaoSample:getSampleByCancerStudyAndSampleIdInDatabase: cancerStudyId:170; stableSampleId: Mix_cell-line32
+16:29:53.769    SELECT * FROM sample s join patient p on s.PATIENT_ID=p.INTERNAL_ID where s.STABLE_ID='Mix_cell-line32' and p.CANCER_STUDY_ID=170
 
->DaoSample:getSampleById: 38684
->DaoSample:getSampleById: 38685
->DaoSample:getSampleById: 38716
->DaoSample:getSampleById: 38717
->DaoSample:getSampleById: 38718
->DaoSample:getSampleById: 38719
->DaoSample:getSampleById: 38720
->DaoSample:getSampleById: 38721
->DaoSample:getSampleById: 38722
->DaoSample:getSampleById: 38723
->DaoSample:getSampleById: 38724
->DaoSample:getSampleById: 38725
->DaoSample:getSampleById: 38726
->DaoSample:getSampleById: 38727
->DaoSample:getSampleById: 38728
->DaoSample:getSampleById: 38729
->DaoSample:getSampleById: 38730
->DaoSample:getSampleById: 38731
->DaoSample:getSampleById: 38732
->DaoSample:getSampleById: 38733
->DaoSample:getSampleById: 38734
->DaoSample:getSampleById: 38735
->DaoSample:getSampleById: 38736
->DaoSample:getSampleByIdMarian: 38736
-12:28:21.429    SELECT * FROM sample where internal_id=38736
-
->DaoSample:getSampleByIdMarian:sample: Sample{internalId=38736, stableId=Mix_cell-line23, sampleType=Primary So  lid Tumor, internalPatientId=37961, cancerTypeId=acc}
->CancerStudyView:validate:sampleList: org.mskcc.cbio.portal.model.SampleList{stableId acc_tcga_chuv3_all, sampl  eListId 335, sampleListId 170, name All cases in study, description All cases in study, SampleListCategory OTHE  R, sampleList [H1975, Mix_cell-line, Mix_cell-line3, Mix_cell-line4, Mix_cell-line5, Mix_cell-line6, Mix_cell-l  ine7, Mix_cell-line8, Mix_cell-line9, Mix_cell-line10, Mix_cell-line11, Mix_cell-line12, Mix_cell-line13, Mix_c  ell-line14, Mix_cell-line15, Mix_cell-line16, Mix_cell-line17, Mix_cell-line18, Mix_cell-line19, Mix_cell-line2  0, Mix_cell-line21, Mix_cell-line22, Mix_cell-line23]}
-<CancerStudyView:validate
+>DaoSample:getSampleByCancerStudyAndSampleIdInDatabase: Sample{internalId=38745, stableId=Mix_cell-line32, sampleType=Primary Solid Tumor, internalPatientId=37970, cancerTypeId=acc}
 >XXXXXX  getCancerStudyByStableId: acc_tcga_chuv3
 java.lang.Thread.getStackTrace(Thread.java:1556)
-org.mskcc.cbio.portal.dao.DaoCancerStudy.printStack(DaoCancerStudy.java:347)
-org.mskcc.cbio.portal.dao.DaoCancerStudy.getCancerStudyByStableId(DaoCancerStudy.java:393)
+org.mskcc.cbio.portal.dao.DaoCancerStudy.printStack(DaoCancerStudy.java:327)
+org.mskcc.cbio.portal.dao.DaoCancerStudy.getCancerStudyByStableId(DaoCancerStudy.java:373)
 org.mskcc.cbio.portal.web_api.GetGeneticProfiles.getGeneticProfiles(GetGeneticProfiles.java:58)
-org.mskcc.cbio.portal.model.CancerStudy.getGeneticProfiles(CancerStudy.java:199)
-org.mskcc.cbio.portal.model.CancerStudy.getMutationProfile(CancerStudy.java:233)
-12:28:21.430    SELECT 1
+org.mskcc.cbio.portal.model.CancerStudy.getGeneticProfiles(CancerStudy.java:210)
+org.mskcc.cbio.portal.model.CancerStudy.getMutationProfile(CancerStudy.java:249)
+16:29:53.770    SELECT 1
 
-12:28:21.431    SELECT * FROM  cancer_study where CANCER_STUDY_IDENTIFIER='acc_tcga_chuv3'
+16:29:53.771    SELECT * FROM  cancer_study where CANCER_STUDY_IDENTIFIER='acc_tcga_chuv3'
 
-<XXXXXX  getCancerStudyByStableId: CancerStudy [studyID=170, name=Adrenocortical Carcinoma (TCGA, Provisional),   description=TCGA Adrenocortical Carcinoma; raw data at the <A HREF="https://tcga-data.nci.nih.gov/">NCI</A>.,   cancerStudyIdentifier=acc_tcga_chuv3, typeOfCancerId=acc, publicStudy=true]
->XXXXXX  getCancerStudyByStableId: acc_tcga_chuv3
-java.lang.Thread.getStackTrace(Thread.java:1556)
-org.mskcc.cbio.portal.dao.DaoCancerStudy.printStack(DaoCancerStudy.java:347)
-org.mskcc.cbio.portal.dao.DaoCancerStudy.getCancerStudyByStableId(DaoCancerStudy.java:393)
-org.mskcc.cbio.portal.web_api.GetGeneticProfiles.getGeneticProfiles(GetGeneticProfiles.java:58)
-org.mskcc.cbio.portal.model.CancerStudy.getGeneticProfiles(CancerStudy.java:199)
-org.mskcc.cbio.portal.model.CancerStudy.getCopyNumberAlterationProfile(CancerStudy.java:276)
-12:28:21.432    SELECT 1
-
-12:28:21.433    SELECT * FROM  cancer_study where CANCER_STUDY_IDENTIFIER='acc_tcga_chuv3'
-
-<XXXXXX  getCancerStudyByStableId: CancerStudy [studyID=170, name=Adrenocortical Carcinoma (TCGA, Provisional),   description=TCGA Adrenocortical Carcinoma; raw data at the <A HREF="https://tcga-data.nci.nih.gov/">NCI</A>.,   cancerStudyIdentifier=acc_tcga_chuv3, typeOfCancerId=acc, publicStudy=true]
->CancerStudyView:processRequest2
-12:28:21.435    SELECT 1
-
-12:28:21.436    SELECT count(*) FROM mut_sig WHERE CANCER_STUDY_ID = 170
-
-12:28:21.437    SELECT 1
-
-12:28:21.438    SELECT count(*) FROM gistic WHERE CANCER_STUDY_ID = 170
-
-12:28:21.438    SELECT 1
-
-12:28:21.439    SELECT EXISTS (SELECT 1 FROM `copy_number_seg` WHERE `CANCER_STUDY_ID`=170)
-
->CancerStudyView:processRequest3
-<CancerStudyView:processRequest
-xxxxxxxxxxxxxxxxx Query
-xxxxxxxxxxxxxxxxx doQuery
-12:28:22.180    SELECT 1
-
-12:28:22.182    SELECT
-        sample.STABLE_ID
-        FROM sample_list_list
-        INNER JOIN sample_list ON sample_list_list.LIST_ID = sample_list.LIST_ID
-        INNER JOIN sample ON sample_list_list.SAMPLE_ID = sample.INTERNAL_ID
-        WHERE sample_list.STABLE_ID = 'acc_tcga_chuv3_all'
-
-12:28:22.221    SELECT 1
-
-12:28:22.222    SET autocommit=0
-
-xxxxxxxxxxxxxxxxx Query
-xxxxxxxxxxxxxxxxx doQuery
-12:28:22.224    select
-        sample.STABLE_ID as id,
-        sample.SAMPLE_TYPE as sample_type,
-        patient.STABLE_ID as patient_id,
-        cancer_study.CANCER_STUDY_IDENTIFIER as study_id
-    from sample inner join patient on sample.PATIENT_ID = patient.INTERNAL_ID
-                inner join cancer_study on patient.CANCER_STUDY_ID = cancer_study.CANCER_STUDY_ID
-    where cancer_study.CANCER_STUDY_IDENTIFIER = 'acc_tcga_chuv3' and
-    sample.STABLE_ID in  (  'H1975' , 'Mix_cell-line' , 'Mix_cell-line3' , 'Mix_cell-line4' , 'Mix_cell-line5'   , 'Mix_cell-line6' , 'Mix_cell-line7' , 'Mix_cell-line8' , 'Mix_cell-line9' , 'Mix_cell-line10' , 'Mix_cell-lin  e11' , 'Mix_cell-line12' , 'Mix_cell-line13' , 'Mix_cell-line14' , 'Mix_cell-line15' , 'Mix_cell-line16' , 'Mix  _cell-line17' , 'Mix_cell-line18' , 'Mix_cell-line19' , 'Mix_cell-line20' , 'Mix_cell-line21' , 'Mix_cell-line2  2' , 'Mix_cell-line23' )
-
-12:28:22.225    commit
-
-12:28:22.226    SET autocommit=1
-
-12:28:22.267    SELECT 1
-
-12:28:22.267    SET autocommit=0
-xxxxxxxxxxxxxxxxx Query
-xxxxxxxxxxxxxxxxx doQuery
-xxxxxxxxxxxxxxxxx Query
-xxxxxxxxxxxxxxxxx doQuery
-12:28:22.276    SELECT 1
-
-12:28:22.277    SELECT 1
-
-
-xxxxxxxxxxxxxxxxx Query
-xxxxxxxxxxxxxxxxx doQuery
-12:28:22.279    SELECT 1
-12:28:22.279    select
-        genetic_profile.STABLE_ID as id,
-        genetic_profile.NAME as name,
-        genetic_profile.DESCRIPTION as description,
-        genetic_profile.DATATYPE as datatype,
-        cancer_study.CANCER_STUDY_IDENTIFIER as study_id,
-        genetic_profile.GENETIC_ALTERATION_TYPE as genetic_alteration_type,
-        genetic_profile.SHOW_PROFILE_IN_ANALYSIS_TAB as show_profile_in_analysis_tab
-    from genetic_profile inner join cancer_study on genetic_profile.CANCER_STUDY_ID = cancer_study.CANCER_STUDY  _ID
-    where cancer_study.CANCER_STUDY_IDENTIFIER='acc_tcga_chuv3'
-
-
-12:28:22.279    SET autocommit=0
-
-xxxxxxxxxxxxxxxxx Query
-xxxxxxxxxxxxxxxxx doQuery
-12:28:22.280    commit
-12:28:22.281    select
-        CANCER_STUDY_IDENTIFIER as id,
-        TYPE_OF_CANCER_ID as type_of_cancer,
-        NAME as name,
-        SHORT_NAME as short_name,
-        DESCRIPTION as description,
-        PMID as pmid,
-        CITATION as citation,
-        GROUPS as groups,
-        CANCER_STUDY_ID  as internal_id
-    from cancer_study
-    where CANCER_STUDY_IDENTIFIER in  (  'acc_tcga_chuv3' )
-
-12:28:22.282    SELECT
-        sample.STABLE_ID
-        FROM sample_list_list
-        INNER JOIN sample_list ON sample_list_list.LIST_ID = sample_list.LIST_ID
-        INNER JOIN sample ON sample_list_list.SAMPLE_ID = sample.INTERNAL_ID
-        WHERE sample_list.STABLE_ID = 'acc_tcga_chuv3_sequenced'
-
-12:28:22.281    SELECT
-        sample.STABLE_ID
-        FROM sample_list_list
-        INNER JOIN sample_list ON sample_list_list.LIST_ID = sample_list.LIST_ID
-        INNER JOIN sample ON sample_list_list.SAMPLE_ID = sample.INTERNAL_ID
-        WHERE sample_list.STABLE_ID = 'acc_tcga_chuv3_cna'
-
-12:28:22.282    SET autocommit=1
-
-
-xxxxxxxxxxxxxxxxx Query
-xxxxxxxxxxxxxxxxx doQuery
-12:28:22.285    select clinical_attribute_meta.ATTR_ID,clinical_attribute_meta.DISPLAY_NAME,clinical_attribute_  meta.DESCRIPTION,clinical_attribute_meta.DATATYPE,clinical_attribute_meta.PATIENT_ATTRIBUTE,clinical_attribute_  meta.PRIORITY from clinical_attribute_meta
-    where clinical_attribute_meta.CANCER_STUDY_ID=170
-
-12:28:22.286    commit
-
-12:28:22.287    SET autocommit=1
-
->XXXXXX  getCancerStudyByStableId: acc_tcga_chuv3
-java.lang.Thread.getStackTrace(Thread.java:1556)
-org.mskcc.cbio.portal.dao.DaoCancerStudy.printStack(DaoCancerStudy.java:347)
-org.mskcc.cbio.portal.dao.DaoCancerStudy.getCancerStudyByStableId(DaoCancerStudy.java:393)
-org.mskcc.cbio.portal.servlet.CnaJSON.processCnaFractionsRequest(CnaJSON.java:236)
-org.mskcc.cbio.portal.servlet.CnaJSON.processRequest(CnaJSON.java:87)
-org.mskcc.cbio.portal.servlet.CnaJSON.doPost(CnaJSON.java:536)
->XXXXXX  getCancerStudyByInternalId: 170
-java.lang.Thread.getStackTrace(Thread.java:1556)
-org.mskcc.cbio.portal.dao.DaoCancerStudy.printStack(DaoCancerStudy.java:347)
-org.mskcc.cbio.portal.dao.DaoCancerStudy.getCancerStudyByInternalId(DaoCancerStudy.java:358)
-org.mskcc.cbio.portal.servlet.MutationsJSON.processRequest(MutationsJSON.java:129)
-org.mskcc.cbio.portal.servlet.MutationsJSON.doPost(MutationsJSON.java:816)
-javax.servlet.http.HttpServlet.service(HttpServlet.java:661)
-12:28:22.315    SELECT 1
-
-12:28:22.316    SELECT 1
-
-12:28:22.317    SELECT * FROM cbioportal.cancer_study where CANCER_STUDY_ID=170
-
-<XXXXXX  getCancerStudyByInternalId: CancerStudy [studyID=170, name=Adrenocortical Carcinoma (TCGA, Provisional  ), description=TCGA Adrenocortical Carcinoma; raw data at the <A HREF="https://tcga-data.nci.nih.gov/">NCI</A>.  , cancerStudyIdentifier=acc_tcga_chuv3, typeOfCancerId=acc, publicStudy=true]
->XXXXXX  getCancerStudyByStableId: acc_tcga_chuv3
-java.lang.Thread.getStackTrace(Thread.java:1556)
-org.mskcc.cbio.portal.dao.DaoCancerStudy.printStack(DaoCancerStudy.java:347)
-org.mskcc.cbio.portal.dao.DaoCancerStudy.getCancerStudyByStableId(DaoCancerStudy.java:393)
-org.mskcc.cbio.portal.util.internal.AccessControlImpl.isAccessibleCancerStudy(AccessControlImpl.java:123)
-org.mskcc.cbio.portal.servlet.MutationsJSON.processRequest(MutationsJSON.java:130)
-org.mskcc.cbio.portal.servlet.MutationsJSON.doPost(MutationsJSON.java:816)
-12:28:22.318    SELECT 1
-
-12:28:22.318    SELECT * FROM  cancer_study where CANCER_STUDY_IDENTIFIER='acc_tcga_chuv3'
-
-<XXXXXX  getCancerStudyByStableId: CancerStudy [studyID=170, name=Adrenocortical Carcinoma (TCGA, Provisional),   description=TCGA Adrenocortical Carcinoma; raw data at the <A HREF="https://tcga-data.nci.nih.gov/">NCI</A>.,   cancerStudyIdentifier=acc_tcga_chuv3, typeOfCancerId=acc, publicStudy=true]
->XXXXXX  getCancerStudyByStableId: acc_tcga_chuv3
-java.lang.Thread.getStackTrace(Thread.java:1556)
-org.mskcc.cbio.portal.dao.DaoCancerStudy.printStack(DaoCancerStudy.java:347)
-org.mskcc.cbio.portal.dao.DaoCancerStudy.getCancerStudyByStableId(DaoCancerStudy.java:393)
-org.mskcc.cbio.portal.util.internal.AccessControlImpl.isAccessibleCancerStudy(AccessControlImpl.java:123)
-org.mskcc.cbio.portal.servlet.CnaJSON.processCnaFractionsRequest(CnaJSON.java:238)
-org.mskcc.cbio.portal.servlet.CnaJSON.processRequest(CnaJSON.java:87)
-12:28:22.320    SELECT * FROM  cancer_study where CANCER_STUDY_IDENTIFIER='acc_tcga_chuv3'
-
-<XXXXXX  getCancerStudyByStableId: CancerStudy [studyID=170, name=Adrenocortical Carcinoma (TCGA, Provisional),   description=TCGA Adrenocortical Carcinoma; raw data at the <A HREF="https://tcga-data.nci.nih.gov/">NCI</A>.,   cancerStudyIdentifier=acc_tcga_chuv3, typeOfCancerId=acc, publicStudy=true]
-12:28:22.321    SELECT 1
-
-12:28:22.321    SELECT * FROM  cancer_study where CANCER_STUDY_IDENTIFIER='acc_tcga_chuv3'
-
-<XXXXXX  getCancerStudyByStableId: CancerStudy [studyID=170, name=Adrenocortical Carcinoma (TCGA, Provisional),   description=TCGA Adrenocortical Carcinoma; raw data at the <A HREF="https://tcga-data.nci.nih.gov/">NCI</A>.,   cancerStudyIdentifier=acc_tcga_chuv3, typeOfCancerId=acc, publicStudy=true]
-12:28:22.322    SELECT 1
-
->DaoSample:getSampleByCancerStudyAndSampleIdInDatabase: cancerStudyId:170; stableSampleId: Mix_cell-line23
-12:28:22.322    SELECT 1
-
->DaoSample:getSampleByCancerStudyAndSampleIdInDatabase: cancerStudyId:170; stableSampleId: Mix_cell-line23
-12:28:22.323    SELECT * FROM sample s join patient p on s.PATIENT_ID=p.INTERNAL_ID where s.STABLE_ID='Mix_cell  -line23' and p.CANCER_STUDY_ID=170
-
->DaoSample:getSampleByCancerStudyAndSampleIdInDatabase: Sample{internalId=38736, stableId=Mix_cell-line23, samp  leType=Primary Solid Tumor, internalPatientId=37961, cancerTypeId=acc}
-12:28:22.323    SELECT * FROM sample s join patient p on s.PATIENT_ID=p.INTERNAL_ID where s.STABLE_ID='Mix_cell  -line23' and p.CANCER_STUDY_ID=170
-
->DaoSample:getSampleByCancerStudyAndSampleIdInDatabase: Sample{internalId=38736, stableId=Mix_cell-line23, samp  leType=Primary Solid Tumor, internalPatientId=37961, cancerTypeId=acc}
-xxxxxxxxxxxxxxxxx Query
-xxxxxxxxxxxxxxxxx doQuery
-12:28:22.325    SELECT 1
-
-12:28:22.327    select
-
-        SAMPLE_ID as sampleId,
-        MUTATION_COUNT as mutationCount
-
-        from mutation_count
-
-        where GENETIC_PROFILE_ID = 536
-
-
-            and SAMPLE_ID in
-             (
-                38684
-             ,
-                38685
-             ,
-                38716
-             ,
-                38717
-             ,
-                38718
-             ,
-                38719
-             ,
-                38720
-             ,
-                38721
-             ,
-                38722
-             ,
-                38723
-             ,
-                38724
-             ,
-                38725
-             ,
-                38726
-             ,
-                38727
-             ,
-                38728
-             ,
-                38729
-             ,
-                38730
-             ,
-                38731
-             ,
-                38732
-             ,
-                38733
-             ,
-                38734
-             ,
-                38735
-             ,
-                38736
-             )
-
->DaoSample:getSampleById: 38720
->DaoSample:getSampleById: 38721
->DaoSample:getSampleById: 38722
->DaoSample:getSampleById: 38723
->DaoSample:getSampleById: 38724
->DaoSample:getSampleById: 38725
->DaoSample:getSampleById: 38726
->DaoSample:getSampleById: 38727
->DaoSample:getSampleById: 38728
->DaoSample:getSampleById: 38729
->DaoSample:getSampleById: 38730
->DaoSample:getSampleById: 38731
->DaoSample:getSampleById: 38732
->DaoSample:getSampleById: 38733
->DaoSample:getSampleById: 38734
->DaoSample:getSampleById: 38735
->DaoSample:getSampleById: 38736
-12:28:22.323    SELECT 1
-
-12:28:22.333    SELECT  `SAMPLE_ID`, SUM(`END`-`START`) FROM `copy_number_seg` WHERE `CANCER_STUDY_ID`=170 AND   ABS(`SEGMENT_MEAN`)>=0.2 AND `SAMPLE_ID` IN ('38684','38685','38716','38717','38718','38719','38720','38721','3  8722','38723','38724','38725','38726','38727','38728','38729','38730','38731','38732','38733','38734','38735','  38736') GROUP BY `SAMPLE_ID`
-
-11-Jul-2017 12:28:22.332 SEVERE [http-nio-8080-exec-9] org.apache.catalina.core.StandardWrapperValve.invoke Ser  vlet.service() for servlet [MutationsJSON] in context with path [/cbioportal-1.5.0] threw exception
+<XXXXXX  getCancerStudyByStableId: CancerStudy [studyID=170, name=Adrenocortical Carcinoma (TCGA, Provisional), description=TCGA Adrenocortical Carcinoma; raw data at the <A HREF="https://tcga-data.nci.nih.gov/">NCI</A>., cancerStudyIdentifier=acc_tcga_chuv3, typeOfCancerId=acc, publicStudy=true]
+>getMutationProfile: caseId: Mix_cell-line32; geneticProfiles: [org.mskcc.cbio.portal.model.GeneticProfile@2b9c702d[geneticProfileId=536,stableId=acc_tcga_chuv3_mutations,cancerStudyId=170,geneticAlterationType=MUTATION_EXTENDED,datatype=MAF,profileName=Mutations,profileDescription=Mutation data from whole exome sequencing.,targetLine=<null>,showProfileInAnalysisTab=true,otherMetadataFields=<null>]]
+>getMutationProfile1: caseId: Mix_cell-line32; geneticProfile : org.mskcc.cbio.portal.model.GeneticProfile@2b9c702d[geneticProfileId=536,stableId=acc_tcga_chuv3_mutations,cancerStudyId=170,geneticAlterationType=MUTATION_EXTENDED,datatype=MAF,profileName=Mutations,profileDescription=Mutation data from whole exome sequencing.,targetLine=<null>,showProfileInAnalysisTab=true,otherMetadataFields=<null>]
+>acceptableCaseId: caseId: Mix_cell-line32; geneticProfile: org.mskcc.cbio.portal.model.GeneticProfile@2b9c702d[geneticProfileId=536,stableId=acc_tcga_chuv3_mutations,cancerStudyId=170,geneticAlterationType=MUTATION_EXTENDED,datatype=MAF,profileName=Mutations,profileDescription=Mutation data from whole exome sequencing.,targetLine=<null>,showProfileInAnalysisTab=true,otherMetadataFields=<null>]
+11-Jul-2017 16:29:53.772 SEVERE [http-nio-8080-exec-3] org.apache.catalina.core.StandardWrapperValve.invoke Servlet.service() for servlet [patient_view] in context with path [/cbioportal-1.5.0] threw exception
  java.lang.NullPointerException
-        at org.mskcc.cbio.portal.servlet.MutationsJSON.convertMapSampleKeys(MutationsJSON.java:431)
-        at org.mskcc.cbio.portal.servlet.MutationsJSON.processCountMutationsRequest(MutationsJSON.java:411)
-        at org.mskcc.cbio.portal.servlet.MutationsJSON.processRequest(MutationsJSON.java:139)
-        at org.mskcc.cbio.portal.servlet.MutationsJSON.doPost(MutationsJSON.java:816)
-        at javax.servlet.http.HttpServlet.service(HttpServlet.java:661)
+        at org.mskcc.cbio.portal.model.CancerStudy.acceptableCaseId(CancerStudy.java:244)
+        at org.mskcc.cbio.portal.model.CancerStudy.getMutationProfile(CancerStudy.java:229)
+        at org.mskcc.cbio.portal.model.CancerStudy.getMutationProfile(CancerStudy.java:249)
+        at org.mskcc.cbio.portal.servlet.PatientView.validate(PatientView.java:288)
+        at org.mskcc.cbio.portal.servlet.PatientView.processRequest(PatientView.java:127)
+        at org.mskcc.cbio.portal.servlet.PatientView.doGet(PatientView.java:585)
+        at javax.servlet.http.HttpServlet.service(HttpServlet.java:635)
         at javax.servlet.http.HttpServlet.service(HttpServlet.java:742)
         at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:230)
         at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:165)
@@ -390,8 +100,4 @@ xxxxxxxxxxxxxxxxx doQuery
         at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
         at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:61)
         at java.lang.Thread.run(Thread.java:745)
-
-12:28:22.335    SELECT 1
-
-12:28:22.337    SELECT  `SAMPLE_ID`, SUM(`END`-`START`) FROM `copy_number_seg` WHERE `CANCER_STUDY_ID`=170 AND   `SAMPLE_ID` IN ('38684','38685','38716','38717','38718','38719','38720','38721','38722','38723','38724','38725'  ,'38726','38727','38728','38729','38730','38731','38732','38733','38734','38735','38736') GROUP BY `SAMPLE_ID`
 

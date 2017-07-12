@@ -104,7 +104,7 @@ public class ExcelAdaptor {
 
         for (int c = 1; c < col.size(); c++) {
             String val = col.get(c);
-           
+
             String[] variants = val.split(Pattern.quote(","));
             String aaChange = null;
             for (String variant : variants) {
@@ -117,7 +117,7 @@ public class ExcelAdaptor {
                     if (!transcript.startsWith("NM")) {
                         throw new RuntimeException("Transcript name: " + transcript);
                     }
-                 
+
                     if (cannonicalTranscripts.contains(transcript)) {
                         aaChange = vals[4];
                         break;
@@ -214,6 +214,7 @@ public class ExcelAdaptor {
                 doc.get(colNum).add(getCellValue(row.getCell(colNum)));
             }
         }
+        wb.close();
     }
 
     void printDocument(List<List<String>> document) {
@@ -298,7 +299,7 @@ public class ExcelAdaptor {
 
     public Path run() throws IOException, InvalidFormatException {
         loadDocument(sourceFilePath);
-        printDocument();
+       // printDocument();
         filterColumns();
 
         filterAAChangeColumn();
@@ -308,7 +309,7 @@ public class ExcelAdaptor {
         addColumn(SAMPLE_NAME_COLUMN, getSampleName(sourceFilePath));
         insertColumn(IGNORED_COLUMN, "");
         insertHeaders();
-        printDocument();
+      //  printDocument();
         saveDocument(getOutputFilePath());
         return getOutputFilePath();
     }

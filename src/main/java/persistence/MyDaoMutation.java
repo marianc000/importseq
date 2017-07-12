@@ -5,8 +5,6 @@ import org.mskcc.cbio.portal.util.MutationKeywordUtils;
 
 import java.sql.*;
 import org.mskcc.cbio.portal.dao.DaoException;
-import org.mskcc.cbio.portal.dao.DaoMutation;
-import org.mskcc.cbio.portal.dao.JdbcUtil;
 
 /**
  * Data access object for Mutation table
@@ -46,12 +44,12 @@ public final class MyDaoMutation {
                 + Integer.toString(mutation.getTumorRefCount()) + ","
                 + Integer.toString(mutation.getNormalAltCount()) + ","
                 + Integer.toString(mutation.getNormalRefCount()) + ")";
-        System.out.println(">getMutationInsertSql: " + sql);
+      //  // System.out.println(">getMutationInsertSql: " + sql);
         return sql;
     }
 
     public static int addMutation(Connection con, ExtendedMutation mutation) throws SQLException {
-        System.out.println(">addMutation");
+        // System.out.println(">addMutation");
         String sql = getMutationInsertSql(mutation);
         try (PreparedStatement pstmt = con.prepareStatement(sql)) {
             return pstmt.executeUpdate();
@@ -72,9 +70,9 @@ public final class MyDaoMutation {
     }
 
     static String getInsertMutationEventSql(ExtendedMutation.MutationEvent event) {
-        System.out.println(">addMutationEvent");
+        // System.out.println(">addMutationEvent");
         String keyword = MutationKeywordUtils.guessOncotatorMutationKeyword(event.getProteinChange(), event.getMutationType());
-        System.out.println(">addMutationEvent: keyword=" + keyword);
+        // System.out.println(">addMutationEvent: keyword=" + keyword);
         String mySql = sql
                 + event.getMutationEventId() + ","
                 + event.getGene().getEntrezGeneId() + ","
@@ -105,23 +103,23 @@ public final class MyDaoMutation {
                 + boolToStr(event.isCanonicalTranscript()) + ","
                 + wrapString(keyword == null ? "\\N" : (event.getGene().getHugoGeneSymbolAllCaps() + " " + keyword))
                 + ")";
-        System.out.println("<addMutationEvent: sql=" + mySql);
+        // System.out.println("<addMutationEvent: sql=" + mySql);
         return mySql;
     }
 
     public static int addMutationEvent(Connection con, ExtendedMutation.MutationEvent event) throws DaoException, SQLException {
-        System.out.println(">addMutationEvent");
+        // System.out.println(">addMutationEvent");
 
         String sql = getInsertMutationEventSql(event);
         try (PreparedStatement pstmt = con.prepareStatement(sql)) {
             pstmt.executeUpdate();
         }
-        System.out.println("<addMutationEvent");
+        // System.out.println("<addMutationEvent");
         return 1;
     }
 
     public static int calculateMutationCount(Connection con, int profileId) throws SQLException {
-        System.out.println(">addMutationEvent: profileId=" + profileId);
+        // System.out.println(">addMutationEvent: profileId=" + profileId);
         String sql = "INSERT INTO mutation_count "
                 + "SELECT genetic_profile.`GENETIC_PROFILE_ID`, `SAMPLE_ID`, COUNT(*) AS MUTATION_COUNT "
                 + "FROM `mutation` , `genetic_profile` "
@@ -146,7 +144,7 @@ public final class MyDaoMutation {
             ResultSet rs = st.executeQuery();
             rs.next();
             long id = rs.getLong(1);
-            System.out.println("getLargestMutationEventId: id" + id);
+            // System.out.println("getLargestMutationEventId: id" + id);
             return id;
         }
     }

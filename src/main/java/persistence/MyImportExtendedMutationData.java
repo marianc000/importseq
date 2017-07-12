@@ -34,8 +34,8 @@ public class MyImportExtendedMutationData {
     private MutationFilter myMutationFilter;
     private int entriesSkipped = 0;
     private int samplesSkipped = 0;
-    private Set<String> sampleSet = new HashSet<String>();
-    private Set<String> geneSet = new HashSet<String>();
+    private Set<String> sampleSet = new HashSet<>();
+    private Set<String> geneSet = new HashSet<>();
     private String genePanel;
 
     /**
@@ -67,10 +67,8 @@ public class MyImportExtendedMutationData {
         System.out.println(">importData");
         //   MySQLbulkLoader.bulkLoadOn();
         Sample sample = MySampleDao.getSampleById(con, sampleId);
-        System.out.println(">importData2");
+
         MySampleDao.addSampleProfile(con, sample.getInternalId(), geneticProfileId);
-        System.out.println(">importData21");
-        HashSet<String> sequencedCaseSet = new HashSet<>();
 
         Set<MutationEvent> newEvents = new HashSet<>();
 
@@ -78,254 +76,240 @@ public class MyImportExtendedMutationData {
 
         long mutationEventId = MyDaoMutation.getLargestMutationEventId(con);
 
-        FileReader reader = new FileReader(mutationFile);
-        BufferedReader buf = new BufferedReader(reader);
+        try (BufferedReader buf = new BufferedReader(new FileReader(mutationFile))) {
 
-        //  DaoGeneOptimized daoGene = DaoGeneOptimized.getInstance();
-        //  The MAF File Changes fairly frequently, and we cannot use column index constants.
-        String line = buf.readLine();
-        while (line.startsWith("#")) {
-            line = buf.readLine(); // skip comments/meta info
-        }
+            //  DaoGeneOptimized daoGene = DaoGeneOptimized.getInstance();
+            //  The MAF File Changes fairly frequently, and we cannot use column index constants.
+            String line = buf.readLine();
+            while (line.startsWith("#")) {
+                line = buf.readLine(); // skip comments/meta info
+            }
 
-        line = line.trim();
+            line = line.trim();
 
-        MafUtil mafUtil = new MafUtil(line);
+            MafUtil mafUtil = new MafUtil(line);
 
-        boolean fileHasOMAData = false;
+            boolean fileHasOMAData = false;
 
-        if (mafUtil.getMaFImpactIndex() >= 0) {
-            // fail gracefully if a non-essential column is missing
-            // e.g. if there is no MA_link.var column, we assume that the value is NA and insert it as such
-            fileHasOMAData = true;
-            ProgressMonitor.setCurrentMessage(" --> OMA Scores Column Number:  "
-                    + mafUtil.getMaFImpactIndex());
-        } else {
-            fileHasOMAData = false;
-        }
+            if (mafUtil.getMaFImpactIndex() >= 0) {
+                // fail gracefully if a non-essential column is missing
+                // e.g. if there is no MA_link.var column, we assume that the value is NA and insert it as such
+                fileHasOMAData = true;
+                ProgressMonitor.setCurrentMessage(" --> OMA Scores Column Number:  "
+                        + mafUtil.getMaFImpactIndex());
+            } else {
+                fileHasOMAData = false;
+            }
 
-        System.out.println(">importData3");
-        //  GeneticProfile geneticProfile = DaoGeneticProfile.getGeneticProfileById(geneticProfileId);
-        while ((line = buf.readLine()) != null) {
+            //  GeneticProfile geneticProfile = DaoGeneticProfile.getGeneticProfileById(geneticProfileId);
+            while ((line = buf.readLine()) != null) {
 
-            System.out.println(">importData4");
-            if (!line.startsWith("#") && line.trim().length() > 0) {
-                String[] parts = line.split("\t", -1); // the -1 keeps trailing empty strings; see JavaDoc for String
-                MafRecord record = mafUtil.parseRecord(line);
+                if (!line.startsWith("#") && line.trim().length() > 0) {
+                    String[] parts = line.split("\t", -1); // the -1 keeps trailing empty strings; see JavaDoc for String
+                    MafRecord record = mafUtil.parseRecord(line);
 
-                // process case id
-                String barCode = record.getTumorSampleID();
-                // backwards compatible part (i.e. in the new process, the sample should already be there. TODO - replace this workaround later with an exception:
+                    // process case id
+                    String barCode = record.getTumorSampleID();
+                    // backwards compatible part (i.e. in the new process, the sample should already be there. TODO - replace this workaround later with an exception:
 
-                String validationStatus = record.getValidationStatus();
+                    String validationStatus = record.getValidationStatus();
 
-                if (validationStatus == null
-                        || validationStatus.equalsIgnoreCase("Wildtype")) {
-                    ProgressMonitor.logWarning("Skipping entry with Validation_Status: Wildtype");
-                    entriesSkipped++;
-                    continue;
-                }
-                System.out.println(">importData40");
-                String chr = MyDaoGeneOptimized.normalizeChr(record.getChr().toUpperCase());
-                System.out.println(">importData401");
-
-                if (chr == null) {
-                    ProgressMonitor.logWarning("Skipping entry with chromosome value: " + record.getChr());
-                    entriesSkipped++;
-                    continue;
-                }
-                System.out.println(">importData402");
-                record.setChr(chr);
-
-                if (record.getStartPosition() < 0) {
-                    record.setStartPosition(0);
-                }
-
-                if (record.getEndPosition() < 0) {
-                    record.setEndPosition(0);
-                }
-
-                String functionalImpactScore = "";
-                // using -1 is not safe, FIS can be a negative value
-                Float fisValue = Float.MIN_VALUE;
-                String linkXVar = "";
-                String linkMsa = "";
-                String linkPdb = "";
-                System.out.println(">importData402");
-                if (fileHasOMAData) {
-//					functionalImpactScore = getField(parts, "MA:FImpact" );
-//					fisValue = getField(parts, "MA:FIS");
-//					linkXVar = getField(parts, "MA:link.var" );
-//					linkMsa = getField(parts, "MA:link.MSA" );
-//					linkPdb = getField(parts, "MA:link.PDB" );
-
-                    functionalImpactScore = record.getMaFuncImpact();
-                    fisValue = record.getMaFIS();
-                    linkXVar = record.getMaLinkVar();
-                    linkMsa = record.getMaLinkMsa();
-                    linkPdb = record.getMaLinkPdb();
-
-                    functionalImpactScore = transformOMAScore(functionalImpactScore);
-                    linkXVar = linkXVar.replace("\"", "");
-                }
-
-                String mutationType,
-                        proteinChange,
-                        aaChange,
-                        codonChange,
-                        refseqMrnaId,
-                        uniprotAccession;
-
-                int proteinPosStart,
-                        proteinPosEnd;
-                System.out.println(">importData41");
-                // determine whether to use canonical or best effect transcript
-                // try canonical first
-                if (ExtendedMutationUtil.isAcceptableMutation(record.getVariantClassification())) {
-                    mutationType = record.getVariantClassification();
-                } // if not acceptable either, use the default value
-                else {
-                    mutationType = ExtendedMutationUtil.getMutationType(record);
-                }
-                System.out.println(">importData411");
-                // skip RNA mutations
-                if (mutationType != null && mutationType.equalsIgnoreCase("rna")) {
-                    ProgressMonitor.logWarning("Skipping entry with mutation type: RNA");
-                    entriesSkipped++;
-                    continue;
-                }
-                System.out.println(">importData412");
-                proteinChange = ExtendedMutationUtil.getProteinChange(parts, record);
-                //proteinChange = record.getProteinChange();
-                aaChange = record.getAminoAcidChange();
-                codonChange = record.getCodons();
-                refseqMrnaId = record.getRefSeq();
-                if (this.swissprotIsAccession) {
-                    uniprotAccession = record.getSwissprot();
-                } else {
-                    String uniprotName = record.getSwissprot();
-
-                    uniprotAccession = MyDaoUniProtIdMapping.mapFromUniprotIdToAccession(uniprotName);
-                }
-                System.out.println(">importData413");
-                proteinPosStart = ExtendedMutationUtil.getProteinPosStart(
-                        record.getProteinPosition(), proteinChange);
-                proteinPosEnd = ExtendedMutationUtil.getProteinPosEnd(
-                        record.getProteinPosition(), proteinChange);
-
-                //  Assume we are dealing with Entrez Gene Ids (this is the best / most stable option)
-                String geneSymbol = record.getHugoGeneSymbol();
-                String entrezIdString = record.getGivenEntrezGeneId();
-                System.out.println(">importData414");
-                CanonicalGene gene = MyDaoGeneOptimized.getInstance(con).getNonAmbiguousGene(geneSymbol, chr);
-                System.out.println(">gene=" + gene);
-                if (gene == null) {
-                    throw new RuntimeException("gene is null");
-                }
-                ExtendedMutation mutation = new ExtendedMutation();
-
-                mutation.setGeneticProfileId(geneticProfileId);
-                mutation.setSampleId(sample.getInternalId());
-                mutation.setGene(gene);
-                mutation.setSequencingCenter(record.getCenter());
-                mutation.setSequencer(record.getSequencer());
-                mutation.setProteinChange(proteinChange);
-                mutation.setAminoAcidChange(aaChange);
-                mutation.setMutationType(mutationType);
-                mutation.setChr(record.getChr());
-                mutation.setStartPosition(record.getStartPosition());
-                mutation.setEndPosition(record.getEndPosition());
-                mutation.setValidationStatus(record.getValidationStatus());
-                mutation.setMutationStatus(record.getMutationStatus());
-                mutation.setFunctionalImpactScore(functionalImpactScore);
-                mutation.setFisValue(fisValue);
-                mutation.setLinkXVar(linkXVar);
-                mutation.setLinkPdb(linkPdb);
-                mutation.setLinkMsa(linkMsa);
-                mutation.setNcbiBuild(record.getNcbiBuild());
-                mutation.setStrand(record.getStrand());
-                mutation.setVariantType(record.getVariantType());
-                mutation.setAllele(record.getTumorSeqAllele1(), record.getTumorSeqAllele2(), record.getReferenceAllele());
-                mutation.setDbSnpRs(record.getDbSNP_RS());
-                mutation.setDbSnpValStatus(record.getDbSnpValStatus());
-                mutation.setMatchedNormSampleBarcode(record.getMatchedNormSampleBarcode());
-                mutation.setMatchNormSeqAllele1(record.getMatchNormSeqAllele1());
-                mutation.setMatchNormSeqAllele2(record.getMatchNormSeqAllele2());
-                mutation.setTumorValidationAllele1(record.getTumorValidationAllele1());
-                mutation.setTumorValidationAllele2(record.getTumorValidationAllele2());
-                mutation.setMatchNormValidationAllele1(record.getMatchNormValidationAllele1());
-                mutation.setMatchNormValidationAllele2(record.getMatchNormValidationAllele2());
-                mutation.setVerificationStatus(record.getVerificationStatus());
-                mutation.setSequencingPhase(record.getSequencingPhase());
-                mutation.setSequenceSource(record.getSequenceSource());
-                mutation.setValidationMethod(record.getValidationMethod());
-                mutation.setScore(record.getScore());
-                mutation.setBamFile(record.getBamFile());
-
-                // here we set      Variant Reads	Ref Reads              
-                mutation.setTumorAltCount(ExtendedMutationUtil.getTumorAltCount(record));
-                mutation.setTumorRefCount(ExtendedMutationUtil.getTumorRefCount(record));
-                mutation.setNormalAltCount(ExtendedMutationUtil.getNormalAltCount(record));
-                mutation.setNormalRefCount(ExtendedMutationUtil.getNormalRefCount(record));
-
-                // TODO rename the oncotator column names (remove "oncotator")
-                mutation.setOncotatorCodonChange(codonChange);
-                mutation.setOncotatorRefseqMrnaId(refseqMrnaId);
-                mutation.setOncotatorUniprotAccession(uniprotAccession);
-                mutation.setOncotatorProteinPosStart(proteinPosStart);
-                mutation.setOncotatorProteinPosEnd(proteinPosEnd);
-
-                // TODO we don't use this info right now...
-                mutation.setCanonicalTranscript(true);
-
-                sequencedCaseSet.add(sample.getStableId());
-                System.out.println("XXXXXXX " + mutation.getEvent());
-                //  Filter out Mutations
-                if (myMutationFilter.acceptMutation(mutation)) {
-                    System.out.println(">importData46");
-                    MutationEvent e = mutation.getEvent();
-                    System.out.println(">importData47");
-                    MutationEvent event = MyMutationEventDao.getMutationEvent(con,
-                            e.getGene().getEntrezGeneId(),
-                            e.getChr(),
-                            e.getStartPosition(),
-                            e.getEndPosition(),
-                            e.getProteinChange(), e.getTumorSeqAllele(), e.getMutationType());
-
-                    if (event != null) {
-                        mutation.setEvent(event);
-                    } else {
-                        mutation.setMutationEventId(++mutationEventId);
-                        // existingEvents.put(mutation.getEvent(), mutation.getEvent());
-                        newEvents.add(mutation.getEvent());
+                    if (validationStatus == null
+                            || validationStatus.equalsIgnoreCase("Wildtype")) {
+                        ProgressMonitor.logWarning("Skipping entry with Validation_Status: Wildtype");
+                        entriesSkipped++;
+                        continue;
                     }
 
-                    if (mutations.get(mutation) != null) {
-                        throw new RuntimeException("Mutation exists already");
-                    } else {
-                        mutations.put(mutation, mutation);
-                    }
-                    //keep track:
-                    sampleSet.add(barCode);
-                    geneSet.add(mutation.getEntrezGeneId() + "");
-                } else {
-                    entriesSkipped++;
-                }
+                    String chr = MyDaoGeneOptimized.normalizeChr(record.getChr().toUpperCase());
 
+                    if (chr == null) {
+                        ProgressMonitor.logWarning("Skipping entry with chromosome value: " + record.getChr());
+                        entriesSkipped++;
+                        continue;
+                    }
+
+                    record.setChr(chr);
+
+                    if (record.getStartPosition() < 0) {
+                        record.setStartPosition(0);
+                    }
+
+                    if (record.getEndPosition() < 0) {
+                        record.setEndPosition(0);
+                    }
+
+                    String functionalImpactScore = "";
+                    // using -1 is not safe, FIS can be a negative value
+                    Float fisValue = Float.MIN_VALUE;
+                    String linkXVar = "";
+                    String linkMsa = "";
+                    String linkPdb = "";
+
+                    if (fileHasOMAData) {
+                        functionalImpactScore = record.getMaFuncImpact();
+                        fisValue = record.getMaFIS();
+                        linkXVar = record.getMaLinkVar();
+                        linkMsa = record.getMaLinkMsa();
+                        linkPdb = record.getMaLinkPdb();
+
+                        functionalImpactScore = transformOMAScore(functionalImpactScore);
+                        linkXVar = linkXVar.replace("\"", "");
+                    }
+
+                    String mutationType,
+                            proteinChange,
+                            aaChange,
+                            codonChange,
+                            refseqMrnaId,
+                            uniprotAccession;
+
+                    int proteinPosStart,
+                            proteinPosEnd;
+
+                    // determine whether to use canonical or best effect transcript
+                    // try canonical first
+                    if (ExtendedMutationUtil.isAcceptableMutation(record.getVariantClassification())) {
+                        mutationType = record.getVariantClassification();
+                    } // if not acceptable either, use the default value
+                    else {
+                        mutationType = ExtendedMutationUtil.getMutationType(record);
+                    }
+
+                    // skip RNA mutations
+                    if (mutationType != null && mutationType.equalsIgnoreCase("rna")) {
+                        ProgressMonitor.logWarning("Skipping entry with mutation type: RNA");
+                        entriesSkipped++;
+                        continue;
+                    }
+
+                    proteinChange = ExtendedMutationUtil.getProteinChange(parts, record);
+                    //proteinChange = record.getProteinChange();
+                    aaChange = record.getAminoAcidChange();
+                    codonChange = record.getCodons();
+                    refseqMrnaId = record.getRefSeq();
+                    if (this.swissprotIsAccession) {
+                        uniprotAccession = record.getSwissprot();
+                    } else {
+                        String uniprotName = record.getSwissprot();
+
+                        uniprotAccession = MyDaoUniProtIdMapping.mapFromUniprotIdToAccession(con, uniprotName);
+                    }
+
+                    proteinPosStart = ExtendedMutationUtil.getProteinPosStart(
+                            record.getProteinPosition(), proteinChange);
+                    proteinPosEnd = ExtendedMutationUtil.getProteinPosEnd(
+                            record.getProteinPosition(), proteinChange);
+
+                    //  Assume we are dealing with Entrez Gene Ids (this is the best / most stable option)
+                    String geneSymbol = record.getHugoGeneSymbol();
+
+                    CanonicalGene gene = MyDaoGeneOptimized.getInstance(con).getNonAmbiguousGene(geneSymbol, chr);
+                  //  System.out.println(">gene=" + gene);
+                    if (gene == null) {
+                        throw new RuntimeException("gene is null");
+                    }
+                    ExtendedMutation mutation = new ExtendedMutation();
+
+                    mutation.setGeneticProfileId(geneticProfileId);
+                    mutation.setSampleId(sample.getInternalId());
+                    mutation.setGene(gene);
+                    mutation.setSequencingCenter(record.getCenter());
+                    mutation.setSequencer(record.getSequencer());
+                    mutation.setProteinChange(proteinChange);
+                    mutation.setAminoAcidChange(aaChange);
+                    mutation.setMutationType(mutationType);
+                    mutation.setChr(record.getChr());
+                    mutation.setStartPosition(record.getStartPosition());
+                    mutation.setEndPosition(record.getEndPosition());
+                    mutation.setValidationStatus(record.getValidationStatus());
+                    mutation.setMutationStatus(record.getMutationStatus());
+                    mutation.setFunctionalImpactScore(functionalImpactScore);
+                    mutation.setFisValue(fisValue);
+                    mutation.setLinkXVar(linkXVar);
+                    mutation.setLinkPdb(linkPdb);
+                    mutation.setLinkMsa(linkMsa);
+                    mutation.setNcbiBuild(record.getNcbiBuild());
+                    mutation.setStrand(record.getStrand());
+                    mutation.setVariantType(record.getVariantType());
+                    mutation.setAllele(record.getTumorSeqAllele1(), record.getTumorSeqAllele2(), record.getReferenceAllele());
+                    mutation.setDbSnpRs(record.getDbSNP_RS());
+                    mutation.setDbSnpValStatus(record.getDbSnpValStatus());
+                    mutation.setMatchedNormSampleBarcode(record.getMatchedNormSampleBarcode());
+                    mutation.setMatchNormSeqAllele1(record.getMatchNormSeqAllele1());
+                    mutation.setMatchNormSeqAllele2(record.getMatchNormSeqAllele2());
+                    mutation.setTumorValidationAllele1(record.getTumorValidationAllele1());
+                    mutation.setTumorValidationAllele2(record.getTumorValidationAllele2());
+                    mutation.setMatchNormValidationAllele1(record.getMatchNormValidationAllele1());
+                    mutation.setMatchNormValidationAllele2(record.getMatchNormValidationAllele2());
+                    mutation.setVerificationStatus(record.getVerificationStatus());
+                    mutation.setSequencingPhase(record.getSequencingPhase());
+                    mutation.setSequenceSource(record.getSequenceSource());
+                    mutation.setValidationMethod(record.getValidationMethod());
+                    mutation.setScore(record.getScore());
+                    mutation.setBamFile(record.getBamFile());
+
+                    // here we set      Variant Reads	Ref Reads              
+                    mutation.setTumorAltCount(ExtendedMutationUtil.getTumorAltCount(record));
+                    mutation.setTumorRefCount(ExtendedMutationUtil.getTumorRefCount(record));
+                    mutation.setNormalAltCount(ExtendedMutationUtil.getNormalAltCount(record));
+                    mutation.setNormalRefCount(ExtendedMutationUtil.getNormalRefCount(record));
+
+                    // TODO rename the oncotator column names (remove "oncotator")
+                    mutation.setOncotatorCodonChange(codonChange);
+                    mutation.setOncotatorRefseqMrnaId(refseqMrnaId);
+                    mutation.setOncotatorUniprotAccession(uniprotAccession);
+                    mutation.setOncotatorProteinPosStart(proteinPosStart);
+                    mutation.setOncotatorProteinPosEnd(proteinPosEnd);
+
+                    // TODO we don't use this info right now...
+                    mutation.setCanonicalTranscript(true);
+
+                    //  Filter out Mutations
+                    if (myMutationFilter.acceptMutation(mutation)) {
+
+                        MutationEvent e = mutation.getEvent();
+
+                        MutationEvent event = MyMutationEventDao.getMutationEvent(con,
+                                e.getGene().getEntrezGeneId(),
+                                e.getChr(),
+                                e.getStartPosition(),
+                                e.getEndPosition(),
+                                e.getProteinChange(), e.getTumorSeqAllele(), e.getMutationType());
+
+                        if (event != null) {
+                            mutation.setEvent(event);
+                        } else {
+                            mutation.setMutationEventId(++mutationEventId);
+                            // existingEvents.put(mutation.getEvent(), mutation.getEvent());
+                            newEvents.add(mutation.getEvent());
+                        }
+
+                        if (mutations.get(mutation) != null) {
+                            throw new RuntimeException("Mutation exists already");
+                        } else {
+                            mutations.put(mutation, mutation);
+                        }
+                        //keep track:
+                        sampleSet.add(barCode);
+                        geneSet.add(mutation.getEntrezGeneId() + "");
+                    } else {
+                        entriesSkipped++;
+                    }
+
+                }
             }
         }
-        System.out.println(">importData5");
         for (MutationEvent event : newEvents) {
 
             MyDaoMutation.addMutationEvent(con, event);
 
         }
-        System.out.println(">importData6");
+
         for (ExtendedMutation mutation : mutations.values()) {
             MyDaoMutation.addMutation(con, mutation);
         }
 
-        System.out.println(">importData8");
         // calculate mutation count for every sample
         MyDaoMutation.calculateMutationCount(con, geneticProfileId);
         System.out.println(">importData9");

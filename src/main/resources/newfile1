@@ -1,0 +1,105 @@
+>PatientView:processRequest
+16:44:33.002    SELECT 1
+
+>PatientView:validate
+>XXXXXX  getCancerStudyByStableId: acc_tcga_chuv3
+java.lang.Thread.getStackTrace(Thread.java:1556)
+org.mskcc.cbio.portal.dao.DaoCancerStudy.printStack(DaoCancerStudy.java:327)
+org.mskcc.cbio.portal.dao.DaoCancerStudy.getCancerStudyByStableId(DaoCancerStudy.java:373)
+org.mskcc.cbio.portal.servlet.PatientView.validate(PatientView.java:202)
+org.mskcc.cbio.portal.servlet.PatientView.processRequest(PatientView.java:127)
+org.mskcc.cbio.portal.servlet.PatientView.doGet(PatientView.java:585)
+16:44:33.003    SELECT 1
+
+16:44:33.005    SELECT * FROM  cancer_study where CANCER_STUDY_IDENTIFIER='acc_tcga_chuv3'
+
+<XXXXXX  getCancerStudyByStableId: CancerStudy [studyID=170, name=Adrenocortical Carcinoma (TCGA, Provisional), description=TCGA Adrenocortical Carcinoma; raw data at the <A HREF="https://tcga-data.nci.nih.gov/">NCI</A>., cancerStudyIdentifier=acc_tcga_chuv3, typeOfCancerId=acc, publicStudy=true]
+>PatientView:validate:cancerStudy: CancerStudy [studyID=170, name=Adrenocortical Carcinoma (TCGA, Provisional), description=TCGA Adrenocortical Carcinoma; raw data at the <A HREF="https://tcga-data.nci.nih.gov/">NCI</A>., cancerStudyIdentifier=acc_tcga_chuv3, typeOfCancerId=acc, publicStudy=true]
+>DaoSample:getSampleByCancerStudyAndSampleIdInDatabase: cancerStudyId:170; stableSampleId: Mix_cell-line34
+16:44:33.007    SELECT * FROM sample s join patient p on s.PATIENT_ID=p.INTERNAL_ID where s.STABLE_ID='Mix_cell-line34' and p.CANCER_STUDY_ID=170
+
+>DaoSample:getSampleByCancerStudyAndSampleIdInDatabase: Sample{internalId=38747, stableId=Mix_cell-line34, sampleType=Primary Solid Tumor, internalPatientId=37972, cancerTypeId=acc}
+>PatientView:validate:_sample: Sample{internalId=38747, stableId=Mix_cell-line34, sampleType=Primary Solid Tumor, internalPatientId=37972, cancerTypeId=acc}
+>XXXXXX  getCancerStudyByStableId: acc_tcga_chuv3
+java.lang.Thread.getStackTrace(Thread.java:1556)
+org.mskcc.cbio.portal.dao.DaoCancerStudy.printStack(DaoCancerStudy.java:327)
+org.mskcc.cbio.portal.dao.DaoCancerStudy.getCancerStudyByStableId(DaoCancerStudy.java:373)
+org.mskcc.cbio.portal.util.internal.AccessControlImpl.isAccessibleCancerStudy(AccessControlImpl.java:124)
+org.mskcc.cbio.portal.servlet.PatientView.validate(PatientView.java:268)
+org.mskcc.cbio.portal.servlet.PatientView.processRequest(PatientView.java:127)
+16:44:33.009    SELECT 1
+
+16:44:33.010    SELECT * FROM  cancer_study where CANCER_STUDY_IDENTIFIER='acc_tcga_chuv3'
+
+<XXXXXX  getCancerStudyByStableId: CancerStudy [studyID=170, name=Adrenocortical Carcinoma (TCGA, Provisional), description=TCGA Adrenocortical Carcinoma; raw data at the <A HREF="https://tcga-data.nci.nih.gov/">NCI</A>., cancerStudyIdentifier=acc_tcga_chuv3, typeOfCancerId=acc, publicStudy=true]
+16:44:33.012    SELECT 1
+
+16:44:33.014    SELECT EXISTS (SELECT 1 FROM `copy_number_seg` WHERE `CANCER_STUDY_ID`=170)
+
+>DaoSample:getSampleByCancerStudyAndSampleIdInDatabase: cancerStudyId:170; stableSampleId: Mix_cell-line34
+16:44:33.015    SELECT * FROM sample s join patient p on s.PATIENT_ID=p.INTERNAL_ID where s.STABLE_ID='Mix_cell-line34' and p.CANCER_STUDY_ID=170
+
+>DaoSample:getSampleByCancerStudyAndSampleIdInDatabase: Sample{internalId=38747, stableId=Mix_cell-line34, sampleType=Primary Solid Tumor, internalPatientId=37972, cancerTypeId=acc}
+>XXXXXX  getCancerStudyByStableId: acc_tcga_chuv3
+java.lang.Thread.getStackTrace(Thread.java:1556)
+org.mskcc.cbio.portal.dao.DaoCancerStudy.printStack(DaoCancerStudy.java:327)
+org.mskcc.cbio.portal.dao.DaoCancerStudy.getCancerStudyByStableId(DaoCancerStudy.java:373)
+org.mskcc.cbio.portal.web_api.GetGeneticProfiles.getGeneticProfiles(GetGeneticProfiles.java:58)
+org.mskcc.cbio.portal.model.CancerStudy.getGeneticProfiles(CancerStudy.java:210)
+org.mskcc.cbio.portal.model.CancerStudy.getMutationProfile(CancerStudy.java:253)
+16:44:33.016    SELECT 1
+
+16:44:33.018    SELECT * FROM  cancer_study where CANCER_STUDY_IDENTIFIER='acc_tcga_chuv3'
+
+<XXXXXX  getCancerStudyByStableId: CancerStudy [studyID=170, name=Adrenocortical Carcinoma (TCGA, Provisional), description=TCGA Adrenocortical Carcinoma; raw data at the <A HREF="https://tcga-data.nci.nih.gov/">NCI</A>., cancerStudyIdentifier=acc_tcga_chuv3, typeOfCancerId=acc, publicStudy=true]
+>getMutationProfile: caseId: Mix_cell-line34; geneticProfiles: [org.mskcc.cbio.portal.model.GeneticProfile@4ab8575c[geneticProfileId=536,stableId=acc_tcga_chuv3_mutations,cancerStudyId=170,geneticAlterationType=MUTATION_EXTENDED,datatype=MAF,profileName=Mutations,profileDescription=Mutation data from whole exome sequencing.,targetLine=<null>,showProfileInAnalysisTab=true,otherMetadataFields=<null>]]
+>getMutationProfile1: caseId: Mix_cell-line34; geneticProfile : org.mskcc.cbio.portal.model.GeneticProfile@4ab8575c[geneticProfileId=536,stableId=acc_tcga_chuv3_mutations,cancerStudyId=170,geneticAlterationType=MUTATION_EXTENDED,datatype=MAF,profileName=Mutations,profileDescription=Mutation data from whole exome sequencing.,targetLine=<null>,showProfileInAnalysisTab=true,otherMetadataFields=<null>]
+>acceptableCaseId: caseId: Mix_cell-line34; geneticProfile: org.mskcc.cbio.portal.model.GeneticProfile@4ab8575c[geneticProfileId=536,stableId=acc_tcga_chuv3_mutations,cancerStudyId=170,geneticAlterationType=MUTATION_EXTENDED,datatype=MAF,profileName=Mutations,profileDescription=Mutation data from whole exome sequencing.,targetLine=<null>,showProfileInAnalysisTab=true,otherMetadataFields=<null>]
+>acceptableCaseId1: geneticProfile.getCancerStudyId(): 170; StableIdUtil.getSampleId(caseId): Mix_cell-line34
+>acceptableCaseId1: sample: null
+11-Jul-2017 16:44:33.019 SEVERE [http-nio-8080-exec-1] org.apache.catalina.core.StandardWrapperValve.invoke Servlet.service() for servlet [patient_view] in context with path [/cbioportal-1.5.0] threw exception
+ java.lang.NullPointerException
+        at org.mskcc.cbio.portal.model.CancerStudy.acceptableCaseId(CancerStudy.java:248)
+        at org.mskcc.cbio.portal.model.CancerStudy.getMutationProfile(CancerStudy.java:229)
+        at org.mskcc.cbio.portal.model.CancerStudy.getMutationProfile(CancerStudy.java:253)
+        at org.mskcc.cbio.portal.servlet.PatientView.validate(PatientView.java:288)
+        at org.mskcc.cbio.portal.servlet.PatientView.processRequest(PatientView.java:127)
+        at org.mskcc.cbio.portal.servlet.PatientView.doGet(PatientView.java:585)
+        at javax.servlet.http.HttpServlet.service(HttpServlet.java:635)
+        at javax.servlet.http.HttpServlet.service(HttpServlet.java:742)
+        at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:230)
+        at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:165)
+        at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:52)
+        at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:192)
+        at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:165)
+        at org.mskcc.cbio.portal.util.XssFilter.doFilter(XssFilter.java:65)
+        at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:192)
+        at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:165)
+        at org.springframework.security.web.FilterChainProxy.doFilterInternal(FilterChainProxy.java:186)
+        at org.springframework.security.web.FilterChainProxy.doFilter(FilterChainProxy.java:160)
+        at org.springframework.web.filter.DelegatingFilterProxy.invokeDelegate(DelegatingFilterProxy.java:344)
+        at org.springframework.web.filter.DelegatingFilterProxy.doFilter(DelegatingFilterProxy.java:261)
+        at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:192)
+        at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:165)
+        at org.apache.catalina.filters.CorsFilter.handleNonCORS(CorsFilter.java:419)
+        at org.apache.catalina.filters.CorsFilter.doFilter(CorsFilter.java:169)
+        at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:192)
+        at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:165)
+        at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:198)
+        at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:96)
+        at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:478)
+        at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:140)
+        at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:80)
+        at org.apache.catalina.valves.AbstractAccessLogValve.invoke(AbstractAccessLogValve.java:624)
+        at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:87)
+        at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:341)
+        at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:799)
+        at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:66)
+        at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:861)
+        at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1455)
+        at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:49)
+        at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+        at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+        at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:61)
+        at java.lang.Thread.run(Thread.java:745)
+

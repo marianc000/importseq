@@ -5,6 +5,7 @@
  */
 package main;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import org.junit.Test;
@@ -17,10 +18,11 @@ import static org.junit.Assert.*;
 public class MyImportTest {
 
     @Test
-    public void testGetSampleName() {
-        Path p = Paths.get("C:\\Projects\\cBioPortal\\data sample\\Mix_cell-line.hg19_coding01.Tab.xlsx.out");
-        MyImport i = new MyImport();
-        assertEquals(i.getSampleName(p), "Mix_cell-line");
+    public void testGetSampleName() throws IOException {
+        String sourceFilePath = "C:\\Projects\\cBioPortal\\data sample\\Mix_cell-line13.hg19_coding01.Tab.xlsx";
+        Path p = Paths.get(sourceFilePath);
+        MyImport i = new MyImport(null);
+        assertEquals(i.getSampleName(p), "Mix_cell-line13");
     }
 
 }

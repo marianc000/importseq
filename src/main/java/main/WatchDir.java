@@ -1,10 +1,11 @@
 package main;
 
-
 import java.nio.file.*;
 import static java.nio.file.StandardWatchEventKinds.*;
 import java.io.*;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Example to watch a directory (or tree) for changes to files.
@@ -37,17 +38,17 @@ public class WatchDir {
         keys.put(key, dir);
     }
 
-    /**
-     * Register the given directory, and all its sub-directories, with the
-     * WatchService.
-     */
-    /**
-     * Creates a WatchService and registers the given directory
-     */
-    WatchDir(Path dir) throws IOException {
+    MyProperties p;
+    MyImport i;
+
+    WatchDir() throws IOException {
+        p = new MyProperties();
+        i = new MyImport(p);
+
         this.watcher = FileSystems.getDefault().newWatchService();
         this.keys = new HashMap<>();
-        register(dir);
+
+        register(p.getSourceDirPath());
     }
 
     /**
@@ -84,8 +85,8 @@ public class WatchDir {
                 Path child = dir.resolve(name);
 
                 // print out event
-               System.out.println(event.kind().name()+"; "+ child+"; "+name);
-
+                System.out.println(">processEvents:detected: " + event.kind().name() + "; " + child + "; " + name);
+                processFile(child);
             }
 
             // reset key and remove from set if directory no longer accessible
@@ -101,12 +102,56 @@ public class WatchDir {
         }
     }
 
-    static String EXCEL_DIR = "H:\\cbioportal_import";
+    static String ACCEPTABLE_SOURCE_FILE_EXTENSION = ".xlsx";
+
+    static boolean isAcceptable(Path filePath) {
+        return filePath.getFileName().toString().endsWith(ACCEPTABLE_SOURCE_FILE_EXTENSION);
+    }
+
+    boolean isComplete(Path filePath) {
+        long s1 = 0, s2 = 0;
+        try {
+            s1 = Files.size(filePath);
+            Thread.sleep(100);
+            s2 = Files.size(filePath);
+            System.out.println(">isComplete: " + s1 + "; " + s2);
+        } catch (Exception ex) {
+            return false;
+        }
+        return (s1 == s2);
+    }
+
+    void waitUntilComplete(Path filePath) {
+        System.out.println(">waitUntilComplete");
+        while (!isComplete(filePath)) {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException ex) {
+
+            }
+        }
+    }
+
+    void processFile(Path filePath) {
+        System.out.println(">processFile: " + filePath);
+        if (!isAcceptable(filePath)) {
+            System.out.println(">processFile: unacceptable " + filePath);
+            return;
+        }
+        System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+        waitUntilComplete(filePath);
+        try {
+            i.runImportWithFilePath(filePath);
+        } catch (Exception e) {
+            System.out.println("processFile exception: ");
+            e.printStackTrace();
+        }
+
+        System.out.println("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<processFile: " + filePath);
+        System.out.println();
+    }
 
     public static void main(String[] args) throws IOException {
-
-        // register directory and process its events
-        Path dir = Paths.get(EXCEL_DIR);
-        new WatchDir(dir).processEvents();
+        new WatchDir().processEvents();
     }
 }

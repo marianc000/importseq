@@ -7,13 +7,17 @@ package main;
 
 import folder.ExcelAdaptor;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Connection;
+
 import persistence.MyAddCaseList;
-import static persistence.MyConnection.closeConnection;
 import static persistence.MyConnection.getConnection;
 import persistence.MyImportClinicalData;
 import persistence.MyImportProfileData;
+import utils.FileUtils;
 
 /**
  *
@@ -21,9 +25,14 @@ import persistence.MyImportProfileData;
  */
 public class MyImport {
 
-    static String STUDY_NAME = "acc_tcga_chuv3";
-    String sourceFilePath = "C:\\Projects\\cBioPortal\\data sample\\Mix_cell-line13.hg19_coding01.Tab.xlsx";
+    MyProperties p;
 
+    public MyImport(MyProperties p) throws IOException {
+        this.p = p;
+
+    }
+
+    // static String STUDY_NAME = "acc_tcga_chuv3";
     String getSampleName(Path path) {
         String fileName = path.getFileName().toString();
         String sampleName = fileName.substring(0, fileName.indexOf("."));
@@ -34,39 +43,61 @@ public class MyImport {
         return sampleName;
     }
 
-    void run(Connection con) throws Exception {
+    void importFile(Connection con, String sourceFilePath) throws Exception {
+        String sampleName = getSampleName(Paths.get(sourceFilePath));
+        MyImportClinicalData cd = new MyImportClinicalData(p.getTargetStudyName());
+        int cancerStudyId = cd.getCancerStudyId(con, p.getTargetStudyName());
+        if (cd.doesSampleIdExistInCancerStudy(con, cancerStudyId, sampleName)) {
+            throw new RuntimeException("sample " + sampleName + " for patient" + sampleName + " already exist, skipping");
+        }
+
         Path dataFilePath = new ExcelAdaptor(sourceFilePath).run();
 
         File dataFile = dataFilePath.toFile();
         System.out.println("dataFile: " + dataFile);
 
-        String sampleName = getSampleName(dataFilePath);
-
 // commit switch off autocommit, and then commit
-        MyImportClinicalData cd = new MyImportClinicalData(STUDY_NAME);
         MyImportProfileData pd = new MyImportProfileData();
         MyAddCaseList cl = new MyAddCaseList();
+        try {
+            con.setAutoCommit(false);
 
-        con.setAutoCommit(false);
-        int cancerStudyId = cd.getCancerStudyId(con, STUDY_NAME);
-        int sampleId = cd.addSample(con, cancerStudyId, sampleName, sampleName);
-        int geneticProfileId = cd.getGeneticProfileId(con, cancerStudyId);
-        pd.run(con, geneticProfileId, dataFile, sampleId);
-        cl.addSampleToList(con, cancerStudyId, sampleId);
-        //  throw new RuntimeException("not readY!!!!");
-        con.commit();
+            int sampleId = cd.addSample(con, cancerStudyId, sampleName, sampleName);
+            int geneticProfileId = cd.getGeneticProfileId(con, cancerStudyId);
 
+            pd.run(con, geneticProfileId, dataFile, sampleId);
+
+            cl.addSampleToList(con, cancerStudyId, sampleId);
+            //  throw new RuntimeException("not readY!!!!");
+            con.commit();
+        } finally {
+            System.out.println("importFile:deleting " + dataFilePath);
+            Files.delete(dataFilePath);
+            System.out.println("importFile:deleted " + dataFilePath);
+        }
+    }
+
+    public void runImportWithFilePath(Path sourceFilePath) throws Exception {
+        FileUtils fu = new FileUtils(p.getImportedDirPath(), p.getRejectedDirPath());
+        try (Connection con = getConnection()) {
+            importFile(con, sourceFilePath.toString());
+        } catch (Exception ex) {
+            System.out.println("Exception:" + ex.getMessage());
+            fu.moveFileToRejected(sourceFilePath);
+            throw ex;
+        }
+// everything is fine
+        fu.moveFileToImported(sourceFilePath);
+    }
+
+    public void runImport(String sourceFilePathString) throws Exception {
+        Path sourceFilePath = p.getSourceFilePath(sourceFilePathString);
+        runImportWithFilePath(sourceFilePath);
     }
 
     public static void main(String... args) throws Exception {
-        Connection con = getConnection();
-        try {
-            new MyImport().run(con);
-        } catch (Exception ex) {
-            System.out.println("Exception:" + ex);
-            ex.printStackTrace();
-        } finally {
-            closeConnection();
-        }
+        String SOURCE_FILE_NAME = "Mix_cell-line44.hg19_coding01.Tab.xlsx";
+        MyImport i = new MyImport(new MyProperties());
+        i.runImport(SOURCE_FILE_NAME);
     }
 }

@@ -24,7 +24,7 @@ import org.mskcc.cbio.portal.dao.DaoException;
 final class MyDaoGene {
 
     private static Map<Long, Set<String>> getAllAliases(Connection con) throws SQLException {
-        System.out.println(">getAllAliases");
+        // System.out.println(">getAllAliases");
         Map<Long, Set<String>> map = new HashMap<>();
 
         String sql = "SELECT * FROM gene_alias";
@@ -42,7 +42,7 @@ final class MyDaoGene {
 
             }
         }
-        System.out.println("<getAllAliases");
+        // System.out.println("<getAllAliases");
         return map;
     }
 
@@ -53,7 +53,7 @@ final class MyDaoGene {
      * @throws DaoException Database Error.
      */
     public static ArrayList<CanonicalGene> getAllGenes(Connection con) throws SQLException {
-        System.out.println(">getAllGenes");
+        // System.out.println(">getAllGenes");
         Map<Long, Set<String>> mapAliases = getAllAliases(con);
         ArrayList<CanonicalGene> geneList = new ArrayList<>();
         String sql = "SELECT * FROM gene";
@@ -72,7 +72,7 @@ final class MyDaoGene {
                 gene.setType(rs.getString("TYPE"));
                 geneList.add(gene);
             }
-            System.out.println("<getAllGenes");
+            // System.out.println("<getAllGenes");
             return geneList;
         }
     }

@@ -72,7 +72,7 @@ public class MyDaoGeneOptimized {
                         cbioCancerGenes.add(gene);
                     } else {
                         System.out.println(line + " in the cbio cancer gene list config file [resources" + CBIO_CANCER_GENES_FILE
-                                + "] is not a HUGO gene symbol. You should either update this file or update the `gene` and `gene_alias` tables to fix this.");
+                             + "] is not a HUGO gene symbol. You should either update this file or update the `gene` and `gene_alias` tables to fix this.");
                     }
                 }
                 in.close();
@@ -99,7 +99,7 @@ public class MyDaoGeneOptimized {
             e.printStackTrace();
         }
     }
- 
+
     private void cacheGene(CanonicalGene gene) {
         geneSymbolMap.put(gene.getHugoGeneSymbolAllCaps(), gene);
         entrezIdMap.put(gene.getEntrezGeneId(), gene);
@@ -116,12 +116,6 @@ public class MyDaoGeneOptimized {
         }
     }
 
-    /**
-     * Gets Global Singleton Instance.
-     *
-     * @return DaoGeneOptimized Singleton.
-     * @throws DaoException Database Error.
-     */
     public static MyDaoGeneOptimized getInstance(Connection con) throws SQLException {
         if (daoGeneOptimized == null) {
             daoGeneOptimized = new MyDaoGeneOptimized(con);
@@ -171,6 +165,7 @@ public class MyDaoGeneOptimized {
      * @return Canonical Gene Object.
      */
     public CanonicalGene getGene(String hugoGeneSymbol) {
+        // System.out.println(">getGene: " + hugoGeneSymbol);
         return geneSymbolMap.get(hugoGeneSymbol.toUpperCase());
     }
 
@@ -208,7 +203,13 @@ public class MyDaoGeneOptimized {
      * @return Canonical Gene Object.
      */
     public CanonicalGene getGene(long entrezId) {
-        return entrezIdMap.get(entrezId);
+        // System.out.println(">getGene long: " + entrezId);
+        CanonicalGene gene = entrezIdMap.get(entrezId);
+        if (gene == null) {
+            throw new RuntimeException("gene is null");
+        }
+         // System.out.println("<getGene gene: " + gene);
+        return gene;
     }
 
     /**
@@ -321,17 +322,8 @@ public class MyDaoGeneOptimized {
         return null;
     }
 
-    /**
-     * Look for gene that can be non-ambiguously determined
-     *
-     * @param geneId an Entrez Gene ID or HUGO symbol or gene alias
-     * @param chr chromosome
-     * @param issueWarning if true and gene is not ambiguous, print all the
-     * Entrez Ids corresponding to the geneId provided
-     * @return a gene that can be non-ambiguously determined, or null if cannot.
-     */
     public CanonicalGene getNonAmbiguousGene(String geneId, String chr) {
-        System.out.println(">getNonAmbiguousGene: geneId="+geneId+"; chr="+chr);
+        // System.out.println(">getNonAmbiguousGene: geneId=" + geneId + "; chr=" + chr);
         List<CanonicalGene> genes = guessGene(geneId, chr);
         if (genes.isEmpty()) {
             return null;
@@ -353,8 +345,6 @@ public class MyDaoGeneOptimized {
             sb.append(",");
         }
         sb.deleteCharAt(sb.length() - 1);
-
-        ProgressMonitor.logWarning(sb.toString());
 
         return null;
 
@@ -382,18 +372,7 @@ public class MyDaoGeneOptimized {
      * @return Array List of All Genes.
      */
     public ArrayList<CanonicalGene> getAllGenes() {
-        return new ArrayList<CanonicalGene>(entrezIdMap.values());
+        return new ArrayList<>(entrezIdMap.values());
     }
-
-    /**
-     * Deletes all Gene Records in the Database.
-     *
-     * @throws DaoException Database Error.
-     *
-     * @deprecated only used by deprecated code, so deprecating this as well.
-     */
-//    public void deleteAllRecords() throws DaoException {
-//        MyDaoGene.deleteAllRecords();
-//    }
 
 }
