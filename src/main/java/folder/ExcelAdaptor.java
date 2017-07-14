@@ -5,8 +5,10 @@
  */
 package folder;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -37,7 +39,7 @@ public class ExcelAdaptor {
 
     String sourceFilePath;
     //  static String sourceFilePath = "C:\\Projects\\cBioPortal\\data sample\\H1975.hg19_coding01.TabTest.xlsx";
-    static String canonicalMapFileName = "C:\\Projects\\cBioPortal\\isoform_overrides_uniprot.txt";
+    static String canonicalMapFileName = "/isoform_overrides_uniprot.txt";
     static String AA_CHANGE_COLUMN = "AAChange.refGene";
     static String EXONIC_FUNC_REFGENE = "ExonicFunc.refGene";
     static String IGNORED_COLUMN = "#version 2.4";
@@ -263,8 +265,21 @@ public class ExcelAdaptor {
         return col;
     }
 
+    List<String> loadList(String fileName) throws IOException {
+        System.out.println(">ExcelAdaptor:loadList");
+        List<String> list = new LinkedList<>();
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream(fileName)))) {
+            String l;
+            while ((l = br.readLine()) != null) {
+                list.add(l);
+            }
+        }
+        System.out.println("<ExcelAdaptor:loadList: " + list.size());
+        return list;
+    }
+
     void loadCanonicalGeneMap(String fileName) throws IOException {
-        List<String> l = Files.readAllLines(Paths.get(fileName));
+        List<String> l = loadList(fileName);
         for (int c = l.size() - 1; c >= 0; c--) {
             String row = l.get(c);
             String[] cols = row.split("\t", -1);
@@ -277,6 +292,7 @@ public class ExcelAdaptor {
         }
 
         cannonicalTranscripts = new HashSet<>(l);
+
     }
 
     Set<String> cannonicalTranscripts;
@@ -299,7 +315,7 @@ public class ExcelAdaptor {
 
     public Path run() throws IOException, InvalidFormatException {
         loadDocument(sourceFilePath);
-       // printDocument();
+        // printDocument();
         filterColumns();
 
         filterAAChangeColumn();
@@ -309,7 +325,7 @@ public class ExcelAdaptor {
         addColumn(SAMPLE_NAME_COLUMN, getSampleName(sourceFilePath));
         insertColumn(IGNORED_COLUMN, "");
         insertHeaders();
-      //  printDocument();
+        //  printDocument();
         saveDocument(getOutputFilePath());
         return getOutputFilePath();
     }

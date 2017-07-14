@@ -23,16 +23,20 @@ public class MyProperties extends Properties {
     static String REJECTED_DIR_KEY = "REJECTED_DIR";
     static String STUDY_NAME_KEY = "STUDY_NAME";
 
-    private static MyProperties i;
-
-//    public static MyProperties getInstance() throws IOException {
-//        if (i == null) {
-//            i = new MyProperties();
-//        }
-//        return i;
-//    }
     public MyProperties() throws IOException {
-        try (InputStream is = getClass().getResourceAsStream(PROPERTIES_FILE_NAME)) {
+        loadMyProperties();
+    }
+
+    public MyProperties(String resourceName) throws IOException {
+        loadMyProperties(resourceName);
+    }
+
+    final void loadMyProperties() throws IOException {
+        loadMyProperties(PROPERTIES_FILE_NAME);
+    }
+
+    final void loadMyProperties(String resourceName) throws IOException {
+        try (InputStream is = getClass().getResourceAsStream(resourceName)) {
             load(is);
         }
     }

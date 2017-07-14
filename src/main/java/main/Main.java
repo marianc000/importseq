@@ -12,6 +12,7 @@ package main;
 public class Main {
 
     public static void main(String... args) throws Exception {
-        new WatchDir().processEvents();
+         MyProperties p=new  MyProperties();
+         new WatchDir(p).processEvents();
     }
 }

@@ -39,8 +39,8 @@ public class WatchDir {
     MyProperties p;
     MyImport i;
 
-    public WatchDir() throws IOException {
-        p = new MyProperties();
+    public WatchDir(MyProperties p) throws IOException {
+        this.p = p;
         i = new MyImport(p);
 
         this.watcher = FileSystems.getDefault().newWatchService();
@@ -48,6 +48,7 @@ public class WatchDir {
 
         register(p.getSourceDirPath());
     }
+ 
 
     public void stop() throws IOException {
         System.out.println(">WatchDir:stop");
@@ -161,8 +162,8 @@ public class WatchDir {
         System.out.println("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<processFile: " + filePath);
         System.out.println();
     }
-
-    public static void main(String[] args) throws IOException {
-        new WatchDir().processEvents();
-    }
+//
+//    public static void main(String[] args) throws IOException {
+//        new WatchDir().processEvents();
+//    }
 }
