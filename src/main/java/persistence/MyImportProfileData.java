@@ -10,8 +10,6 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import org.mskcc.cbio.portal.dao.DaoException;
-import org.mskcc.cbio.portal.scripts.ImportExtendedMutationData;
-import org.mskcc.cbio.portal.util.SpringUtil;
 
 /**
  *
@@ -22,7 +20,7 @@ public class MyImportProfileData {
     public void run(Connection con ,int geneticProfileId, File dataFile, int sampleId  ) throws IOException, DaoException, SQLException {
 
         System.out.println("MyImportProfileData: Reading data from:  " + dataFile.getAbsolutePath());
-        SpringUtil.initDataSource();
+       // SpringUtil.initDataSource();
         MyImportExtendedMutationData importer = new MyImportExtendedMutationData(dataFile, geneticProfileId, null);
 
         importer.importData(con,sampleId);

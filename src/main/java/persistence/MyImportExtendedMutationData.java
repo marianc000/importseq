@@ -6,7 +6,6 @@ import org.mskcc.cbio.portal.model.ExtendedMutation.MutationEvent;
 import org.mskcc.cbio.portal.util.*;
 import org.mskcc.cbio.maf.*;
 
-import org.apache.commons.lang.StringUtils;
 
 import java.io.BufferedReader;
 import java.io.File;

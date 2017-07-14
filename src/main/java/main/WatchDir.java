@@ -4,8 +4,6 @@ import java.nio.file.*;
 import static java.nio.file.StandardWatchEventKinds.*;
 import java.io.*;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Example to watch a directory (or tree) for changes to files.
@@ -41,7 +39,7 @@ public class WatchDir {
     MyProperties p;
     MyImport i;
 
-    WatchDir() throws IOException {
+    public WatchDir() throws IOException {
         p = new MyProperties();
         i = new MyImport(p);
 
@@ -51,54 +49,66 @@ public class WatchDir {
         register(p.getSourceDirPath());
     }
 
+    public void stop() throws IOException {
+        System.out.println(">WatchDir:stop");
+        watcher.close();
+        System.out.println("<WatchDir:stop");
+    }
+
     /**
      * Process all events for keys queued to the watcher
      */
-    void processEvents() {
-        for (;;) {
+    public void processEvents() {
+        System.out.println(">WatchDir:processEvents");
+        try {
+            for (;;) {
 
-            // wait for key to be signalled
-            WatchKey key;
-            try {
-                key = watcher.take();
-            } catch (InterruptedException x) {
-                return;
-            }
+                // wait for key to be signalled
+                WatchKey key;
+                try {
+                    key = watcher.take();
+                } catch (InterruptedException | ClosedWatchServiceException ex) {
+                    System.out.println("WatchDir:processEvents:exception: " + ex);
+                    return;
+                }
 
-            Path dir = keys.get(key);
-            if (dir == null) {
-                System.err.println("WatchKey not recognized!!");
-                continue;
-            }
-
-            for (WatchEvent<?> event : key.pollEvents()) {
-                WatchEvent.Kind kind = event.kind();
-
-                // TBD - provide example of how OVERFLOW event is handled
-                if (kind == OVERFLOW) {
+                Path dir = keys.get(key);
+                if (dir == null) {
+                    System.err.println("WatchDir:WatchKey not recognized!!");
                     continue;
                 }
 
-                // Context for directory entry event is the file name of entry
-                WatchEvent<Path> ev = cast(event);
-                Path name = ev.context();
-                Path child = dir.resolve(name);
+                for (WatchEvent<?> event : key.pollEvents()) {
+                    WatchEvent.Kind kind = event.kind();
 
-                // print out event
-                System.out.println(">processEvents:detected: " + event.kind().name() + "; " + child + "; " + name);
-                processFile(child);
-            }
+                    // TBD - provide example of how OVERFLOW event is handled
+                    if (kind == OVERFLOW) {
+                        continue;
+                    }
 
-            // reset key and remove from set if directory no longer accessible
-            boolean valid = key.reset();
-            if (!valid) {
-                keys.remove(key);
+                    // Context for directory entry event is the file name of entry
+                    WatchEvent<Path> ev = cast(event);
+                    Path name = ev.context();
+                    Path child = dir.resolve(name);
 
-                // all directories are inaccessible
-                if (keys.isEmpty()) {
-                    break;
+                    // print out event
+                    System.out.println("WatchDir:processEvents:detected: " + event.kind().name() + "; " + child + "; " + name);
+                    processFile(child);
+                }
+
+                // reset key and remove from set if directory no longer accessible
+                boolean valid = key.reset();
+                if (!valid) {
+                    keys.remove(key);
+
+                    // all directories are inaccessible
+                    if (keys.isEmpty()) {
+                        break;
+                    }
                 }
             }
+        } finally {
+            System.out.println("<WatchDir:processEvents");
         }
     }
 
@@ -123,7 +133,8 @@ public class WatchDir {
 
     void waitUntilComplete(Path filePath) {
         System.out.println(">waitUntilComplete");
-        while (!isComplete(filePath)) {
+        while (!isComplete(filePath)||!Files.isReadable(filePath)||!Files.isWritable(filePath)) {
+             System.out.println("waitUntilComplete:waiting");
             try {
                 Thread.sleep(100);
             } catch (InterruptedException ex) {
