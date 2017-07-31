@@ -10,8 +10,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import org.mskcc.cbio.portal.dao.DaoException;
-import org.mskcc.cbio.portal.model.Sample;
+ 
 
 /**
  *
@@ -19,13 +18,13 @@ import org.mskcc.cbio.portal.model.Sample;
  */
 public class MySampleDao {
 
-    public static Sample getSampleById(Connection con, int sampleId) throws SQLException {
+    public static MySample getSampleById(Connection con, int sampleId) throws SQLException {
         String sql = "SELECT * FROM  sample where INTERNAL_ID=?";
         try (PreparedStatement st = con.prepareStatement(sql)) {
             st.setInt(1, sampleId);
             ResultSet rs = st.executeQuery();
             if (rs.next()) {
-                Sample s = new Sample(rs.getInt("INTERNAL_ID"),
+                MySample s = new MySample(rs.getInt("INTERNAL_ID"),
                         rs.getString("STABLE_ID"),
                         rs.getInt("PATIENT_ID"),
                         rs.getString("TYPE_OF_CANCER_ID"));
@@ -52,7 +51,7 @@ public class MySampleDao {
         }
     }
 
-    public static int addSampleProfile(Connection con, int sampleId, int geneticProfileId) throws DaoException, SQLException {
+    public static int addSampleProfile(Connection con, int sampleId, int geneticProfileId) throws  SQLException {
       //  getSampleProfileBySampleById(con, sampleId);
         String sql = "INSERT INTO sample_profile (`SAMPLE_ID`, `GENETIC_PROFILE_ID` ) VALUES (?,? )";
         try (PreparedStatement pstmt = con.prepareStatement(sql )) {

@@ -3,8 +3,7 @@ package persistence;
 
 import java.util.HashSet;
 import java.util.Set;
-
-import org.mskcc.cbio.portal.model.ExtendedMutation;
+ 
 
 /**
  * Filter mutations as they're imported into the CGDS dbms.
@@ -45,11 +44,11 @@ public class MyMutationFilter {
      * Indicate whether the specified mutation should be accepted as input to
      * the CGDS Database.
      * <p>
-     * @param mutation an ExtendedMutation.
+     * @param mutation an MyExtendedMutation.
      * <br>
      * @return true if the mutation should be imported into the dbms
      */
-    public boolean acceptMutation(ExtendedMutation mutation) {
+    public boolean acceptMutation(MyExtendedMutation mutation) {
         this.decisions++;
 
         /*

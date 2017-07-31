@@ -10,8 +10,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import org.mskcc.cbio.portal.model.Sample;
-
+ 
 /**
  *
  * @author mcaikovs
@@ -106,7 +105,7 @@ public class MyImportClinicalData {
 
         try (PreparedStatement pstmt = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             pstmt.setString(1, stableSampleId);
-            pstmt.setString(2, Sample.Type.PRIMARY_SOLID_TUMOR.toString());
+            pstmt.setString(2, MySample.Type.PRIMARY_SOLID_TUMOR.toString());
             pstmt.setInt(3, internalPatientId);
             pstmt.setString(4, getTypeOfCancerId());
             pstmt.executeUpdate();

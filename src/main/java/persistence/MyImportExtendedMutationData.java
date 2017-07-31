@@ -1,10 +1,5 @@
 package persistence;
-
-import org.mskcc.cbio.portal.dao.*;
-import org.mskcc.cbio.portal.model.*;
-import org.mskcc.cbio.portal.model.ExtendedMutation.MutationEvent;
-import org.mskcc.cbio.portal.util.*;
-import org.mskcc.cbio.maf.*;
+ 
 
 
 import java.io.BufferedReader;
@@ -14,7 +9,7 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.*;
-import org.mskcc.cbio.portal.scripts.MutationFilter;
+import persistence.MyExtendedMutation.MutationEvent;
 
 /**
  * Import an extended mutation file. Columns may be in any order.
@@ -30,7 +25,7 @@ public class MyImportExtendedMutationData {
     private File mutationFile;
     private int geneticProfileId;
     private boolean swissprotIsAccession;
-    private MutationFilter myMutationFilter;
+    private MyMutationFilter myMutationFilter;
     private int entriesSkipped = 0;
     private int samplesSkipped = 0;
     private Set<String> sampleSet = new HashSet<>();
@@ -48,7 +43,7 @@ public class MyImportExtendedMutationData {
         this.genePanel = genePanel;
 
         // create default MutationFilter
-        myMutationFilter = new MutationFilter();
+        myMutationFilter = new MyMutationFilter();
     }
 
     /**
@@ -62,16 +57,16 @@ public class MyImportExtendedMutationData {
         this.swissprotIsAccession = swissprotIsAccession;
     }
 
-    public void importData(Connection con, int sampleId) throws IOException, DaoException, SQLException {
+    public void importData(Connection con, int sampleId) throws IOException , SQLException {
         System.out.println(">importData");
         //   MySQLbulkLoader.bulkLoadOn();
-        Sample sample = MySampleDao.getSampleById(con, sampleId);
+        MySample sample = MySampleDao.getSampleById(con, sampleId);
 
         MySampleDao.addSampleProfile(con, sample.getInternalId(), geneticProfileId);
 
         Set<MutationEvent> newEvents = new HashSet<>();
 
-        Map<ExtendedMutation, ExtendedMutation> mutations = new HashMap<>();
+        Map<MyExtendedMutation, MyExtendedMutation> mutations = new HashMap<>();
 
         long mutationEventId = MyDaoMutation.getLargestMutationEventId(con);
 
@@ -86,7 +81,7 @@ public class MyImportExtendedMutationData {
 
             line = line.trim();
 
-            MafUtil mafUtil = new MafUtil(line);
+            MyMafUtil mafUtil = new MyMafUtil(line);
 
             boolean fileHasOMAData = false;
 
@@ -94,8 +89,7 @@ public class MyImportExtendedMutationData {
                 // fail gracefully if a non-essential column is missing
                 // e.g. if there is no MA_link.var column, we assume that the value is NA and insert it as such
                 fileHasOMAData = true;
-                ProgressMonitor.setCurrentMessage(" --> OMA Scores Column Number:  "
-                        + mafUtil.getMaFImpactIndex());
+                System.out.println(" --> OMA Scores Column Number:  "  + mafUtil.getMaFImpactIndex());
             } else {
                 fileHasOMAData = false;
             }
@@ -105,7 +99,7 @@ public class MyImportExtendedMutationData {
 
                 if (!line.startsWith("#") && line.trim().length() > 0) {
                     String[] parts = line.split("\t", -1); // the -1 keeps trailing empty strings; see JavaDoc for String
-                    MafRecord record = mafUtil.parseRecord(line);
+                    MyMafRecord record = mafUtil.parseRecord(line);
 
                     // process case id
                     String barCode = record.getTumorSampleID();
@@ -115,7 +109,7 @@ public class MyImportExtendedMutationData {
 
                     if (validationStatus == null
                             || validationStatus.equalsIgnoreCase("Wildtype")) {
-                        ProgressMonitor.logWarning("Skipping entry with Validation_Status: Wildtype");
+                        System.out.println("Skipping entry with Validation_Status: Wildtype");
                         entriesSkipped++;
                         continue;
                     }
@@ -123,7 +117,7 @@ public class MyImportExtendedMutationData {
                     String chr = MyDaoGeneOptimized.normalizeChr(record.getChr().toUpperCase());
 
                     if (chr == null) {
-                        ProgressMonitor.logWarning("Skipping entry with chromosome value: " + record.getChr());
+                        System.out.println("Skipping entry with chromosome value: " + record.getChr());
                         entriesSkipped++;
                         continue;
                     }
@@ -168,21 +162,21 @@ public class MyImportExtendedMutationData {
 
                     // determine whether to use canonical or best effect transcript
                     // try canonical first
-                    if (ExtendedMutationUtil.isAcceptableMutation(record.getVariantClassification())) {
+                    if (MyExtendedMutationUtil.isAcceptableMutation(record.getVariantClassification())) {
                         mutationType = record.getVariantClassification();
                     } // if not acceptable either, use the default value
                     else {
-                        mutationType = ExtendedMutationUtil.getMutationType(record);
+                        mutationType = MyExtendedMutationUtil.getMutationType(record);
                     }
 
                     // skip RNA mutations
                     if (mutationType != null && mutationType.equalsIgnoreCase("rna")) {
-                        ProgressMonitor.logWarning("Skipping entry with mutation type: RNA");
+                        System.out.println("Skipping entry with mutation type: RNA");
                         entriesSkipped++;
                         continue;
                     }
 
-                    proteinChange = ExtendedMutationUtil.getProteinChange(parts, record);
+                    proteinChange = MyExtendedMutationUtil.getProteinChange(parts, record);
                     //proteinChange = record.getProteinChange();
                     aaChange = record.getAminoAcidChange();
                     codonChange = record.getCodons();
@@ -195,20 +189,20 @@ public class MyImportExtendedMutationData {
                         uniprotAccession = MyDaoUniProtIdMapping.mapFromUniprotIdToAccession(con, uniprotName);
                     }
 
-                    proteinPosStart = ExtendedMutationUtil.getProteinPosStart(
+                    proteinPosStart = MyExtendedMutationUtil.getProteinPosStart(
                             record.getProteinPosition(), proteinChange);
-                    proteinPosEnd = ExtendedMutationUtil.getProteinPosEnd(
+                    proteinPosEnd = MyExtendedMutationUtil.getProteinPosEnd(
                             record.getProteinPosition(), proteinChange);
 
                     //  Assume we are dealing with Entrez Gene Ids (this is the best / most stable option)
                     String geneSymbol = record.getHugoGeneSymbol();
 
-                    CanonicalGene gene = MyDaoGeneOptimized.getInstance(con).getNonAmbiguousGene(geneSymbol, chr);
+                    MyCanonicalGene gene = MyDaoGeneOptimized.getInstance(con).getNonAmbiguousGene(geneSymbol, chr);
                   //  System.out.println(">gene=" + gene);
                     if (gene == null) {
                         throw new RuntimeException("gene is null");
                     }
-                    ExtendedMutation mutation = new ExtendedMutation();
+                    MyExtendedMutation mutation = new MyExtendedMutation();
 
                     mutation.setGeneticProfileId(geneticProfileId);
                     mutation.setSampleId(sample.getInternalId());
@@ -249,10 +243,10 @@ public class MyImportExtendedMutationData {
                     mutation.setBamFile(record.getBamFile());
 
                     // here we set      Variant Reads	Ref Reads              
-                    mutation.setTumorAltCount(ExtendedMutationUtil.getTumorAltCount(record));
-                    mutation.setTumorRefCount(ExtendedMutationUtil.getTumorRefCount(record));
-                    mutation.setNormalAltCount(ExtendedMutationUtil.getNormalAltCount(record));
-                    mutation.setNormalRefCount(ExtendedMutationUtil.getNormalRefCount(record));
+                    mutation.setTumorAltCount(MyExtendedMutationUtil.getTumorAltCount(record));
+                    mutation.setTumorRefCount(MyExtendedMutationUtil.getTumorRefCount(record));
+                    mutation.setNormalAltCount(MyExtendedMutationUtil.getNormalAltCount(record));
+                    mutation.setNormalRefCount(MyExtendedMutationUtil.getNormalRefCount(record));
 
                     // TODO rename the oncotator column names (remove "oncotator")
                     mutation.setOncotatorCodonChange(codonChange);
@@ -305,7 +299,7 @@ public class MyImportExtendedMutationData {
 
         }
 
-        for (ExtendedMutation mutation : mutations.values()) {
+        for (MyExtendedMutation mutation : mutations.values()) {
             MyDaoMutation.addMutation(con, mutation);
         }
 
@@ -334,7 +328,7 @@ public class MyImportExtendedMutationData {
         } else if (omaScore.equalsIgnoreCase("N") || omaScore.equalsIgnoreCase("neutral")) {
             return "N";
         } else if (omaScore.equalsIgnoreCase("[sent]")) {
-            return ExtendedMutationUtil.NOT_AVAILABLE; // TODO temp workaround for invalid sent values
+            return MyExtendedMutationUtil.NOT_AVAILABLE; // TODO temp workaround for invalid sent values
         } else {
             return omaScore;
         }

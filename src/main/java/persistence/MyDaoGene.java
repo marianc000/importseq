@@ -1,7 +1,5 @@
 package persistence;
-
-import org.mskcc.cbio.portal.model.CanonicalGene;
-
+ 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -50,10 +48,10 @@ final class MyDaoGene {
      * @return ArrayList of Canonical Genes.
      * @throws DaoException Database Error.
      */
-    public static ArrayList<CanonicalGene> getAllGenes(Connection con) throws SQLException {
+    public static ArrayList<MyCanonicalGene> getAllGenes(Connection con) throws SQLException {
         // System.out.println(">getAllGenes");
         Map<Long, Set<String>> mapAliases = getAllAliases(con);
-        ArrayList<CanonicalGene> geneList = new ArrayList<>();
+        ArrayList<MyCanonicalGene> geneList = new ArrayList<>();
         String sql = "SELECT * FROM gene";
         try (PreparedStatement st = con.prepareStatement(sql)) {
 
@@ -63,7 +61,7 @@ final class MyDaoGene {
                 int geneticEntityId = rs.getInt("GENETIC_ENTITY_ID");
                 long entrezGeneId = rs.getInt("ENTREZ_GENE_ID");
                 Set<String> aliases = mapAliases.get(entrezGeneId);
-                CanonicalGene gene = new CanonicalGene(geneticEntityId, entrezGeneId,
+                MyCanonicalGene gene = new MyCanonicalGene(geneticEntityId, entrezGeneId,
                         rs.getString("HUGO_GENE_SYMBOL"), aliases);
                 gene.setCytoband(rs.getString("CYTOBAND"));
                 gene.setLength(rs.getInt("LENGTH"));

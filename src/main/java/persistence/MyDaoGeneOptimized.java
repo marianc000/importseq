@@ -16,9 +16,6 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
  
-import org.mskcc.cbio.portal.model.CanonicalGene;
- 
-
 /**
  * A Utility Class that speeds access to Gene Info.
  *
@@ -31,12 +28,12 @@ public class MyDaoGeneOptimized {
 
     private static MyDaoGeneOptimized daoGeneOptimized;
     //nb: make sure any map is also cleared in clearCache() method below:
-    private final HashMap<String, CanonicalGene> geneSymbolMap = new HashMap<>();
-    private final HashMap<Long, CanonicalGene> entrezIdMap = new HashMap<>();
-    private final HashMap<Integer, CanonicalGene> geneticEntityMap = new HashMap<>();
-    private final HashMap<String, List<CanonicalGene>> geneAliasMap = new HashMap<>();
-    private final Set<CanonicalGene> cbioCancerGenes = new HashSet<>();
-    private final Map<String, CanonicalGene> disambiguousGenes = new HashMap<>();
+    private final HashMap<String, MyCanonicalGene> geneSymbolMap = new HashMap<>();
+    private final HashMap<Long, MyCanonicalGene> entrezIdMap = new HashMap<>();
+    private final HashMap<Integer, MyCanonicalGene> geneticEntityMap = new HashMap<>();
+    private final HashMap<String, List<MyCanonicalGene>> geneAliasMap = new HashMap<>();
+    private final Set<MyCanonicalGene> cbioCancerGenes = new HashSet<>();
+    private final Map<String, MyCanonicalGene> disambiguousGenes = new HashMap<>();
 
     /**
      * Private Constructor, to enforce singleton pattern.
@@ -50,8 +47,8 @@ public class MyDaoGeneOptimized {
     private synchronized void fillCache(Connection con) throws SQLException {
 
         //  Automatically populate hashmap upon init
-        ArrayList<CanonicalGene> globalGeneList = MyDaoGene.getAllGenes(con);
-        for (CanonicalGene currentGene : globalGeneList) {
+        ArrayList<MyCanonicalGene> globalGeneList = MyDaoGene.getAllGenes(con);
+        for (MyCanonicalGene currentGene : globalGeneList) {
             cacheGene(currentGene);
         }
 
@@ -62,7 +59,7 @@ public class MyDaoGeneOptimized {
                         new InputStreamReader(getClass().getResourceAsStream(CBIO_CANCER_GENES_FILE)));
                 for (String line = in.readLine(); line != null; line = in.readLine()) {
                     String[] parts = line.trim().split("\t", -1);
-                    CanonicalGene gene = null;
+                    MyCanonicalGene gene = null;
                     if (parts.length > 1) {
                         gene = getGene(Long.parseLong(parts[1]));
                     } else {
@@ -86,7 +83,7 @@ public class MyDaoGeneOptimized {
                         continue;
                     }
                     String[] parts = line.trim().split("\t", -1);
-                    CanonicalGene gene = getGene(Long.parseLong(parts[1]));
+                    MyCanonicalGene gene = getGene(Long.parseLong(parts[1]));
                     if (gene == null) {
                         System.out.println(line + " in config file [resources" + GENE_SYMBOL_DISAMBIGUATION_FILE
                                 + "]is not valid. You should either update this file or update the `gene` and `gene_alias` tables to fix this.");
@@ -100,16 +97,16 @@ public class MyDaoGeneOptimized {
         }
     }
 
-    private void cacheGene(CanonicalGene gene) {
+    private void cacheGene(MyCanonicalGene gene) {
         geneSymbolMap.put(gene.getHugoGeneSymbolAllCaps(), gene);
         entrezIdMap.put(gene.getEntrezGeneId(), gene);
         geneticEntityMap.put(gene.getGeneticEntityId(), gene);
 
         for (String alias : gene.getAliases()) {
             String aliasUp = alias.toUpperCase();
-            List<CanonicalGene> genes = geneAliasMap.get(aliasUp);
+            List<MyCanonicalGene> genes = geneAliasMap.get(aliasUp);
             if (genes == null) {
-                genes = new ArrayList<CanonicalGene>();
+                genes = new ArrayList<MyCanonicalGene>();
                 geneAliasMap.put(aliasUp, genes);
             }
             genes.add(gene);
@@ -132,7 +129,7 @@ public class MyDaoGeneOptimized {
      */
     public static int getGeneticEntityId(long entrezGeneId) {
         //get entity id from cache:
-        CanonicalGene gene = daoGeneOptimized.getGene(entrezGeneId);
+        MyCanonicalGene gene = daoGeneOptimized.getGene(entrezGeneId);
         if (gene != null) {
             return gene.getGeneticEntityId();
         } else {
@@ -148,7 +145,7 @@ public class MyDaoGeneOptimized {
      */
     public static long getEntrezGeneId(int geneticEntityId) {
         //get entity id from cache:
-        CanonicalGene gene = daoGeneOptimized.getGeneByEntityId(geneticEntityId);
+        MyCanonicalGene gene = daoGeneOptimized.getGeneByEntityId(geneticEntityId);
         //since not every genetic entity will be a gene, this could be null (but would
         //be a programming error elsewhere, so throw exception):
         if (gene == null) {
@@ -164,7 +161,7 @@ public class MyDaoGeneOptimized {
      * @param hugoGeneSymbol HUGO Gene Symbol.
      * @return Canonical Gene Object.
      */
-    public CanonicalGene getGene(String hugoGeneSymbol) {
+    public MyCanonicalGene getGene(String hugoGeneSymbol) {
         // System.out.println(">getGene: " + hugoGeneSymbol);
         return geneSymbolMap.get(hugoGeneSymbol.toUpperCase());
     }
@@ -180,14 +177,14 @@ public class MyDaoGeneOptimized {
      *
      * @return
      */
-    public List<CanonicalGene> getGene(String geneSymbol, boolean searchInAliases) {
-        CanonicalGene gene = getGene(geneSymbol);
+    public List<MyCanonicalGene> getGene(String geneSymbol, boolean searchInAliases) {
+        MyCanonicalGene gene = getGene(geneSymbol);
         if (gene != null) {
             return Collections.singletonList(gene);
         }
 
         if (searchInAliases) {
-            List<CanonicalGene> genes = geneAliasMap.get(geneSymbol.toUpperCase());
+            List<MyCanonicalGene> genes = geneAliasMap.get(geneSymbol.toUpperCase());
             if (genes != null) {
                 return Collections.unmodifiableList(genes);
             }
@@ -202,9 +199,9 @@ public class MyDaoGeneOptimized {
      * @param entrezId Entrez Gene ID.
      * @return Canonical Gene Object.
      */
-    public CanonicalGene getGene(long entrezId) {
+    public MyCanonicalGene getGene(long entrezId) {
         // System.out.println(">getGene long: " + entrezId);
-        CanonicalGene gene = entrezIdMap.get(entrezId);
+        MyCanonicalGene gene = entrezIdMap.get(entrezId);
         if (gene == null) {
             throw new RuntimeException("gene is null");
         }
@@ -218,7 +215,7 @@ public class MyDaoGeneOptimized {
      * @param entrezId Entrez Gene ID.
      * @return Canonical Gene Object.
      */
-    public CanonicalGene getGeneByEntityId(int geneticEntityId) {
+    public MyCanonicalGene getGeneByEntityId(int geneticEntityId) {
         return geneticEntityMap.get(geneticEntityId);
     }
 
@@ -232,7 +229,7 @@ public class MyDaoGeneOptimized {
      * @param geneId an Entrez Gene ID or HUGO symbol or gene alias
      * @return A list of genes that match, an empty list if no match.
      */
-    public List<CanonicalGene> guessGene(String geneId) {
+    public List<MyCanonicalGene> guessGene(String geneId) {
         return guessGene(geneId, null);
     }
 
@@ -247,14 +244,14 @@ public class MyDaoGeneOptimized {
      * @param chr chromosome
      * @return A list of genes that match, an empty list if no match.
      */
-    public List<CanonicalGene> guessGene(String geneId, String chr) {
+    public List<MyCanonicalGene> guessGene(String geneId, String chr) {
 
-        CanonicalGene gene = getGene(geneId); // HUGO gene symbol
+        MyCanonicalGene gene = getGene(geneId); // HUGO gene symbol
         if (gene != null) {
             return Collections.singletonList(gene);
         }
 
-        List<CanonicalGene> genes = geneAliasMap.get(geneId.toUpperCase());
+        List<MyCanonicalGene> genes = geneAliasMap.get(geneId.toUpperCase());
         if (genes != null) {
             if (chr == null) {
                 return Collections.unmodifiableList(genes);
@@ -262,8 +259,8 @@ public class MyDaoGeneOptimized {
 
             String nchr = normalizeChr(chr);
 
-            List<CanonicalGene> ret = new ArrayList<CanonicalGene>();
-            for (CanonicalGene cg : genes) {
+            List<MyCanonicalGene> ret = new ArrayList<MyCanonicalGene>();
+            for (MyCanonicalGene cg : genes) {
                 String gchr = getChrFromCytoband(cg.getCytoband());
                 if (gchr == null // TODO: should we exlude this?
                         || gchr.equals(nchr)) {
@@ -322,9 +319,9 @@ public class MyDaoGeneOptimized {
         return null;
     }
 
-    public CanonicalGene getNonAmbiguousGene(String geneId, String chr) {
+    public MyCanonicalGene getNonAmbiguousGene(String geneId, String chr) {
         // System.out.println(">getNonAmbiguousGene: geneId=" + geneId + "; chr=" + chr);
-        List<CanonicalGene> genes = guessGene(geneId, chr);
+        List<MyCanonicalGene> genes = guessGene(geneId, chr);
         if (genes.isEmpty()) {
             return null;
         }
@@ -340,7 +337,7 @@ public class MyDaoGeneOptimized {
         StringBuilder sb = new StringBuilder("Ambiguous alias ");
         sb.append(geneId);
         sb.append(": corresponding entrez ids of ");
-        for (CanonicalGene gene : genes) {
+        for (MyCanonicalGene gene : genes) {
             sb.append(gene.getEntrezGeneId());
             sb.append(",");
         }
@@ -350,19 +347,19 @@ public class MyDaoGeneOptimized {
 
     }
 
-    public Set<Long> getEntrezGeneIds(Collection<CanonicalGene> genes) {
+    public Set<Long> getEntrezGeneIds(Collection<MyCanonicalGene> genes) {
         Set<Long> entrezGeneIds = new HashSet<Long>();
-        for (CanonicalGene gene : genes) {
+        for (MyCanonicalGene gene : genes) {
             entrezGeneIds.add(gene.getEntrezGeneId());
         }
         return entrezGeneIds;
     }
 
-    public Set<CanonicalGene> getCbioCancerGenes() {
+    public Set<MyCanonicalGene> getCbioCancerGenes() {
         return Collections.unmodifiableSet(cbioCancerGenes);
     }
 
-    public boolean isCbioCancerGene(CanonicalGene gene) {
+    public boolean isCbioCancerGene(MyCanonicalGene gene) {
         return cbioCancerGenes.contains(gene);
     }
 
@@ -371,7 +368,7 @@ public class MyDaoGeneOptimized {
      *
      * @return Array List of All Genes.
      */
-    public ArrayList<CanonicalGene> getAllGenes() {
+    public ArrayList<MyCanonicalGene> getAllGenes() {
         return new ArrayList<>(entrezIdMap.values());
     }
 

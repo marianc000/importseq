@@ -1,23 +1,21 @@
- 
-
 package persistence;
 
-import org.codehaus.jackson.annotate.JsonIgnore;
-
-import org.apache.commons.lang.builder.ToStringBuilder;
-
+//import org.codehaus.jackson.annotate.JsonIgnore;
+//
+//import org.apache.commons.lang.builder.ToStringBuilder;
 /**
  * Encapsules Details regarding a Single Mutation.
  *
  * @author Ethan Cerami.
  */
-public final class MyExtendedMutation
-{
+public final class MyExtendedMutation {
+
     public final static class MutationEvent {
+
         private long mutationEventId;
-        private CanonicalGene gene;
+        private MyCanonicalGene gene;
         private String chr;
-            private long startPosition;
+        private long startPosition;
         private long endPosition;
         private String proteinChange; // amino acid change
         private String mutationType; // variant classification
@@ -26,7 +24,7 @@ public final class MyExtendedMutation
         private String linkXVar;
         private String linkPdb;
         private String linkMsa;
-            private String keyword;
+        private String keyword;
         private String ncbiBuild;
         private String strand;
         private String variantType;
@@ -51,13 +49,13 @@ public final class MyExtendedMutation
             this.mutationEventId = mutationEventId;
         }
 
-        @JsonIgnore
-        public CanonicalGene getGene() {
+        // @JsonIgnore
+        public MyCanonicalGene getGene() {
             return gene;
         }
 
-        @JsonIgnore
-        public void setGene(CanonicalGene gene) {
+        // @JsonIgnore
+        public void setGene(MyCanonicalGene gene) {
             this.gene = gene;
         }
 
@@ -230,7 +228,7 @@ public final class MyExtendedMutation
          *
          * @param oncotatorUniprotName the UniprotKB name
          * @deprecated set the accession with
-         *             {@link #setOncotatorUniprotAccession(String)} instead
+         * {@link #setOncotatorUniprotAccession(String)} instead
          */
         @Deprecated
         public void setOncotatorUniprotName(String oncotatorUniprotName) {
@@ -353,7 +351,7 @@ public final class MyExtendedMutation
     private String validationMethod;
     private String score;
     private String bamFile;
-	private String aminoAcidChange;
+    private String aminoAcidChange;
     private int tumorAltCount;
     private int tumorRefCount;
     private int normalAltCount;
@@ -362,20 +360,21 @@ public final class MyExtendedMutation
     public MyExtendedMutation() {
         this(new MutationEvent());
     }
-    
+
     public MyExtendedMutation(MutationEvent event) {
-         this.event = event;
+        this.event = event;
     }
 
     /**
      * Constructor.
      *
-     * @param gene              Gene Object.
-     * @param validationStatus  Validation Status,  e.g. Valid or Unknown.
-     * @param mutationStatus    Mutation Status, e.g. Somatic or Germline.
-     * @param mutationType      Mutation Type, e.g. Nonsense_Mutation, Frame_Shift_Del, etc.
+     * @param gene Gene Object.
+     * @param validationStatus Validation Status, e.g. Valid or Unknown.
+     * @param mutationStatus Mutation Status, e.g. Somatic or Germline.
+     * @param mutationType Mutation Type, e.g. Nonsense_Mutation,
+     * Frame_Shift_Del, etc.
      */
-    public MyExtendedMutation(CanonicalGene gene, String validationStatus, String mutationStatus,
+    public MyExtendedMutation(MyCanonicalGene gene, String validationStatus, String mutationStatus,
             String mutationType) {
         this();
         this.setGene(gene);
@@ -386,6 +385,7 @@ public final class MyExtendedMutation
 
     /**
      * Sets the Sequencing Center which performed the sequencing.
+     *
      * @param center sequencing center, e.g. WashU, Broad, etc.
      */
     public void setSequencingCenter(String center) {
@@ -394,6 +394,7 @@ public final class MyExtendedMutation
 
     /**
      * Gets the Sequencing Center which performed the sequencing.
+     *
      * @return sequencing center, e.g. WashU, Broad, etc.
      */
     public String getSequencingCenter() {
@@ -402,19 +403,21 @@ public final class MyExtendedMutation
 
     /**
      * Gets the Mutations Status, e.g. Somatic or Germline.
+     *
      * @return mutation status, e.g. Somatic or Germline.
      */
     public String getMutationStatus() {
         return mutationStatus;
     }
 
-    @JsonIgnore
+    // @JsonIgnore
     public boolean isGermlineMutation() {
         return getMutationStatus() != null && getMutationStatus().equalsIgnoreCase(GERMLINE);
     }
 
     /**
      * Sets the Mutation Status, e.g. Somatic or Germline.
+     *
      * @param mutationStatus mutation status, e.g. Somatic or Germline.
      */
     public void setMutationStatus(String mutationStatus) {
@@ -423,6 +426,7 @@ public final class MyExtendedMutation
 
     /**
      * Sets the Validation Status, e.g. Valid or Unknown.
+     *
      * @param validationStatus validation status, e.g. Valid or Unknown.
      */
     public void setValidationStatus(String validationStatus) {
@@ -431,6 +435,7 @@ public final class MyExtendedMutation
 
     /**
      * Gets the Validation Status, e.g. Valid or Unknown.
+     *
      * @return validation status, e.g. Valid or Unknown.
      */
     public String getValidationStatus() {
@@ -439,7 +444,9 @@ public final class MyExtendedMutation
 
     /**
      * Sets the Mutation Type, e.g. Nonsense_Mutation, Frame_Shift_Del, etc.
-     * @param mutationType mutation type, e.g. Nonsense_Mutation, Frame_Shift_Del, etc.
+     *
+     * @param mutationType mutation type, e.g. Nonsense_Mutation,
+     * Frame_Shift_Del, etc.
      */
     public void setMutationType(String mutationType) {
         event.setMutationType(mutationType);
@@ -447,6 +454,7 @@ public final class MyExtendedMutation
 
     /**
      * Gets the Mutation Type, e.g. Nonsense_Mutation, Frame_Shift_Del, etc.
+     *
      * @return mutation type, e.g. Nonsense_Mutation, Frame_Shift_Del, etc.
      */
     public String getMutationType() {
@@ -501,17 +509,15 @@ public final class MyExtendedMutation
         event.setProteinChange(proteinChange);
     }
 
-	public String getAminoAcidChange()
-	{
-		return aminoAcidChange;
-	}
+    public String getAminoAcidChange() {
+        return aminoAcidChange;
+    }
 
-	public void setAminoAcidChange(String aminoAcidChange)
-	{
-		this.aminoAcidChange = aminoAcidChange;
-	}
+    public void setAminoAcidChange(String aminoAcidChange) {
+        this.aminoAcidChange = aminoAcidChange;
+    }
 
-	public String getFunctionalImpactScore() {
+    public String getFunctionalImpactScore() {
         return event.getFunctionalImpactScore();
     }
 
@@ -614,33 +620,29 @@ public final class MyExtendedMutation
     public void setTumorSeqAllele2(String tumorSeqAllele2) {
         this.tumorSeqAllele2 = tumorSeqAllele2;
     }
-        
-        
-        
-        /**
-         * Set alleles. For variant allele: one of the tumor sequence alleles
-         * which is different from the reference allele.
+
+    /**
+     * Set alleles. For variant allele: one of the tumor sequence alleles which
+     * is different from the reference allele.
      *
-     * @param varAllele1  the first variant allele
-     * @param varAllele2  the second variant allele
-     * @param refAllele  the reference allele
-     * @return          tumor sequence allele different from the reference allele
+     * @param varAllele1 the first variant allele
+     * @param varAllele2 the second variant allele
+     * @param refAllele the reference allele
+     * @return tumor sequence allele different from the reference allele
      */
-    public void setAllele(String varAllele1, String varAllele2, String refAllele)
-    {
-            this.setReferenceAllele(refAllele);
-            this.setTumorSeqAllele1(varAllele1);
-            this.setTumorSeqAllele2(varAllele2);
-            
-            String varAllele = varAllele1;
+    public void setAllele(String varAllele1, String varAllele2, String refAllele) {
+        this.setReferenceAllele(refAllele);
+        this.setTumorSeqAllele1(varAllele1);
+        this.setTumorSeqAllele2(varAllele2);
 
-            if (refAllele != null &&
-                    refAllele.equals(varAllele1))
-            {
-                    varAllele = varAllele2;
-            }
+        String varAllele = varAllele1;
 
-            this.setTumorSeqAllele(varAllele);
+        if (refAllele != null
+                && refAllele.equals(varAllele1)) {
+            varAllele = varAllele2;
+        }
+
+        this.setTumorSeqAllele(varAllele);
     }
 
     public String getDbSnpRs() {
@@ -803,18 +805,15 @@ public final class MyExtendedMutation
         event.setOncotatorDbSnpRs(oncotatorDbSnpRs);
     }
 
-    public String getOncotatorRefseqMrnaId()
-    {
+    public String getOncotatorRefseqMrnaId() {
         return event.getOncotatorRefseqMrnaId();
     }
 
-    public void setOncotatorRefseqMrnaId(String oncotatorRefseqMrnaId)
-    {
+    public void setOncotatorRefseqMrnaId(String oncotatorRefseqMrnaId) {
         event.setOncotatorRefseqMrnaId(oncotatorRefseqMrnaId);
     }
 
-    public String getOncotatorUniprotName()
-    {
+    public String getOncotatorUniprotName() {
         return event.getOncotatorUniprotName();
     }
 
@@ -823,80 +822,69 @@ public final class MyExtendedMutation
      *
      * @param oncotatorUniprotName the UniprotKB name
      * @deprecated set the accession with
-     *             {@link #setOncotatorUniprotAccession(String)} instead
+     * {@link #setOncotatorUniprotAccession(String)} instead
      */
     @Deprecated
-    public void setOncotatorUniprotName(String oncotatorUniprotName)
-    {
+    public void setOncotatorUniprotName(String oncotatorUniprotName) {
         event.setOncotatorUniprotName(oncotatorUniprotName);
     }
 
-    public String getOncotatorUniprotAccession()
-    {
+    public String getOncotatorUniprotAccession() {
         return event.getOncotatorUniprotAccession();
     }
 
-    public void setOncotatorUniprotAccession(String oncotatorUniprotAccession)
-    {
+    public void setOncotatorUniprotAccession(String oncotatorUniprotAccession) {
         event.setOncotatorUniprotAccession(oncotatorUniprotAccession);
     }
 
-    public String getOncotatorCodonChange()
-    {
+    public String getOncotatorCodonChange() {
         return event.getOncotatorCodonChange();
     }
 
-    public void setOncotatorCodonChange(String oncotatorCodonChange)
-    {
+    public void setOncotatorCodonChange(String oncotatorCodonChange) {
         event.setOncotatorCodonChange(oncotatorCodonChange);
     }
 
-    public int getOncotatorProteinPosStart()
-    {
+    public int getOncotatorProteinPosStart() {
         return event.getOncotatorProteinPosStart();
     }
 
-    public void setOncotatorProteinPosStart(int oncotatorProteinPosStart)
-    {
+    public void setOncotatorProteinPosStart(int oncotatorProteinPosStart) {
         event.setOncotatorProteinPosStart(oncotatorProteinPosStart);
     }
 
-    public int getOncotatorProteinPosEnd()
-    {
+    public int getOncotatorProteinPosEnd() {
         return event.getOncotatorProteinPosEnd();
     }
 
-    public void setOncotatorProteinPosEnd(int oncotatorProteinPosEnd)
-    {
+    public void setOncotatorProteinPosEnd(int oncotatorProteinPosEnd) {
         event.setOncotatorProteinPosEnd(oncotatorProteinPosEnd);
     }
 
-    public boolean isCanonicalTranscript()
-    {
+    public boolean isCanonicalTranscript() {
         return event.isCanonicalTranscript();
     }
 
-    public void setCanonicalTranscript(boolean canonicalTranscript)
-    {
+    public void setCanonicalTranscript(boolean canonicalTranscript) {
         event.setCanonicalTranscript(canonicalTranscript);
     }
 
-    @JsonIgnore
-    public void setGene(CanonicalGene gene) {
+    // @JsonIgnore
+    public void setGene(MyCanonicalGene gene) {
         event.setGene(gene);
     }
 
-    @JsonIgnore
-    public CanonicalGene getGene() {
+    // @JsonIgnore
+    public MyCanonicalGene getGene() {
         return event.getGene();
     }
 
-    @JsonIgnore
+    // @JsonIgnore
     public long getEntrezGeneId() {
         return event.getGene().getEntrezGeneId();
     }
 
-    @JsonIgnore
+    // @JsonIgnore
     public String getGeneSymbol() {
         return event.getGene().getHugoGeneSymbolAllCaps();
     }
@@ -924,12 +912,11 @@ public final class MyExtendedMutation
     public void setEvent(MutationEvent event) {
         this.event = event;
     }
-    
-    @Override
-    public String toString() {
-        return ToStringBuilder.reflectionToString(this);
-    }
 
+//    @Override
+//    public String toString() {
+//        return ToStringBuilder.reflectionToString(this);
+//    }
     @Override
     public int hashCode() {
         int hash = 7;

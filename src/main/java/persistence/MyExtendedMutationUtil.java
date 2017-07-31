@@ -1,11 +1,7 @@
  
 
 package persistence;
-
-import org.mskcc.cbio.portal.model.CanonicalGene;
-import org.mskcc.cbio.portal.model.ExtendedMutation;
-import org.mskcc.cbio.maf.MafRecord;
-import org.mskcc.cbio.maf.TabDelimitedFileUtil;
+ 
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -56,7 +52,7 @@ public class MyExtendedMutationUtil
 	 * @param record    MAF record for the current line
 	 * @return          most accurate protein change
 	 */
-	public static String getProteinChange(String[] parts, MafRecord record)
+	public static String getProteinChange(String[] parts, MyMafRecord record)
 	{
 		// try annotator value first
 		//String proteinChange = record.getOncotatorProteinChange();
@@ -105,10 +101,10 @@ public class MyExtendedMutationUtil
 		// parts[0] is the protein start-end positions, parts[1] is the length
 		String[] parts = proteinPosition.split("/");
 
-		int position = TabDelimitedFileUtil.getPartInt(0, parts[0].split("-"));
+		int position = MyTabDelimitedFileUtil.getPartInt(0, parts[0].split("-"));
 
 		// there is a case where the protein change is "-"
-		if (position == TabDelimitedFileUtil.NA_INT)
+		if (position == MyTabDelimitedFileUtil.NA_INT)
 		{
 			// try to extract it from protein change value
 			Pattern p = Pattern.compile(".*[A-Z]([0-9]+)[^0-9]+");
@@ -128,7 +124,7 @@ public class MyExtendedMutationUtil
 		// parts[0] is the protein start-end positions, parts[1] is the length
 		String[] parts = proteinPosition.split("/");
 
-		int end = TabDelimitedFileUtil.getPartInt(1, parts[0].split("-"));
+		int end = MyTabDelimitedFileUtil.getPartInt(1, parts[0].split("-"));
 
 		// if no end position is provided,
 		// then use start position as end position
@@ -156,7 +152,7 @@ public class MyExtendedMutationUtil
 		if (mutationType == null ||
 		    mutationType.length() == 0 ||
 		    mutationType.equals("NULL") ||
-		    mutationType.equals(TabDelimitedFileUtil.NA_STRING))
+		    mutationType.equals(MyTabDelimitedFileUtil.NA_STRING))
 		{
 			return false;
 		}
@@ -174,14 +170,14 @@ public class MyExtendedMutationUtil
 		return !(silent || loh || wildtype || utr3 || utr5 || flank5 || igr || rna);
 	}
 
-	public static String getMutationType(MafRecord record)
+	public static String getMutationType(MyMafRecord record)
 	{
 		String mutationType = record.getOncotatorVariantClassification();
 
 		if (mutationType == null ||
 		    mutationType.length() == 0 ||
 		    mutationType.equals("NULL") ||
-		    mutationType.equals(TabDelimitedFileUtil.NA_STRING))
+		    mutationType.equals(MyTabDelimitedFileUtil.NA_STRING))
 		{
 			mutationType = record.getVariantClassification();
 		}
@@ -189,62 +185,62 @@ public class MyExtendedMutationUtil
 		return mutationType;
 	}
 
-	public static int getTumorAltCount(MafRecord record) {
-		int result = TabDelimitedFileUtil.NA_INT ;
+	public static int getTumorAltCount(MyMafRecord record) {
+		int result = MyTabDelimitedFileUtil.NA_INT ;
 
-		if (record.getTumorAltCount() != TabDelimitedFileUtil.NA_INT) {
+		if (record.getTumorAltCount() != MyTabDelimitedFileUtil.NA_INT) {
 			result = record.getTumorAltCount();
-		} else if(record.getTVarCov() != TabDelimitedFileUtil.NA_INT) {
+		} else if(record.getTVarCov() != MyTabDelimitedFileUtil.NA_INT) {
 			result = record.getTVarCov();
-		} else if((record.getTumorDepth() != TabDelimitedFileUtil.NA_INT) &&
-		          (record.getTumorVaf() != TabDelimitedFileUtil.NA_INT)) {
+		} else if((record.getTumorDepth() != MyTabDelimitedFileUtil.NA_INT) &&
+		          (record.getTumorVaf() != MyTabDelimitedFileUtil.NA_INT)) {
 			result = Math.round(record.getTumorDepth() * record.getTumorVaf());
 		}
 
 		return result;
 	}
 
-	public static int getTumorRefCount(MafRecord record) {
-		int result = TabDelimitedFileUtil.NA_INT;
+	public static int getTumorRefCount(MyMafRecord record) {
+		int result = MyTabDelimitedFileUtil.NA_INT;
 
-		if (record.getTumorRefCount() != TabDelimitedFileUtil.NA_INT) {
+		if (record.getTumorRefCount() != MyTabDelimitedFileUtil.NA_INT) {
 			result = record.getTumorRefCount();
-		} else if((record.getTVarCov() != TabDelimitedFileUtil.NA_INT) &&
-		          (record.getTTotCov() != TabDelimitedFileUtil.NA_INT)) {
+		} else if((record.getTVarCov() != MyTabDelimitedFileUtil.NA_INT) &&
+		          (record.getTTotCov() != MyTabDelimitedFileUtil.NA_INT)) {
 			result = record.getTTotCov()-record.getTVarCov();
-		} else if((record.getTumorDepth() != TabDelimitedFileUtil.NA_INT) &&
-		          (record.getTumorVaf() != TabDelimitedFileUtil.NA_INT)) {
+		} else if((record.getTumorDepth() != MyTabDelimitedFileUtil.NA_INT) &&
+		          (record.getTumorVaf() != MyTabDelimitedFileUtil.NA_INT)) {
 			result = record.getTumorDepth() - Math.round(record.getTumorDepth() * record.getTumorVaf());
 		}
 
 		return result;
 	}
 
-	public static int getNormalAltCount(MafRecord record) {
-		int result = TabDelimitedFileUtil.NA_INT ;
+	public static int getNormalAltCount(MyMafRecord record) {
+		int result = MyTabDelimitedFileUtil.NA_INT ;
 
-		if (record.getNormalAltCount() != TabDelimitedFileUtil.NA_INT) {
+		if (record.getNormalAltCount() != MyTabDelimitedFileUtil.NA_INT) {
 			result = record.getNormalAltCount();
-		} else if(record.getNVarCov() != TabDelimitedFileUtil.NA_INT) {
+		} else if(record.getNVarCov() != MyTabDelimitedFileUtil.NA_INT) {
 			result = record.getNVarCov();
-		} else if((record.getNormalDepth() != TabDelimitedFileUtil.NA_INT) &&
-		          (record.getNormalVaf() != TabDelimitedFileUtil.NA_INT)) {
+		} else if((record.getNormalDepth() != MyTabDelimitedFileUtil.NA_INT) &&
+		          (record.getNormalVaf() != MyTabDelimitedFileUtil.NA_INT)) {
 			result = Math.round(record.getNormalDepth() * record.getNormalVaf());
 		}
 
 		return result;
 	}
 
-	public static int getNormalRefCount(MafRecord record) {
-		int result = TabDelimitedFileUtil.NA_INT;
+	public static int getNormalRefCount(MyMafRecord record) {
+		int result = MyTabDelimitedFileUtil.NA_INT;
 
-		if (record.getNormalRefCount() != TabDelimitedFileUtil.NA_INT) {
+		if (record.getNormalRefCount() != MyTabDelimitedFileUtil.NA_INT) {
 			result = record.getNormalRefCount();
-		} else if((record.getNVarCov() != TabDelimitedFileUtil.NA_INT) &&
-		          (record.getNTotCov() != TabDelimitedFileUtil.NA_INT)) {
+		} else if((record.getNVarCov() != MyTabDelimitedFileUtil.NA_INT) &&
+		          (record.getNTotCov() != MyTabDelimitedFileUtil.NA_INT)) {
 			result = record.getNTotCov()-record.getNVarCov();
-		} else if((record.getNormalDepth() != TabDelimitedFileUtil.NA_INT) &&
-		          (record.getNormalVaf() != TabDelimitedFileUtil.NA_INT)) {
+		} else if((record.getNormalDepth() != MyTabDelimitedFileUtil.NA_INT) &&
+		          (record.getNormalVaf() != MyTabDelimitedFileUtil.NA_INT)) {
 			result = record.getNormalDepth() - Math.round(record.getNormalDepth() * record.getNormalVaf());
 		}
 
@@ -258,16 +254,16 @@ public class MyExtendedMutationUtil
 	 *
 	 * @return  a mutation instance initialized by default values
 	 */
-	public static ExtendedMutation newMutation()
+	public static MyExtendedMutation newMutation()
 	{
-		Integer defaultInt = TabDelimitedFileUtil.NA_INT;
-		String defaultStr = TabDelimitedFileUtil.NA_STRING;
-		//Long defaultLong = TabDelimitedFileUtil.NA_LONG;
+		Integer defaultInt = MyTabDelimitedFileUtil.NA_INT;
+		String defaultStr = MyTabDelimitedFileUtil.NA_STRING;
+		//Long defaultLong = MyTabDelimitedFileUtil.NA_LONG;
 		Long defaultLong = -1L;
-		Float defaultFloat = TabDelimitedFileUtil.NA_FLOAT;
-		CanonicalGene defaultGene = new CanonicalGene("INVALID");
+		Float defaultFloat = MyTabDelimitedFileUtil.NA_FLOAT;
+		MyCanonicalGene defaultGene = new MyCanonicalGene("INVALID");
 
-		ExtendedMutation mutation = new ExtendedMutation();
+		MyExtendedMutation mutation = new MyExtendedMutation();
 
 		mutation.setGeneticProfileId(defaultInt);
 		mutation.setSampleId(defaultInt);

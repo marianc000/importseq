@@ -9,17 +9,14 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import org.mskcc.cbio.portal.dao.DaoGeneOptimized;
-import org.mskcc.cbio.portal.model.CanonicalGene;
-import org.mskcc.cbio.portal.model.ExtendedMutation;
-
+ 
 /**
  *
  * @author mcaikovs
  */
 public class MyMutationEventDao {
 
-    public static ExtendedMutation.MutationEvent getMutationEvent(Connection con,
+    public static MyExtendedMutation.MutationEvent getMutationEvent(Connection con,
             long entrezId, String chr, long startPosition, long endPosition,
             String proteinChange, String tumorSeqAllele, String mutationType) throws SQLException {
         // System.out.println(">getMutationEvent");
@@ -36,7 +33,7 @@ public class MyMutationEventDao {
             ResultSet rs = st.executeQuery();
 
             if (rs.next()) {
-                ExtendedMutation.MutationEvent event = extractMutationEvent(con, rs);
+                MyExtendedMutation.MutationEvent event = extractMutationEvent(con, rs);
                 // System.out.println("found mutation event: " + event);
                 return event;
             }
@@ -46,11 +43,11 @@ public class MyMutationEventDao {
         }
     }
 
-    static ExtendedMutation.MutationEvent extractMutationEvent(Connection con, ResultSet rs) throws SQLException {
-        ExtendedMutation.MutationEvent event = new ExtendedMutation.MutationEvent();
+    static MyExtendedMutation.MutationEvent extractMutationEvent(Connection con, ResultSet rs) throws SQLException {
+        MyExtendedMutation.MutationEvent event = new MyExtendedMutation.MutationEvent();
         event.setMutationEventId(rs.getLong("MUTATION_EVENT_ID"));
         long entrezId = rs.getLong("ENTREZ_GENE_ID");
-        CanonicalGene gene = MyDaoGeneOptimized.getInstance(con).getGene(entrezId);
+        MyCanonicalGene gene = MyDaoGeneOptimized.getInstance(con).getGene(entrezId);
         // System.out.println(">extractMutationEvent: gene=" + gene);
         
         event.setGene(gene);

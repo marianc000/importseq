@@ -12,7 +12,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.mskcc.cbio.portal.model.ExtendedMutation;
+ 
 import static persistence.MyConnection.getConnection;
 import static persistence.MyImportClinicalDataTest.con;
 
@@ -44,7 +44,7 @@ public class MyMutationEventDaoTest {
     @Test
     public void testGetMutationEvent() throws SQLException {
         //SELECT * FROM  mutation_event where ENTREZ_GENE_ID=2064 and CHR='17' and START_POSITION=37880235 and END_POSITION=37880235 and PROTEIN_CHANGE='S760fs' and TUMOR_SEQ_ALLELE='-' and MUTATION_TYPE='In_Frame_Del'
-      ExtendedMutation.MutationEvent e= MyMutationEventDao.getMutationEvent(con, 2064, "17", 37880235, 37880235, "S760fs", "-", "In_Frame_Del");
+      MyExtendedMutation.MutationEvent e= MyMutationEventDao.getMutationEvent(con, 2064, "17", 37880235, 37880235, "S760fs", "-", "In_Frame_Del");
       //  SELECT * FROM  mutation_event where 
      // ENTREZ_GENE_ID=2064 and CHR='17' and START_POSITION=37880235 
        //       and END_POSITION=37880235 and PROTEIN_CHANGE='S760fs' 
