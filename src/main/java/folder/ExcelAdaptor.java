@@ -68,7 +68,7 @@ public class ExcelAdaptor {
 
     String getCellValue(Cell cell) {
         if (cell == null) {
-            System.out.println("WARNING: cell is null");
+           // System.out.println("WARNING: cell is null");
             return "";
         }
         switch (cell.getCellTypeEnum()) {

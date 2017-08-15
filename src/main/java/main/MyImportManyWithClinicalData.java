@@ -81,7 +81,7 @@ public class MyImportManyWithClinicalData {
             throw new RuntimeException("sample names differ");
         }
 
-        int sampleId = cd.addSample(con, cancerStudyId, sampleName, sampleName);
+        int sampleId = cd.addSample(con, cancerStudyId, patientNameInFile, sampleName);
         importClinicalDataValues(con, row, columnAttrs, sampleId);
 
         Path dataFilePath = new ExcelAdaptor(sourceFilePath.toString()).run();
