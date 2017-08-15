@@ -12,7 +12,6 @@ import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -32,12 +31,7 @@ import org.apache.poi.ss.usermodel.WorkbookFactory;
  */
 public class ExcelOperations {
 
-    public ExcelOperations(String sourceFilePath) throws IOException {
-
-        this.sourceFilePath = sourceFilePath;
-    }
-
-    String sourceFilePath;
+    // String sourceFilePath;
     //  static String sourceFilePath = "C:\\Projects\\cBioPortal\\data sample\\H1975.hg19_coding01.TabTest.xlsx";
     static String canonicalMapFileName = "/isoform_overrides_uniprot.txt";
     static String AA_CHANGE_COLUMN = "AAChange.refGene";
@@ -47,10 +41,9 @@ public class ExcelOperations {
     static String SAMPLE_NAME_COLUMN = "chuvFileName";
     List<List<String>> doc;
 
-    public Path getOutputFilePath() {
-        return Paths.get(sourceFilePath + ".out");
-    }
-
+//    public Path getOutputFilePath() {
+//        return Paths.get(sourceFilePath + ".out");
+//    }
     void saveDocument(Path path) throws IOException {
         List<String> content = new LinkedList<>();
         for (int r = 0; r < doc.get(0).size(); r++) {
@@ -64,6 +57,16 @@ public class ExcelOperations {
             content.add(sb.toString());
         }
         Files.write(path, content);
+    }
+
+    List<String> getRow(int index) {
+        List<String> row = new LinkedList<>();
+
+        for (int c = 0; c < doc.size(); c++) {
+            row.add(doc.get(c).get(index));
+
+        }
+        return row;
     }
 
     String getCellValue(Cell cell) {
@@ -88,7 +91,7 @@ public class ExcelOperations {
             case BOOLEAN:
             case FORMULA:
             default:
-                throw new RuntimeException("this should not happen");
+                throw new RuntimeException("this should not happen: " + cell.getCellTypeEnum());
         }
     }
 
@@ -169,11 +172,13 @@ public class ExcelOperations {
             }
         }
         wb.close();
+        System.out.print("loaded rows: " + sheet.getLastRowNum());
         return doc;
     }
 
-    void printDocument(List<List<String>> document) {
+    public void printDocument(List<List<String>> document) {
         for (int row = 0; row < document.get(0).size(); row++) {
+            System.out.print(row + "\t");
             for (int col = 0; col < document.size(); col++) {
                 System.out.print(document.get(col).get(row));
                 if (col < document.size() - 1) {
@@ -267,7 +272,7 @@ public class ExcelOperations {
     }
 
     public Path run() throws IOException, InvalidFormatException {
-        loadDocument(sourceFilePath);
+        //  loadDocument(sourceFilePath);
         // printDocument();
         filterColumns();
 
@@ -275,15 +280,16 @@ public class ExcelOperations {
         replaceExonicFunction();
 
         addColumn(VALIDATION_COLUMN, "Not validated");
-        addColumn(SAMPLE_NAME_COLUMN, getSampleName(sourceFilePath));
+        //   addColumn(SAMPLE_NAME_COLUMN, getSampleName(sourceFilePath));
         insertColumn(IGNORED_COLUMN, "");
         insertHeaders();
         //  printDocument();
-        saveDocument(getOutputFilePath());
-        return getOutputFilePath();
+        //   saveDocument(getOutputFilePath());
+        //   return getOutputFilePath();
+        return null;
     }
 
-    public static void main(String... args) throws IOException, InvalidFormatException {
-        new ExcelOperations("C:\\Projects\\cBioPortal\\data sample\\Mix_cell-line.hg19_coding01.Tab.xlsx").run();
-    }
+//    public static void main(String... args) throws IOException, InvalidFormatException {
+//        new ExcelOperations("C:\\Projects\\cBioPortal\\data sample\\Mix_cell-line.hg19_coding01.Tab.xlsx").run();
+//    }
 }

@@ -107,32 +107,59 @@ public class ExcelAdaptor {
         for (int c = 1; c < col.size(); c++) {
             String val = col.get(c);
 
-            String[] variants = val.split(Pattern.quote(","));
-            String aaChange = null;
-            for (String variant : variants) {
-                String[] vals = variant.split(Pattern.quote(":"));
-                if (vals.length == 1) {
-                    aaChange = "";
-                    break;
-                } else {
-                    String transcript = vals[1];
-                    if (!transcript.startsWith("NM")) {
-                        throw new RuntimeException("Transcript name: " + transcript);
-                    }
-
-                    if (cannonicalTranscripts.contains(transcript)) {
-                        aaChange = vals[4];
-                        break;
-                    }
-                }
-            }
-            if (aaChange == null) {
-                throw new RuntimeException("canonical transcript not found: ");
-            }
-            col.set(c, aaChange);
+            col.set(c, selectCanonicalTranscript(val));
         }
     }
 
+    String selectCanonicalTranscript(String val) {
+      //  System.out.println(">selectCanonicalTranscript: val=" + val);
+        String[] variants = val.split(Pattern.quote(","));
+        String aaChange = null;
+        for (String variant : variants) {
+            String[] vals = variant.split(Pattern.quote(":"));
+            if (vals.length == 1) {
+                aaChange = "";
+                break;
+            } else {
+                String transcript = vals[1];
+                if (!transcript.startsWith("NM")) {
+                    throw new RuntimeException("Transcript name: " + transcript);
+                }
+
+                if (cannonicalTranscripts.contains(transcript)) {
+                    aaChange = vals[4];
+                    break;
+                }
+            }
+        }
+        if (aaChange == null) {
+            aaChange = selectCanonicalTranscriptForGeneWithoutCanonicalTranscript(val);
+        }
+        if (aaChange == null) {
+            throw new RuntimeException("canonical transcript not found: ");
+        }
+        return aaChange;
+    }
+
+    // only one mutation proposed, it is identical for all transcripts
+    String selectCanonicalTranscriptForGeneWithoutCanonicalTranscript(String val) {
+        //System.out.println(">selectCanonicalTranscriptForGeneWithoutCanonicalTranscript: val=" + val);
+        String[] variants = val.split(Pattern.quote(","));
+
+        Set<String> set = new HashSet<>();
+
+        for (String variant : variants) {
+            String[] vals = variant.split(Pattern.quote(":"));
+            set.add(vals[4]);
+        }
+
+        if (set.size() == 1) {
+            return set.iterator().next();
+        }
+
+        return null;
+
+    }
     Map<String, String> exonicFuncRefGene_VariantClassificationMap, sourceTargetHeaders;
 
     private ExcelAdaptor() throws IOException {
@@ -147,7 +174,7 @@ public class ExcelAdaptor {
         exonicFuncRefGene_VariantClassificationMap.put("frameshift insertion", "Frame_Shift_Ins");
         exonicFuncRefGene_VariantClassificationMap.put("nonframeshift insertion", "In_Frame_Ins");
         exonicFuncRefGene_VariantClassificationMap.put("nonsynonymous SNV", "Missense_Mutation");
-
+        exonicFuncRefGene_VariantClassificationMap.put("stoploss", "Nonstop_Mutation");
         sourceTargetHeaders = new HashMap<String, String>() {
             {
                 put("Gene.refGene", "Hugo_Symbol");
@@ -168,21 +195,19 @@ public class ExcelAdaptor {
 
     }
 
-// In_Frame_Del
-//"Silent"
-// 
-//"Translation_Start_Site"
-//"Nonstop_Mutation"
-//"3'UTR"
-//"3'Flank"
-//"5'UTR"
-//"5'Flank"
-//"IGR1"
-//"Intron"
-//"RNA"
-//"Targeted_Region"
-//"De_novo_Start_InFrame"
-//"De_novo_Start_OutOfFrame" 
+//Silent
+//Translation_Start_Site
+//Nonstop_Mutation
+//3'UTR
+//3'Flank
+//5'UTR
+//5'Flank
+//IGR1 
+//Intron
+//RNA
+//Targeted_Region
+//De_novo_Start_InFrame
+//De_novo_Start_OutOfFrame.     
     void replaceExonicFunction() {
         List<String> col = getColumn(EXONIC_FUNC_REFGENE);
 
@@ -190,7 +215,8 @@ public class ExcelAdaptor {
 
             String replacement = exonicFuncRefGene_VariantClassificationMap.get(col.get(c));
             if (replacement == null) {
-                replacement = "";
+                // replacement = "";
+                throw new RuntimeException("variant classification not found for: " + col.get(c));
             }
             col.set(c, replacement);
         }

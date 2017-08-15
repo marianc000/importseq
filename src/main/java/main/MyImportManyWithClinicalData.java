@@ -5,19 +5,25 @@
  */
 package main;
 
+import excel.LoadRROTable;
+import files.FileFinder;
 import folder.ExcelAdaptor;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.sql.Connection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import persistence.MyAddCaseList;
+import persistence.MyClinicalAttribute;
 import static persistence.MyConnection.getConnection;
+import persistence.MyDaoClinicalData;
+
 import persistence.MyImportClinicalData;
 import persistence.MyImportProfileData;
-import utils.FileUtils;
 
 /**
  *
@@ -27,8 +33,7 @@ public class MyImportManyWithClinicalData {
 
     MyProperties p;
 
-    public MyImportManyWithClinicalData(MyProperties p) throws IOException {
-        this.p = p;
+    public MyImportManyWithClinicalData() throws IOException {
 
     }
 
@@ -43,61 +48,119 @@ public class MyImportManyWithClinicalData {
         return sampleName;
     }
 
-    void importFile(Connection con, String sourceFilePath) throws Exception {
-        String sampleName = getSampleName(Paths.get(sourceFilePath));
-        MyImportClinicalData cd = new MyImportClinicalData(p.getTargetStudyName());
-        int cancerStudyId = cd.getCancerStudyId(con, p.getTargetStudyName());
-        if (cd.doesSampleIdExistInCancerStudy(con, cancerStudyId, sampleName)) {
-            throw new RuntimeException("sample " + sampleName + " for patient" + sampleName + " already exist, skipping");
+    public static String RRO_STUDY_NAME = "aca_chuv2_all_stjude_2015";
+    MyImportClinicalData cd = new MyImportClinicalData(RRO_STUDY_NAME);
+
+    void importEverything(Set<Path> mutationFilePaths, Map<String, List<String>> refextNipMap, List<String> headers) throws Exception {
+
+        try (Connection con = getConnection()) {
+            con.setAutoCommit(false);
+            int cancerStudyId = cd.getCancerStudyId(con, RRO_STUDY_NAME);
+
+            List<MyClinicalAttribute> columnAttrs = cd.grabAttrs(con, headers, cancerStudyId);
+
+            for (Path sourceFilePath : mutationFilePaths) {
+                importMutationFile(con, sourceFilePath, columnAttrs, cancerStudyId);
+            }
+            con.commit();
+            // con.rollback();
+        }
+    }
+
+    void importMutationFile(Connection con, Path sourceFilePath, List<MyClinicalAttribute> columnAttrs, int cancerStudyId) throws Exception {
+        System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>importMutationFile: sourceFilePath=" + sourceFilePath.getFileName());
+
+        String sampleName = getSampleName(sourceFilePath);
+        Map<String, List<String>> refextNipMap = rro.getRefextNipMap();
+        List<String> row = refextNipMap.get(sampleName);
+        System.out.println(">importMutationFile: row=" + row);
+        String sampleNameInFile = row.get(rro.getRefextHeaderIndex());
+        String patientNameInFile = row.get(rro.getNipHeaderIndex());
+        System.out.println(">importMutationFile: " + sourceFilePath.getFileName() + "; sampleName=" + sampleNameInFile + "; patientName=" + patientNameInFile);
+        if (!sampleName.equals(sampleNameInFile)) {
+            throw new RuntimeException("sample names differ");
         }
 
-        Path dataFilePath = new ExcelAdaptor(sourceFilePath).run();
+        int sampleId = cd.addSample(con, cancerStudyId, sampleName, sampleName);
+        importClinicalDataValues(con, row, columnAttrs, sampleId);
+
+        Path dataFilePath = new ExcelAdaptor(sourceFilePath.toString()).run();
 
         File dataFile = dataFilePath.toFile();
         System.out.println("dataFile: " + dataFile);
 
-// commit switch off autocommit, and then commit
         MyImportProfileData pd = new MyImportProfileData();
         MyAddCaseList cl = new MyAddCaseList();
-        try {
-            con.setAutoCommit(false);
 
-            int sampleId = cd.addSample(con, cancerStudyId, sampleName, sampleName);
-            int geneticProfileId = cd.getGeneticProfileId(con, cancerStudyId);
+        int geneticProfileId = cd.getGeneticProfileId(con, cancerStudyId);
 
-            pd.run(con, geneticProfileId, dataFile, sampleId);
+        pd.run(con, geneticProfileId, dataFile, sampleId);
 
-            cl.addSampleToList(con, cancerStudyId, sampleId);
-            //  throw new RuntimeException("not readY!!!!");
-            con.commit();
-        } finally {
-            System.out.println("importFile:deleting " + dataFilePath);
-            Files.delete(dataFilePath);
-            System.out.println("importFile:deleted " + dataFilePath);
+        cl.addSampleToList(con, cancerStudyId, sampleId);
+        //  throw new RuntimeException("not readY!!!!");
+        System.out.println("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<importMutationFile: sourceFilePath=" + sourceFilePath.getFileName());
+
+    }
+
+    void importClinicalDataValues(Connection con, List<String> row, List<MyClinicalAttribute> columnAttrs, int internalSampleId) throws Exception {
+        System.out.println(">importClinicalDataValues");
+        int sampleIdIndex = rro.getRefextHeaderIndex();
+        int patientIdIndex = rro.getNipHeaderIndex();
+
+        for (int lc = 0; lc < row.size(); lc++) {
+            //if lc is sampleIdIndex or patientIdIndex, skip as well since these are the relational fields:
+            if (lc == sampleIdIndex || lc == patientIdIndex) {
+                // continue; // skip for tests
+            }
+            //if the value matches one of the missing values, skip this attribute:
+            String val = row.get(lc);
+            if (val == null || val.isEmpty()) {
+                continue;
+            }
+
+            MyDaoClinicalData.addSampleDatum(con, internalSampleId, columnAttrs.get(lc).getAttrId(), val);
         }
+
     }
 
-    public void runImportWithFilePath(Path sourceFilePath) throws Exception {
-        FileUtils fu = new FileUtils(p.getImportedDirPath(), p.getRejectedDirPath());
-        try (Connection con = getConnection()) {
-            importFile(con, sourceFilePath.toString());
-        } catch (Exception ex) {
-            System.out.println("Exception:" + ex.getMessage());
-            fu.moveFileToRejected(sourceFilePath);
-            throw ex;
+    void printSet(Set<String> set) {
+        System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+        for (String s : set) {
+            System.out.println("'" + s + "'");
         }
-// everything is fine
-        fu.moveFileToImported(sourceFilePath);
+        System.out.println("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
+    }
+    LoadRROTable rro;
+
+    public void runImport() throws Exception {
+        rro = new LoadRROTable();
+        rro.init(RRO_FILE_PATH);
+        Map<String, List<String>> refextNipMap = rro.getRefextNipMap();
+        FileFinder ff = new FileFinder();
+        Set<Path> mutationFilePaths = ff.run(SOURCE_FILE_DIR);
+
+        Set<String> samplesInFiles = ff.getSampleNames();
+        System.out.println("Samples in files: " + samplesInFiles.size());
+
+        Set<String> samplesInRro = new HashSet<>(refextNipMap.keySet());
+
+        samplesInRro.removeAll(samplesInFiles);
+        System.out.println("Samples without files: " + samplesInRro);
+
+        samplesInFiles = ff.getSampleNames();
+        samplesInFiles.removeAll(refextNipMap.keySet());
+        System.out.println("Files without rro samples: " + samplesInFiles);
+        System.out.println("Files: " + mutationFilePaths.size());
+        System.out.println("Sample names: " + refextNipMap.size());
+        importEverything(mutationFilePaths, refextNipMap, rro.getHeaders());
     }
 
-    public void runImport(String sourceFilePathString) throws Exception {
-        Path sourceFilePath = p.getSourceFilePath(sourceFilePathString);
-        runImportWithFilePath(sourceFilePath);
-    }
+    static String RRO_FILE_PATH = "C:\\Projects\\cBioPortal\\data sample\\SECOND SAMPLES\\20170725 RRO CBIO exportMCunmodified.xlsx";
+    static String SOURCE_FILE_DIR = "C:\\Projects\\cBioPortal\\data sample\\SECOND SAMPLES\\";
 
     public static void main(String... args) throws Exception {
-        String SOURCE_FILE_NAME = "Mix_cell-line44.hg19_coding01.Tab.xlsx";
-        MyImportManyWithClinicalData i = new MyImportManyWithClinicalData(new MyProperties());
-        i.runImport(SOURCE_FILE_NAME);
+
+        MyImportManyWithClinicalData i = new MyImportManyWithClinicalData();
+        i.runImport();
     }
 }

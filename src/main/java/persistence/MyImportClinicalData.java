@@ -5,12 +5,15 @@
  */
 package persistence;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
- 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  *
  * @author mcaikovs
@@ -140,5 +143,27 @@ public class MyImportClinicalData {
             System.out.println("internalSampleId: " + internalSampleId);
             return internalSampleId;
         }
+    }
+
+    public static final String SAMPLE_ID_COLUMN_NAME = "SAMPLE_ID";
+    public static final String PATIENT_ID_COLUMN_NAME = "PATIENT_ID";
+
+    public List<MyClinicalAttribute> grabAttrs(Connection con, List<String> headers, int cancerStudyId) throws SQLException, IOException {
+        List<MyClinicalAttribute> attrs = new ArrayList<>();
+
+        for (String header : headers) {
+            MyClinicalAttribute attr = new MyClinicalAttribute(header, header, header, "STRING", false, "1", cancerStudyId);
+            attrs.add(attr);
+//            //skip PATIENT_ID / SAMPLE_ID columns, i.e. these are not clinical attributes but relational columns:
+//            if (attr.getAttrId().equals(PATIENT_ID_COLUMN_NAME) // TODO: skip nip and sample name
+//                    || attr.getAttrId().equals(SAMPLE_ID_COLUMN_NAME)) {
+//                continue;
+//            }
+
+            if (!MyDaoClinicalAttributeMeta.doesAttributeExist(con, header, cancerStudyId)) {
+                MyDaoClinicalAttributeMeta.addDatum(con, attr);
+            }
+        }
+        return attrs;
     }
 }
