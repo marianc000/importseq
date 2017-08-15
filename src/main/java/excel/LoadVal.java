@@ -5,34 +5,26 @@
  */
 package excel;
 
+import static excel.LoadRROTable.printMap;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 
-/**
- *
- * @author mcaikovs
- */
-public class LoadRROTable {
+public class LoadVal {
 
     static int HEADERS_ARE_IN_ROW = 0;
     //  static String RRO_FILE_PATH = "C:\\Projects\\cBioPortal\\data sample\\SECOND SAMPLES\\20170725 RRO CBIO exportMCunmodified.xlsx";
 
-  public  static void printMap(Map map) {
-        System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-        for (Object k : map.keySet()) {
-            System.out.println(k + "\t" + map.get(k));
-        }
-        System.out.println(map.size());
-        System.out.println("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
-    }
     static String VALUE_SEPARATOR = ",";
 
     List<String> mergeTwoRows(List<String> row1, List<String> row2) {
@@ -81,26 +73,6 @@ public class LoadRROTable {
 
     ExcelOperations excel = new ExcelOperations();
 
-    Map<String, List<String>> loadRefextNipMap() throws IOException, InvalidFormatException {
-
-        //   excel.printDocument();
-        Map<String, List<String>> refextRowMap = new LinkedHashMap<>();
-        List<String> refextCol = excel.getColumn(SAMPLE_NAME_HEADER_NAME);
-
-        for (int c = HEADERS_ARE_IN_ROW + 1; c < refextCol.size(); c++) {
-            String val = refextCol.get(c).trim();
-            List<String> newRow = excel.getRow(c);
-            if (refextRowMap.containsKey(val)) {
-                List<String> row1 = refextRowMap.get(val);
-                refextRowMap.put(val, mergeTwoRows(row1, newRow));
-            } else {
-                refextRowMap.put(val, newRow);
-            }
-        }
-        printMap(refextRowMap);
-        return refextRowMap;
-    }
-
     public List<String> getHeaders() {
         return excel.getRow(HEADERS_ARE_IN_ROW);
     }
@@ -120,46 +92,59 @@ public class LoadRROTable {
     public int getRefextHeaderIndex() {
         return getHeaders().indexOf(SAMPLE_NAME_HEADER_NAME);
     }
-    
+
     public static String SAMPLE_NAME_HEADER_NAME = "REFEXT";
     public static String IPP_HEADER_NAME = "NIP";
 
-    Map<String, List<List<String>>> createNipSampleMap(Collection< List<String>> rows) throws IOException, InvalidFormatException {
-
-        Map<String, List<List<String>>> nipSamplesMap = new LinkedHashMap<>();
-        int nipIndex = getNipHeaderIndex();
-        for (List<String> row : rows) {
-            String nip = row.get(nipIndex);
-
-            if (!nipSamplesMap.containsKey(nip)) {
-                nipSamplesMap.put(nip, new LinkedList<>());
-            }
-
-            List<List<String>> samples = nipSamplesMap.get(nip);
-            samples.add(row);
-
-        }
-        printMap(nipSamplesMap);
-        return nipSamplesMap;
-
-    }
 // TODO: it is not necessary to make such map, the values would suffice
+    public Map<String, Set<String>> getGeneMutationsMap() throws IOException, InvalidFormatException {
 
-    public Map<String, List<String>> getRefextNipMap() throws IOException, InvalidFormatException {
-
-        return refextNipMap;
+        return geneMutationsMap;
     }
-    Map<String, List<String>> refextNipMap;
-    Map<String, List<List<String>>> nipSamplesMap;
+    Map<String, Set<String>> geneMutationsMap;
 
-    public Map<String, List<String>> init(String rroFilePath) throws IOException, InvalidFormatException {
-        excel.loadDocument(rroFilePath);
-        refextNipMap = loadRefextNipMap();
-        nipSamplesMap = createNipSampleMap(refextNipMap.values());
-        return refextNipMap;
+    public void init(String filePath) throws IOException, InvalidFormatException {
+
+        excel.loadDocument(filePath);
+
+        geneMutationsMap = new HashMap<>();
+        List<String> resultatCol = excel.getColumn("Résultat");
+        List<String> geneCol = excel.getColumn("Gène");
+
+        for (int r = geneCol.size() - 1; r >= 0; r--) {
+            String gene = geneCol.get(r);
+
+            if (gene.isEmpty()) {
+                excel.removeRow(r);
+            } else {
+                String mutation = getMutationFromCell(resultatCol.get(r));
+                if (mutation == null) {
+                    excel.removeRow(r);
+                } else {
+                    System.out.println(gene + "; " + mutation);
+                    if (geneMutationsMap.get(gene) == null) {
+                        geneMutationsMap.put(gene, new HashSet<>());
+                    }
+                    if (!geneMutationsMap.get(gene).add(mutation)) {
+                        throw new RuntimeException("mutation " + mutation + " was already in set " + gene);
+                    }
+                }
+            }
+        }
+        //   printMap(geneMutationsMap);
+        //  excel.printDocument();
     }
+
+    String getMutationFromCell(String s) {
+        Matcher m = p.matcher(s);
+        if (m.matches()) {
+            return m.group(1);
+        }
+        return null;
+    }
+    Pattern p = Pattern.compile(".+\\((.+)\\)", Pattern.DOTALL);
 
     public static void main(String... args) throws IOException, InvalidFormatException {
-        new LoadRROTable().init("C:\\Projects\\cBioPortal\\data sample\\SECOND SAMPLES\\20170725 RRO CBIO exportMCunmodified.xlsx");
+        new LoadVal().init("C:\\Projects\\cBioPortal\\data sample\\SECOND SAMPLES\\C1607855-1SS.hg19_coding01.Val.xlsx");
     }
 }

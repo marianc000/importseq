@@ -69,9 +69,15 @@ public class ExcelOperations {
         return row;
     }
 
+    void removeRow(int index) {
+        for (int c = 0; c < doc.size(); c++) {
+            doc.get(c).remove(index);
+        }
+    }
+
     String getCellValue(Cell cell) {
         if (cell == null) {
-            System.out.println("WARNING: cell is null");
+            //  System.out.println("WARNING: cell is null");
             return "";
         }
         switch (cell.getCellTypeEnum()) {
@@ -167,12 +173,18 @@ public class ExcelOperations {
 
         for (int rowNum = 1; rowNum <= sheet.getLastRowNum(); rowNum++) {
             Row row = sheet.getRow(rowNum);
-            for (int colNum = 0; colNum < doc.size(); colNum++) {
-                doc.get(colNum).add(getCellValue(row.getCell(colNum)));
+            if (row != null) {
+                for (int colNum = 0; colNum < doc.size(); colNum++) {
+                    Cell cell = row.getCell(colNum);
+                    String cellVal = getCellValue(cell);
+                    doc.get(colNum).add(cellVal);
+                }
+            } else {
+                System.out.println("!!!!!!!!!!!!!!!!!!!!!!!! row " + rowNum + " is null, total rows=" + sheet.getLastRowNum() + "; file=" + fileName);
             }
         }
         wb.close();
-        System.out.print("loaded rows: " + sheet.getLastRowNum());
+        System.out.println("loaded rows: " + sheet.getLastRowNum());
         return doc;
     }
 

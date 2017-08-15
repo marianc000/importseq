@@ -5,6 +5,8 @@
  */
 package folder;
 
+import excel.LoadRROTable;
+import excel.LoadVal;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -41,6 +43,7 @@ public class ExcelAdaptor {
     //  static String sourceFilePath = "C:\\Projects\\cBioPortal\\data sample\\H1975.hg19_coding01.TabTest.xlsx";
     static String canonicalMapFileName = "/isoform_overrides_uniprot.txt";
     static String AA_CHANGE_COLUMN = "AAChange.refGene";
+    static String GENE_COLUMN = "Gene.refGene";
     static String EXONIC_FUNC_REFGENE = "ExonicFunc.refGene";
     static String IGNORED_COLUMN = "#version 2.4";
     static String VALIDATION_COLUMN = "chuvValidation";
@@ -68,7 +71,7 @@ public class ExcelAdaptor {
 
     String getCellValue(Cell cell) {
         if (cell == null) {
-           // System.out.println("WARNING: cell is null");
+            // System.out.println("WARNING: cell is null");
             return "";
         }
         switch (cell.getCellTypeEnum()) {
@@ -112,7 +115,7 @@ public class ExcelAdaptor {
     }
 
     String selectCanonicalTranscript(String val) {
-      //  System.out.println(">selectCanonicalTranscript: val=" + val);
+        //  System.out.println(">selectCanonicalTranscript: val=" + val);
         String[] variants = val.split(Pattern.quote(","));
         String aaChange = null;
         for (String variant : variants) {
@@ -177,7 +180,7 @@ public class ExcelAdaptor {
         exonicFuncRefGene_VariantClassificationMap.put("stoploss", "Nonstop_Mutation");
         sourceTargetHeaders = new HashMap<String, String>() {
             {
-                put("Gene.refGene", "Hugo_Symbol");
+                put(GENE_COLUMN, "Hugo_Symbol");
                 put("Chr", "Chromosome");
                 put("Start", "Start_Position");
                 put("End", "End_Position");
@@ -338,9 +341,16 @@ public class ExcelAdaptor {
             col.add(1, header);
         }
     }
+    Map<String, Set<String>> geneValidMutationsMap;
 
     public Path run() throws IOException, InvalidFormatException {
         loadDocument(sourceFilePath);
+        // VAL
+        String sourceValFilePath = sourceFilePath.replace("coding01.Tab", "coding01.Val");
+        LoadVal valFile = new LoadVal();
+        valFile.init(sourceValFilePath);
+        geneValidMutationsMap = valFile.getGeneMutationsMap();
+
         // printDocument();
         filterColumns();
 
@@ -348,6 +358,42 @@ public class ExcelAdaptor {
         replaceExonicFunction();
 
         addColumn(VALIDATION_COLUMN, "Not validated");
+        List<String> geneCol = getColumn(GENE_COLUMN);
+        List<String> mutationCol = getColumn(AA_CHANGE_COLUMN);
+        List<String> validationCol = getColumn(VALIDATION_COLUMN);
+        for (int c = 0; c < geneCol.size(); c++) {
+            String gene = geneCol.get(c);
+            String mutation = mutationCol.get(c);
+            Set<String> validMutations = geneValidMutationsMap.get(gene);
+            if (validMutations != null) {
+                if (validMutations.contains(mutation)) {
+                    validMutations.remove(mutation);
+                    if (validMutations.isEmpty()) {
+                        geneValidMutationsMap.remove(gene);
+                    }
+                    validationCol.set(c, "Validated in Val file");
+                } else {
+                    // try to replace * by X
+                    mutation = mutation.replace("X", "*");
+                    if (validMutations.contains(mutation)) {
+                        validMutations.remove(mutation);
+                        if (validMutations.isEmpty()) {
+                            geneValidMutationsMap.remove(gene);
+                        }
+                        validationCol.set(c, "Validated in Val file");
+                    }
+                }
+            }
+        }
+        LoadRROTable.printMap(geneValidMutationsMap);
+        if (!geneValidMutationsMap.isEmpty()) {
+            // throw new RuntimeException("map is not empty");
+            System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" + sourceFilePath);
+            System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!map is not empty");
+            LoadRROTable.printMap(geneValidMutationsMap);
+            System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        }
+
         addColumn(SAMPLE_NAME_COLUMN, getSampleName(sourceFilePath));
         insertColumn(IGNORED_COLUMN, "");
         insertHeaders();
