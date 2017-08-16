@@ -20,6 +20,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Cell;
@@ -295,7 +296,7 @@ public class ExcelAdaptor {
     }
 
     List<String> loadList(String fileName) throws IOException {
-        System.out.println(">ExcelAdaptor:loadList");
+        // System.out.println(">ExcelAdaptor:loadList");
         List<String> list = new LinkedList<>();
         try (BufferedReader br = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream(fileName)))) {
             String l;
@@ -303,7 +304,7 @@ public class ExcelAdaptor {
                 list.add(l);
             }
         }
-        System.out.println("<ExcelAdaptor:loadList: " + list.size());
+        // System.out.println("<ExcelAdaptor:loadList: " + list.size());
         return list;
     }
 
@@ -347,8 +348,13 @@ public class ExcelAdaptor {
         loadDocument(sourceFilePath);
         // VAL
         String sourceValFilePath = sourceFilePath.replace("coding01.Tab", "coding01.Val");
+        System.out.println("sourceValFilePath=" + sourceValFilePath);
         LoadVal valFile = new LoadVal();
         valFile.init(sourceValFilePath);
+        if (sourceFilePath.equals(sourceValFilePath)) {
+            throw new RuntimeException("wrong file names");
+        }
+
         geneValidMutationsMap = valFile.getGeneMutationsMap();
 
         // printDocument();
@@ -361,31 +367,49 @@ public class ExcelAdaptor {
         List<String> geneCol = getColumn(GENE_COLUMN);
         List<String> mutationCol = getColumn(AA_CHANGE_COLUMN);
         List<String> validationCol = getColumn(VALIDATION_COLUMN);
+        List<String> mutationTypeCol = getColumn(EXONIC_FUNC_REFGENE);
+        System.out.println("geneCol: " + geneCol);
+        System.out.println("mutationCol: " + mutationCol);
         for (int c = 0; c < geneCol.size(); c++) {
             String gene = geneCol.get(c);
             String mutation = mutationCol.get(c);
+            String mutationType = mutationTypeCol.get(c);
             Set<String> validMutations = geneValidMutationsMap.get(gene);
+            System.out.println("gene: " + gene + "; mutation: " + mutation + "; validMutations: " + validMutations);
             if (validMutations != null) {
-                if (validMutations.contains(mutation)) {
-                    validMutations.remove(mutation);
+
+                boolean validated = validMutations.remove(mutation);
+
+                if (!validated) {
+                    // try to replace * by X
+                    String mutation2 = transformStopMutationName(mutation);
+                    validated = validMutations.remove(transformStopMutationName(mutation2));
+                    System.out.println("mutation2: " + mutation2 + "; validMutations: " + validMutations);
+                }
+                if (!validated) { // splicing, no mutation in protein
+                    if (mutation.isEmpty() && mutationType.equals("Splice_Site")) {
+                        validated = validMutations.remove("Splicing");
+                    }
+                }
+                if (!validated) {
+                    for (String validMutation : validMutations) { //p.L252_I254del
+                        String transformedValidMutation = transformDeletionMutationName(validMutation); //p.252_254del
+                        if (mutation.equals(transformedValidMutation)) {
+                            validated = validMutations.remove(validMutation);
+                            break;
+                        }
+                    }
+                }
+
+                if (validated) {
+                    validationCol.set(c, "Validated in Val file");
                     if (validMutations.isEmpty()) {
                         geneValidMutationsMap.remove(gene);
-                    }
-                    validationCol.set(c, "Validated in Val file");
-                } else {
-                    // try to replace * by X
-                    mutation = mutation.replace("X", "*");
-                    if (validMutations.contains(mutation)) {
-                        validMutations.remove(mutation);
-                        if (validMutations.isEmpty()) {
-                            geneValidMutationsMap.remove(gene);
-                        }
-                        validationCol.set(c, "Validated in Val file");
                     }
                 }
             }
         }
-        LoadRROTable.printMap(geneValidMutationsMap);
+        //   LoadRROTable.printMap(geneValidMutationsMap);
         if (!geneValidMutationsMap.isEmpty()) {
             // throw new RuntimeException("map is not empty");
             System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" + sourceFilePath);
@@ -400,6 +424,25 @@ public class ExcelAdaptor {
         //  printDocument();
         saveDocument(getOutputFilePath());
         return getOutputFilePath();
+    }
+    Pattern delMutationPattern = Pattern.compile("p\\.[A-Z]\\d+_[A-Z]\\d+del");
+
+    String transformDeletionMutationName(String nameInVal) {
+        Matcher m = delMutationPattern.matcher(nameInVal);
+        if (m.matches()) {
+            return nameInVal.replaceAll("[A-Z]", "");
+        }
+        return nameInVal;
+    }
+    Pattern stopMutationPattern = Pattern.compile("p\\.[A-Z]\\d+X");
+
+    String transformStopMutationName(String nameInTab) {
+        Matcher m = stopMutationPattern.matcher(nameInTab);
+        if (m.matches()) {
+            return nameInTab.replace("X", "*");
+        }
+
+        return nameInTab;
     }
 
     public static void main(String... args) throws IOException, InvalidFormatException {

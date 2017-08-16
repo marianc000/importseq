@@ -40,9 +40,9 @@ public class LoadRROTable {
         if (row1.size() != row2.size()) {
             throw new RuntimeException("rows have different size");
         }
-        System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>");
-        System.out.println(">row1" + row1);
-        System.out.println(">row2" + row2);
+     //   System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>");
+      //  System.out.println(">row1" + row1);
+     //   System.out.println(">row2" + row2);
         for (int c = 0; c < row1.size(); c++) {
 
             String val1 = row1.get(c);
@@ -75,7 +75,7 @@ public class LoadRROTable {
             }
             row.add(val1);
         }
-        System.out.println("<row3" + row);
+      //  System.out.println("<row3" + row);
         return row;
     }
 

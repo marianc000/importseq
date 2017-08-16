@@ -123,7 +123,7 @@ public class MyImportClinicalData {
     }
 
     public Integer addSample(Connection con, int cancerStudyId, String stablePatientId, String stableSampleId) throws SQLException {
-
+        System.out.println(">addSample: ");
         Integer internalSampleId;
         Integer internalPatientId;
 
@@ -137,10 +137,10 @@ public class MyImportClinicalData {
                 System.out.println("adding patient:" + stablePatientId);
                 internalPatientId = addPatient(con, cancerStudyId, stablePatientId);
             }
-            System.out.println("internalPatientId: " + internalPatientId);
+            //  System.out.println("internalPatientId: " + internalPatientId);
 
             internalSampleId = addSample(con, cancerStudyId, internalPatientId, stableSampleId);
-            System.out.println("internalSampleId: " + internalSampleId);
+            //  System.out.println("internalSampleId: " + internalSampleId);
             return internalSampleId;
         }
     }

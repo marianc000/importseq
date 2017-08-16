@@ -7,12 +7,8 @@ package excel;
 
 import static excel.LoadRROTable.printMap;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -27,50 +23,7 @@ public class LoadVal {
 
     static String VALUE_SEPARATOR = ",";
 
-    List<String> mergeTwoRows(List<String> row1, List<String> row2) {
-        List<String> row = new LinkedList<>();
-        if (row1.size() != row2.size()) {
-            throw new RuntimeException("rows have different size");
-        }
-        System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>");
-        System.out.println(">row1" + row1);
-        System.out.println(">row2" + row2);
-        for (int c = 0; c < row1.size(); c++) {
-
-            String val1 = row1.get(c);
-            String val2 = row2.get(c);
-
-            if (val1 == null) {
-                if (val2 != null) {
-                    val1 = val2;
-                }
-            } else {
-                if (val2 == null) {
-
-                } else {
-
-                    if (val1.equals(val2)) {
-
-                    } else {
-                        Set<String> set = new HashSet<>();
-                        String[] vals1 = val1.split(VALUE_SEPARATOR);
-                        String[] vals2 = val2.split(VALUE_SEPARATOR);
-                        Collections.addAll(set, vals1);
-                        Collections.addAll(set, vals2);
-                        List<String> l = new LinkedList<>(set);
-                        Collections.sort(l);
-                        String val3 = String.join(VALUE_SEPARATOR, l);
-                        System.out.println("val1=" + val1 + "; val2=" + val2 + "; val3=" + val3);
-                        val1 = val3;
-                    }
-                }
-            }
-            row.add(val1);
-        }
-        System.out.println("<row3" + row);
-        return row;
-    }
-
+//   
     ExcelOperations excel = new ExcelOperations();
 
     public List<String> getHeaders() {
@@ -110,14 +63,21 @@ public class LoadVal {
         geneMutationsMap = new HashMap<>();
         List<String> resultatCol = excel.getColumn("Résultat");
         List<String> geneCol = excel.getColumn("Gène");
+        List<String> hCol = excel.getColumn("H");
 
         for (int r = geneCol.size() - 1; r >= 0; r--) {
+            if (!"G".equals(hCol.get(r))) { // some files are aberrant have rows with empty values in H col
+                excel.removeRow(r);
+                continue;
+            }
+
             String gene = geneCol.get(r);
 
             if (gene.isEmpty()) {
                 excel.removeRow(r);
             } else {
                 String mutation = getMutationFromCell(resultatCol.get(r));
+                gene=gene.split(" ")[0]; // for cases like CDKN2A (p14ARF)
                 if (mutation == null) {
                     excel.removeRow(r);
                 } else {
@@ -131,7 +91,7 @@ public class LoadVal {
                 }
             }
         }
-        //   printMap(geneMutationsMap);
+        printMap(geneMutationsMap);
         //  excel.printDocument();
     }
 

@@ -5,6 +5,7 @@
  */
 package main;
 
+import clean.CleanStudy;
 import excel.LoadRROTable;
 import files.FileFinder;
 import folder.ExcelAdaptor;
@@ -73,10 +74,10 @@ public class MyImportManyWithClinicalData {
         String sampleName = getSampleName(sourceFilePath);
         Map<String, List<String>> refextNipMap = rro.getRefextNipMap();
         List<String> row = refextNipMap.get(sampleName);
-        System.out.println(">importMutationFile: row=" + row);
+        // System.out.println(">importMutationFile: row=" + row);
         String sampleNameInFile = row.get(rro.getRefextHeaderIndex());
         String patientNameInFile = row.get(rro.getNipHeaderIndex());
-        System.out.println(">importMutationFile: " + sourceFilePath.getFileName() + "; sampleName=" + sampleNameInFile + "; patientName=" + patientNameInFile);
+        // System.out.println(">importMutationFile: " + sourceFilePath.getFileName() + "; sampleName=" + sampleNameInFile + "; patientName=" + patientNameInFile);
         if (!sampleName.equals(sampleNameInFile)) {
             throw new RuntimeException("sample names differ");
         }
@@ -158,8 +159,9 @@ public class MyImportManyWithClinicalData {
     static String RRO_FILE_PATH = "C:\\Projects\\cBioPortal\\data sample\\SECOND SAMPLES\\20170725 RRO CBIO exportMCunmodified.xlsx";
     static String SOURCE_FILE_DIR = "C:\\Projects\\cBioPortal\\data sample\\SECOND SAMPLES\\";
 
+    // static String SOURCE_FILE_DIR = "C:\\Projects\\cBioPortal\\data sample\\test\\";
     public static void main(String... args) throws Exception {
-
+        new CleanStudy().clean();
         MyImportManyWithClinicalData i = new MyImportManyWithClinicalData();
         i.runImport();
     }

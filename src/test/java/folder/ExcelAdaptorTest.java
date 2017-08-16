@@ -37,4 +37,28 @@ public class ExcelAdaptorTest {
         assertNull(a.selectCanonicalTranscriptForGeneWithoutCanonicalTranscript(s));
     }
 
+    @Test
+    public void testTransformDeletionMutationName() throws IOException {
+        ExcelAdaptor a = new ExcelAdaptor(null);
+        String s = "p.D402_A403del";
+
+        assertEquals(a.transformDeletionMutationName(s), "p.402_403del");
+        s = "p.Q472H";
+        assertEquals(a.transformDeletionMutationName(s), s);
+        s = "p.H1047R";
+        assertEquals(a.transformDeletionMutationName(s), s);
+        s = "p.L252_I254del";
+        assertEquals(a.transformDeletionMutationName(s), "p.252_254del");
+    }
+
+    @Test
+    public void testTransformStopMutationName() throws IOException {
+        ExcelAdaptor a = new ExcelAdaptor(null);
+        String s = "p.R98X";
+
+        assertEquals(a.transformStopMutationName(s), "p.R98*");
+        s = "p.Q472H";
+        assertEquals(a.transformStopMutationName(s), s);
+
+    }
 }
