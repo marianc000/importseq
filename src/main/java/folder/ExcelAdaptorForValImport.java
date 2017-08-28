@@ -7,6 +7,7 @@ package folder;
 
 import excel.LoadRROTable;
 import excel.LoadVal;
+import excel.LoadValForVal;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -92,7 +93,7 @@ public class ExcelAdaptorForValImport {
             case BOOLEAN:
             case FORMULA:
             default:
-                throw new RuntimeException("this should not happen: type: "+cell.getCellTypeEnum()+"; val: "+cell.getStringCellValue() );
+                throw new RuntimeException("this should not happen: type: " + cell.getCellTypeEnum() + "; val: " + cell.getStringCellValue());
         }
     }
 
@@ -349,7 +350,7 @@ public class ExcelAdaptorForValImport {
         // VAL
         String sourceValFilePath = sourceFilePath.replace("coding01.Tab", "coding01.Val");
         System.out.println("sourceValFilePath=" + sourceValFilePath);
-        LoadVal valFile = new LoadVal();
+        LoadValForVal valFile = new LoadValForVal();
         valFile.init(sourceValFilePath);
         if (sourceFilePath.equals(sourceValFilePath)) {
             throw new RuntimeException("wrong file names");

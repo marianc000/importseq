@@ -21,9 +21,9 @@ import persistence.MyImportClinicalData;
  */
 public class CleanStudy {
 
-    MyImportClinicalData cd = new MyImportClinicalData(RRO_STUDY_NAME);
+    MyImportClinicalData cd;
     String[] sqls = {"DELETE FROM sample_list_list WHERE LIST_ID IN (SELECT LIST_ID FROM sample_list WHERE CANCER_STUDY_ID=179)",
-      //  "DELETE FROM sample_list WHERE CANCER_STUDY_ID=179",
+        //  "DELETE FROM sample_list WHERE CANCER_STUDY_ID=179",
         "DELETE FROM mutation_count WHERE GENETIC_PROFILE_ID IN (SELECT GENETIC_PROFILE_ID FROM genetic_profile WHERE CANCER_STUDY_ID=179)",
         "DELETE FROM mutation WHERE GENETIC_PROFILE_ID IN (SELECT GENETIC_PROFILE_ID FROM genetic_profile WHERE CANCER_STUDY_ID=179)",
         "DELETE FROM sample_profile WHERE GENETIC_PROFILE_ID IN (SELECT GENETIC_PROFILE_ID FROM genetic_profile WHERE CANCER_STUDY_ID=179)",
@@ -38,8 +38,8 @@ public class CleanStudy {
 // DELETE FROM genetic_profile_samples WHERE GENETIC_PROFILE_ID IN (SELECT GENETIC_PROFILE_ID FROM genetic_profile WHERE CANCER_STUDY_ID=179)
 // DELETE FROM cancer_study WHERE CANCER_STUDY_ID=179;
 //	
-    public void clean() throws SQLException {
-
+    public void clean(String studyName) throws SQLException {
+        cd = new MyImportClinicalData(studyName);
         try (Connection con = getConnection()) {
             con.setAutoCommit(false);
             int cancerStudyId = cd.getCancerStudyId(con, RRO_STUDY_NAME);
@@ -48,14 +48,13 @@ public class CleanStudy {
                 System.out.println(sql);
                 try (PreparedStatement pstmt = con.prepareStatement(sql)) {
                     System.out.println(pstmt.executeUpdate());
-                    
                 }
             }
             con.commit();
         }
     }
-
-    public static void main(String... args) throws IOException, InvalidFormatException, SQLException {
-        new CleanStudy().clean();
-    }
+//
+//    public static void main(String... args) throws IOException, InvalidFormatException, SQLException {
+//        new CleanStudy().clean();
+//    }
 }

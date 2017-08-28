@@ -64,7 +64,7 @@ public class LoadVal {
         List<String> resultatCol = excel.getColumn("Résultat");
         List<String> geneCol = excel.getColumn("Gène");
         List<String> hCol = excel.getColumn("H");
-
+        List<String> refSeq = excel.getColumn("Référence");
         for (int r = geneCol.size() - 1; r >= 0; r--) {
             if (!"G".equals(hCol.get(r))) { // some files are aberrant have rows with empty values in H col
                 excel.removeRow(r);
@@ -77,7 +77,7 @@ public class LoadVal {
                 excel.removeRow(r);
             } else {
                 String mutation = getMutationFromCell(resultatCol.get(r));
-                gene=gene.split(" ")[0]; // for cases like CDKN2A (p14ARF)
+                gene = gene.split(" ")[0]; // for cases like CDKN2A (p14ARF)
                 if (mutation == null) {
                     excel.removeRow(r);
                 } else {

@@ -9,6 +9,7 @@ import clean.CleanStudy;
 import excel.LoadRROTable;
 import files.FileFinder;
 import folder.ExcelAdaptor;
+import folder.ExcelAdaptorForValImport;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -48,7 +49,7 @@ public class MyImportValWithClinicalData {
         }
         return sampleName;
     }
- 
+
     MyImportClinicalData cd = new MyImportClinicalData(RRO_STUDY_NAME);
 
     void importEverything(Set<Path> mutationFilePaths, Map<String, List<String>> refextNipMap, List<String> headers) throws Exception {
@@ -81,10 +82,10 @@ public class MyImportValWithClinicalData {
             throw new RuntimeException("sample names differ");
         }
 
-        int sampleId = cd.addSample(con, cancerStudyId, patientNameInFile, sampleName);
-        importClinicalDataValues(con, row, columnAttrs, sampleId);
+      //  int sampleId = cd.addSample(con, cancerStudyId, patientNameInFile, sampleName);
+      //  importClinicalDataValues(con, row, columnAttrs, sampleId);
 
-        Path dataFilePath = new ExcelAdaptor(sourceFilePath.toString()).run();
+        Path dataFilePath = new ExcelAdaptorForValImport(sourceFilePath.toString()).run();
 
         File dataFile = dataFilePath.toFile();
         System.out.println("dataFile: " + dataFile);
@@ -94,9 +95,9 @@ public class MyImportValWithClinicalData {
 
         int geneticProfileId = cd.getGeneticProfileId(con, cancerStudyId);
 
-        pd.run(con, geneticProfileId, dataFile, sampleId);
+     //   pd.run(con, geneticProfileId, dataFile, sampleId);
 
-        cl.addSampleToList(con, cancerStudyId, sampleId);
+      //  cl.addSampleToList(con, cancerStudyId, sampleId);
         //  throw new RuntimeException("not readY!!!!");
         System.out.println("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<importMutationFile: sourceFilePath=" + sourceFilePath.getFileName());
 
@@ -132,9 +133,9 @@ public class MyImportValWithClinicalData {
     }
     LoadRROTable rro;
 
-    public void runImport() throws Exception {
+    public void runImport(String clinicalDataFilePath) throws Exception {
         rro = new LoadRROTable();
-        rro.init(RRO_FILE_PATH);
+        rro.init(clinicalDataFilePath);
         Map<String, List<String>> refextNipMap = rro.getRefextNipMap();
         FileFinder ff = new FileFinder();
         Set<Path> mutationFilePaths = ff.run(SOURCE_FILE_DIR);
@@ -157,11 +158,11 @@ public class MyImportValWithClinicalData {
 
     static String RRO_FILE_PATH = "C:\\Projects\\cBioPortal\\data sample\\SECOND SAMPLES\\20170725 RRO CBIO exportMCunmodified.xlsx";
     static String SOURCE_FILE_DIR = "C:\\Projects\\cBioPortal\\data sample\\SECOND SAMPLES\\corrected\\H1703061-1A.hg19_coding01.Val.xlsx";
-public static String RRO_STUDY_NAME = "aca_chuv_val";
+    public static String RRO_STUDY_NAME = "aca_chuv_val";
+
     // static String SOURCE_FILE_DIR = "C:\\Projects\\cBioPortal\\data sample\\test\\";
     public static void main(String... args) throws Exception {
-        new CleanStudy().clean(RRO_STUDY_NAME);
-        MyImportValWithClinicalData i = new MyImportValWithClinicalData();
-        i.runImport();
+        //    new CleanStudy().clean(RRO_STUDY_NAME);
+        new MyImportValWithClinicalData().runImport(RRO_FILE_PATH);
     }
 }

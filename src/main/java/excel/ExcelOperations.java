@@ -69,7 +69,7 @@ public class ExcelOperations {
         return row;
     }
 
-  public  void removeRow(int index) {
+    public void removeRow(int index) {
         for (int c = 0; c < doc.size(); c++) {
             doc.get(c).remove(index);
         }
@@ -101,7 +101,7 @@ public class ExcelOperations {
         }
     }
 
-  public  List<String> getColumn(String header) {
+    public List<String> getColumn(String header) {
         for (List<String> col : doc) {
             if (col.get(0).equals(header)) {
                 return col;
@@ -192,7 +192,7 @@ public class ExcelOperations {
         for (int row = 0; row < document.get(0).size(); row++) {
             System.out.print(row + "\t");
             for (int col = 0; col < document.size(); col++) {
-                System.out.print(document.get(col).get(row));
+                System.out.print(document.get(col).get(row).replace('\n', ' '));
                 if (col < document.size() - 1) {
                     System.out.print("\t");
                 }
@@ -212,12 +212,22 @@ public class ExcelOperations {
 
     }
 
+    void printDocument(String title) {
+        System.out.println(">>> " + title);
+        printDocument(doc);
+        System.out.println("<<< " + title);
+    }
+
     void printDocument() {
         printDocument(doc);
     }
 
     void addColumn(String header, String value) {
         doc.add(createFilledColumn(header, value));
+    }
+
+    void addColumn(List<String> l) {
+        doc.add(l);
     }
 
     void insertColumn(String header, String value) {

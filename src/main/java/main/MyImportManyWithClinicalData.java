@@ -9,6 +9,7 @@ import clean.CleanStudy;
 import excel.LoadRROTable;
 import files.FileFinder;
 import folder.ExcelAdaptor;
+import folder.ExcelAdaptorForValImport;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -161,7 +162,7 @@ public class MyImportManyWithClinicalData {
 
     // static String SOURCE_FILE_DIR = "C:\\Projects\\cBioPortal\\data sample\\test\\";
     public static void main(String... args) throws Exception {
-        new CleanStudy().clean();
+        new CleanStudy().clean(RRO_STUDY_NAME);
         MyImportManyWithClinicalData i = new MyImportManyWithClinicalData();
         i.runImport();
     }
