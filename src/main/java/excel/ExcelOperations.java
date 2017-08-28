@@ -59,7 +59,7 @@ public class ExcelOperations {
         Files.write(path, content);
     }
 
-    List<String> getRow(int index) {
+    public List<String> getRow(int index) {
         List<String> row = new LinkedList<>();
 
         for (int c = 0; c < doc.size(); c++) {
@@ -69,7 +69,7 @@ public class ExcelOperations {
         return row;
     }
 
-    void removeRow(int index) {
+  public  void removeRow(int index) {
         for (int c = 0; c < doc.size(); c++) {
             doc.get(c).remove(index);
         }
@@ -101,7 +101,7 @@ public class ExcelOperations {
         }
     }
 
-    List<String> getColumn(String header) {
+  public  List<String> getColumn(String header) {
         for (List<String> col : doc) {
             if (col.get(0).equals(header)) {
                 return col;

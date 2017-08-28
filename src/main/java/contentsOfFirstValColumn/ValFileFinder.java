@@ -19,7 +19,7 @@ import java.util.Set;
  *
  * @author mcaikovs
  */
-public class FileFinder {
+public class ValFileFinder {
 
     public class Finder extends SimpleFileVisitor<Path> {
 
@@ -72,7 +72,7 @@ public class FileFinder {
         }
     }
 
-    static String SOURCE_FILE_NAME_PATTERN = "*.Tab.xlsx";
+    static String SOURCE_FILE_NAME_PATTERN = "*.Val.xlsx";
 
     Set<Path> mutationFilePaths;
 
@@ -104,6 +104,6 @@ public class FileFinder {
     }
 
     public static void main(String[] args) throws IOException {
-        new FileFinder().run("C:\\Projects\\cBioPortal\\data sample\\SECOND SAMPLES\\");
+        new ValFileFinder().run("C:\\Projects\\cBioPortal\\data sample\\SECOND SAMPLES\\");
     }
 }

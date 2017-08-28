@@ -157,7 +157,7 @@ public class MyImportManyWithClinicalData {
     }
 
     static String RRO_FILE_PATH = "C:\\Projects\\cBioPortal\\data sample\\SECOND SAMPLES\\20170725 RRO CBIO exportMCunmodified.xlsx";
-    static String SOURCE_FILE_DIR = "C:\\Projects\\cBioPortal\\data sample\\SECOND SAMPLES\\";
+    static String SOURCE_FILE_DIR = "C:\\Projects\\cBioPortal\\data sample\\SECOND SAMPLES\\corrected\\";
 
     // static String SOURCE_FILE_DIR = "C:\\Projects\\cBioPortal\\data sample\\test\\";
     public static void main(String... args) throws Exception {

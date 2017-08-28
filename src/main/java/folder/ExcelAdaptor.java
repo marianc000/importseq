@@ -92,7 +92,7 @@ public class ExcelAdaptor {
             case BOOLEAN:
             case FORMULA:
             default:
-                throw new RuntimeException("this should not happen");
+                throw new RuntimeException("this should not happen: type: "+cell.getCellTypeEnum()+"; val: "+cell.getStringCellValue() );
         }
     }
 
