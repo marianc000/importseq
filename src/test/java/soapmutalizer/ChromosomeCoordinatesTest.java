@@ -27,7 +27,7 @@ public class ChromosomeCoordinatesTest {
     public void tearDown() {
     }
 
-       @Test
+    @Test
     public void testExtractChromosomeFromResponse() {
         ChromosomeCoordinates i = new ChromosomeCoordinates();
         int r = i.extractChromosomeFromResponse("NC_000015.9:g.66727455G>T");
@@ -41,7 +41,7 @@ public class ChromosomeCoordinatesTest {
 
     }
 
-       @Test
+    @Test
     public void testNumberConversion() {
         ChromosomeCoordinates i = new ChromosomeCoordinates();
         String r = i.numberConversion("NM_002755.3:c.171G>T");
@@ -53,7 +53,9 @@ public class ChromosomeCoordinatesTest {
         r = i.numberConversion("NM_000038.4:c.4328delC");
         System.out.println(r);
         assertEquals("NC_000005.9:g.112175619delC", r);
-
+        r = i.numberConversion("NM_023110.2:c.396_398dup");
+        System.out.println(r);
+        assertEquals("NC_000008.10:g.38285914_38285916dup", r);
     }
 
     @Test
