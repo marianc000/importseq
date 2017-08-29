@@ -133,7 +133,32 @@ public class MutationNamesTest {
         assertNull(i.getRefAA());
         assertNull(i.getAltAA());
         assertEquals(VariantClassification.FRAME_SHIFT_DEL, i.getVariantClassification());
+    }
 
+    @Test
+    public void testInFrameDeletion() {
+        MutationNames i = new MutationNames("c.754_762del\n (p.L252_I254del)");
+        assertEquals(i.getNucleotideMutation(), "c.754_762del");
+        assertEquals(i.getProteinMutation(), "p.L252_I254del");
+        assertEquals(i.getNucleotideMutationWithoutCoordinates(), "del");
+        assertEquals(i.getRefAllele(), "");
+        assertEquals(i.getAltAllele(), "-");
+        assertNull(i.getRefAA());
+        assertNull(i.getAltAA());
+        assertEquals(VariantClassification.IN_FRAME_DEL, i.getVariantClassification());
+
+        i = new MutationNames("c.1203_1208del\n (p.D402_A403del)");
+        assertEquals(VariantClassification.IN_FRAME_DEL, i.getVariantClassification());
+
+        i = new MutationNames("c.532_534del\n (p.Y178del)");
+        assertEquals(i.getNucleotideMutation(), "c.532_534del");
+        assertEquals(i.getProteinMutation(), "p.Y178del");
+        assertEquals(i.getNucleotideMutationWithoutCoordinates(), "del");
+        assertEquals(i.getRefAllele(), "");
+        assertEquals(i.getAltAllele(), "-");
+        assertNull(i.getRefAA());
+        assertNull(i.getAltAA());
+        assertEquals(VariantClassification.IN_FRAME_DEL, i.getVariantClassification());
     }
 
     @Test
@@ -147,6 +172,19 @@ public class MutationNamesTest {
         assertNull(i.getRefAA());
         assertNull(i.getAltAA());
         assertEquals(VariantClassification.IN_FRAME_INS, i.getVariantClassification());
+    }
+
+    @Test
+    public void testFrameShiftInsertion() {
+        MutationNames i = new MutationNames("c.340dup\n (p.Y114Lfs*7)");
+        assertEquals(i.getNucleotideMutation(), "c.340dup");
+        assertEquals(i.getProteinMutation(), "p.Y114Lfs*7");
+        assertEquals(i.getNucleotideMutationWithoutCoordinates(), "dup");
+        assertEquals(i.getRefAllele(), "-");
+        assertEquals(i.getAltAllele(), "");
+        assertNull(i.getRefAA());
+        assertNull(i.getAltAA());
+        assertEquals(VariantClassification.FRAME_SHIFT_INS, i.getVariantClassification());
     }
 
 }

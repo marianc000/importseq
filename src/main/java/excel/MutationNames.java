@@ -133,26 +133,32 @@ public final class MutationNames {
             altAllele = "-";
             if (getProteinMutation().contains(FRAMESHIFT_MARK)) {
                 variantClassification = VariantClassification.FRAME_SHIFT_DEL;
+            } else {
+                variantClassification = VariantClassification.IN_FRAME_DEL;
             }
             return true;
         }
         return false;
     }
+
     static Pattern duplicationNucleotideMutationWithoutCoordinatesPattern = Pattern.compile("dup([A-Z]*)");
-    static String DUPLICATION_MARK = "dup";
+    //  static String DUPLICATION_MARK = "dup";
 
     boolean setRefAltAllelesForDuplication() {
         Matcher m = duplicationNucleotideMutationWithoutCoordinatesPattern.matcher(getNucleotideMutationWithoutCoordinates());
         if (m.matches()) {
             refAllele = "-"; // TODO:it can be null, call ref retriever
             altAllele = m.group(1);
-            if (getProteinMutation().contains(DUPLICATION_MARK)) {
+            if (getProteinMutation().contains(FRAMESHIFT_MARK)) {
+                variantClassification = VariantClassification.FRAME_SHIFT_INS;
+            } else {
                 variantClassification = VariantClassification.IN_FRAME_INS;
             }
             return true;
         }
         return false;
     }
+
     static Pattern mutationCellInValPattern = Pattern.compile("(c\\..+)\\((.+)\\)", Pattern.DOTALL);
 
     boolean setMutationsFromCell(String s) {

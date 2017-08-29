@@ -17,7 +17,7 @@ public enum VariantClassification {
     SPLICE_SITE("Splice_Site"), //
     // ins
     FRAME_SHIFT_DEL("Frame_Shift_Del"), //
-    IN_FRAME_DEL("In_Frame_Del"),
+    IN_FRAME_DEL("In_Frame_Del"),//
     // del
     FRAME_SHIFT_INS("Frame_Shift_Ins"),
     IN_FRAME_INS("In_Frame_Ins"); //
