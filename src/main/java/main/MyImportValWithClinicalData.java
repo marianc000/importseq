@@ -5,10 +5,8 @@
  */
 package main;
 
-import clean.CleanStudy;
 import excel.LoadRROTable;
 import files.FileFinder;
-import folder.ExcelAdaptor;
 import folder.ExcelAdaptorForValImport;
 import java.io.File;
 import java.io.IOException;
@@ -26,6 +24,7 @@ import persistence.MyDaoClinicalData;
 
 import persistence.MyImportClinicalData;
 import persistence.MyImportProfileData;
+import utils.FileUtils;
 
 /**
  *
@@ -40,15 +39,7 @@ public class MyImportValWithClinicalData {
     }
 
     // static String STUDY_NAME = "acc_tcga_chuv3";
-    String getSampleName(Path path) {
-        String fileName = path.getFileName().toString();
-        String sampleName = fileName.substring(0, fileName.indexOf("."));
-        System.out.println("sampleName: " + sampleName);
-        if (sampleName == null || sampleName.isEmpty()) {
-            throw new RuntimeException("Cannot extract a sample name from path " + path);
-        }
-        return sampleName;
-    }
+
 
     MyImportClinicalData cd = new MyImportClinicalData(RRO_STUDY_NAME);
 
@@ -71,7 +62,7 @@ public class MyImportValWithClinicalData {
     void importMutationFile(Connection con, Path sourceFilePath, List<MyClinicalAttribute> columnAttrs, int cancerStudyId) throws Exception {
         System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>importMutationFile: sourceFilePath=" + sourceFilePath.getFileName());
 
-        String sampleName = getSampleName(sourceFilePath);
+        String sampleName = FileUtils.getSampleName(sourceFilePath);
         Map<String, List<String>> refextNipMap = rro.getRefextNipMap();
         List<String> row = refextNipMap.get(sampleName);
         // System.out.println(">importMutationFile: row=" + row);

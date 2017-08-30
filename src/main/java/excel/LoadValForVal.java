@@ -5,13 +5,20 @@
  */
 package excel;
 
+import static excel.OutputMafRow.convertToRowList;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import utils.CollectionUtils;
+import static utils.CollectionUtils.printList;
+import utils.FileUtils;
 
 public class LoadValForVal {
 
@@ -78,37 +85,21 @@ public class LoadValForVal {
 
     public String NUCLEOTIDE_MUTATION_COLUMN = "nucleotideMutation", PROTEIN_MUTATION_COLUMN = "proteinMutation";
 
-    private void addMutationsColumns(ExcelOperations excel) {
+    private List<OutputMafRow> addMutationsColumns(ExcelOperations excel, String sampleName) {
         List<String> resultatCol = excel.getColumn("Résultat");
-  List<String> outCol=new LinkedList<>();
-        for (int r = resultatCol.size() - 1; r > 0; r--) {
+        List<String> geneCol = excel.getColumn("Gène");
+        List<OutputMafRow> outCol = new ArrayList<>();
 
+        for (int r = 1; r < resultatCol.size(); r++) {
+            outCol.add(new OutputMafRow(resultatCol.get(r), geneCol.get(r), sampleName));
         }
-        excel.printDocument("addMutationsColumns");
-    }
+ 
 
-    private void getGenomicCoordinates(ExcelOperations excel) {
-//        List<String> hCol = excel.getColumn("H");
-//        List<String> geneCol = excel.getColumn("Gène");
-//        List<String> resultatCol = excel.getColumn("Résultat");
-//        List<String> refSeqCol = excel.getColumn("Référence");
-//        for (int r = hCol.size() - 1; r >= 0; r--) {
-//            if (!"G".equals(hCol.get(r))) { // some files are aberrant have rows with empty values in H col
-//                excel.removeRow(r);
-//                continue;
-//            }
-//
-//            if (geneCol.get(r).isEmpty()) {
-//                excel.removeRow(r);
-//                continue;
-//            }
-//
-//            if ("wild type".equals(resultatCol.get(r))) { // some files are aberrant have rows with empty values in H col
-//                excel.removeRow(r);
-//            }
-//
-//        }
-//        excel.printDocument();
+        printList(convertToRowList(outCol));
+        System.out.println(OutputMafRow.getHeaders());
+
+        return outCol;
+        //  excel.printDocument("addMutationsColumns");
     }
 
     public void init(String filePath) throws IOException, InvalidFormatException {
@@ -116,6 +107,8 @@ public class LoadValForVal {
         excel.loadDocument(filePath);
         selectGeneRows(excel);
         geneMutationsMap = new HashMap<>();
+        String sampleName = FileUtils.convertFilePathToSampleName(filePath);
+        Files.write(Paths.get(filePath + ".out2"), convertToRowList(addMutationsColumns(excel, sampleName)));
         List<String> resultatCol = excel.getColumn("Résultat");
         List<String> geneCol = excel.getColumn("Gène");
 
@@ -141,9 +134,7 @@ public class LoadValForVal {
         //  excel.printDocument();
     }
 
-
-
     public static void main(String... args) throws IOException, InvalidFormatException {
-        new LoadValForVal().init("C:\\Projects\\cBioPortal\\data sample\\SECOND SAMPLES\\original\\H1702318-1A.hg19_coding01.Val.xlsx");
+        new LoadValForVal().init("C:\\Projects\\cBioPortal\\data sample\\SECOND SAMPLES\\corrected\\H1702318-1A.hg19_coding01.Val.xlsx");
     }
 }

@@ -29,6 +29,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
+import static utils.FileUtils.saveDocument;
 
 /**
  *
@@ -56,20 +57,7 @@ public class ExcelAdaptorForValImport {
         return Paths.get(sourceFilePath + ".out");
     }
 
-    void saveDocument(Path path) throws IOException {
-        List<String> content = new LinkedList<>();
-        for (int r = 0; r < doc.get(0).size(); r++) {
-            StringBuilder sb = new StringBuilder();
-            for (int c = 0; c < doc.size(); c++) {
-                sb.append(doc.get(c).get(r));
-                if (c < doc.size() - 1) {
-                    sb.append("\t");
-                }
-            }
-            content.add(sb.toString());
-        }
-        Files.write(path, content);
-    }
+
 
     String getCellValue(Cell cell) {
         if (cell == null) {
@@ -423,7 +411,7 @@ public class ExcelAdaptorForValImport {
         insertColumn(IGNORED_COLUMN, "");
         insertHeaders();
         //  printDocument();
-        saveDocument(getOutputFilePath());
+        saveDocument(getOutputFilePath(), doc);
         return getOutputFilePath();
     }
     Pattern delMutationPattern = Pattern.compile("p\\.[A-Z]\\d+_[A-Z]\\d+del");
