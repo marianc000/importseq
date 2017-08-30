@@ -88,12 +88,13 @@ public class LoadValForVal {
     private List<OutputMafRow> addMutationsColumns(ExcelOperations excel, String sampleName) {
         List<String> resultatCol = excel.getColumn("Résultat");
         List<String> geneCol = excel.getColumn("Gène");
+        List<String> alleleFrequencyCol = excel.getColumn("Fr. allélique");
+        List<String> coverageCol = excel.getColumn("Couvert.");
         List<OutputMafRow> outCol = new ArrayList<>();
 
         for (int r = 1; r < resultatCol.size(); r++) {
-            outCol.add(new OutputMafRow(resultatCol.get(r), geneCol.get(r), sampleName));
+            outCol.add(new OutputMafRow(resultatCol.get(r), geneCol.get(r), sampleName,alleleFrequencyCol.get(r),coverageCol.get(r)  ));
         }
- 
 
         printList(convertToRowList(outCol));
         System.out.println(OutputMafRow.getHeaders());

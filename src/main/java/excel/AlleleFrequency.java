@@ -11,28 +11,44 @@ package excel;
  */
 public class AlleleFrequency {
 
-    int refCount;
-    int altCount;
+    float refCount, altCount;
 
-    public int getRefCount() {
-        return refCount;
+    public String getRefCount() {
+        return String.valueOf(getRefCountAsInt());
     }
 
-    public int getAltCount() {
-        return altCount;
+    public String getAltCount() {
+        return String.valueOf(getAltCountAsInt());
+    }
+
+    public int getRefCountAsInt() {
+        return (int) refCount;
+    }
+
+    public int getAltCountAsInt() {
+        return (int) altCount;
+    }
+    float frequencyPercent;
+
+    public float getFrequencyPercent() {
+        return frequencyPercent;
+    }
+
+    public float getCalculatedFrequencyPercent() {
+        return ((float) Math.round(altCount * 100 / (altCount + refCount) * 10)) / 10;
     }
 
     public AlleleFrequency(String frequencyPercentStr, String coverageStr) {
-        System.out.println(frequencyPercentStr + "; " + coverageStr);
-        float frequencyPercent = Float.valueOf(frequencyPercentStr.replace("%", ""));
+        frequencyPercent = Float.valueOf(frequencyPercentStr.replace("%", ""));
         float coverage = Float.valueOf(coverageStr.replace("X", ""));
-        this.altCount = Math.round(coverage * frequencyPercent / 100);
-        this.refCount = (int) coverage - this.altCount;
-    }
+        float altCountFloat = frequencyPercent * coverage / 100;
+        this.altCount = Math.round(altCountFloat);
+        this.refCount = coverage - this.altCount;
+      }
 
     @Override
     public String toString() {
-        return "refCount=" + refCount + "; altCount=" + altCount;
+        return "refCount=" + getRefCount() + "; altCount=" + getAltCount() + "; frequencyPercent()=" + getFrequencyPercent() + "; calculatedFrequencyPercent()=" + getCalculatedFrequencyPercent();
     }
 
 }

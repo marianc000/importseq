@@ -30,27 +30,27 @@ public class AlleleFrequencyTest {
     @Test
     public void testConstructor() {
         AlleleFrequency i = new AlleleFrequency("37.1%", "2430X");
-        System.out.println(i);
-        i = new AlleleFrequency("35.4%", "398X");
-        assertEquals(i.getRefCount(), 257);
-        assertEquals(i.getAltCount(), 141);
 
+        i = new AlleleFrequency("35.4%", "398X");
+        assertEquals(i.getRefCount(), "257");
+        assertEquals(i.getAltCount(), "141");
+        assertEquals(i.getFrequencyPercent(), i.getCalculatedFrequencyPercent(), 0.001);
         //   System.out.println(i);
         i = new AlleleFrequency("37.1%", "2430X");
         System.out.println(i);
         i = new AlleleFrequency("18.7%", "685X");
         System.out.println(i);
         i = new AlleleFrequency("67.2%", "830X");
-        assertEquals(i.getRefCount(), 272);
-        assertEquals(i.getAltCount(), 558);
+        assertEquals(i.getRefCount(), "272");
+        assertEquals(i.getAltCount(), "558");
 
         //     System.out.println(i);
         i = new AlleleFrequency("16.7%", "1093X");
         System.out.println(i);
         i = new AlleleFrequency("54.5%", "246X");
         // System.out.println(i);
-        assertEquals(i.getRefCount(), 112);
-        assertEquals(i.getAltCount(), 134);
+        assertEquals(i.getRefCount(), "112");
+        assertEquals(i.getAltCount(), "134");
         assertTrue(true);
     }
 

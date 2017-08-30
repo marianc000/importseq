@@ -14,8 +14,7 @@ import java.util.List;
  * @author mcaikovs
  */
 public class OutputMafRow {
-
-    String ignoreMe;
+ 
     String chromosome;
     int startPosition;
     int endPosition;
@@ -30,11 +29,17 @@ public class OutputMafRow {
     String fileName;
     MutationNames mutationNames;
     String sampleName;
+    AlleleFrequency alleleFrequency;
 
-    public OutputMafRow(String resultatInVal, String geneNameInVal, String sampleName) {
+    public OutputMafRow(String resultatInVal, String geneNameInVal, String sampleName, String alleleFrequency, String coverage) {
         mutationNames = new MutationNames(resultatInVal);
         this.geneName = geneNameInVal;
         this.sampleName = sampleName;
+        this.alleleFrequency = new AlleleFrequency(alleleFrequency, coverage);
+    }
+
+    public String getIgnoreMe() {
+        return "";
     }
 
     public String getChromosome() {
@@ -61,12 +66,12 @@ public class OutputMafRow {
         return mutationNames.getAltAllele();
     }
 
-    public int getRefCount() {
-        return refCount;
+    public String getRefCount() {
+        return alleleFrequency.getRefCount();
     }
 
-    public int getAltCount() {
-        return altCount;
+    public String getAltCount() {
+        return alleleFrequency.getAltCount();
     }
 
     public String getVariantClassification() {
@@ -90,7 +95,7 @@ public class OutputMafRow {
     }
 
     public String toMafRow() {
-        return ignoreMe + "\t" + getChromosome() + "\t" + getStartPosition() + "\t" + getEndPosition() + "\t" + getRefAllele() + "\t" + getTumorAllele()
+        return getIgnoreMe() + "\t" + getChromosome() + "\t" + getStartPosition() + "\t" + getEndPosition() + "\t" + getRefAllele() + "\t" + getTumorAllele()
                 + "\t" + getGeneName() + "\t" + getRefCount() + "\t" + getAltCount() + "\t" + getVariantClassification() + "\t"
                 + getAaMutation() + "\t" + getValidated() + "\t" + getSampleName();
     }
