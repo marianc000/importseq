@@ -8,13 +8,14 @@ package excel;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import soapmutalizer.ChromosomeCoordinates;
 
 /**
  *
  * @author mcaikovs
  */
 public class OutputMafRow {
- 
+
     String chromosome;
     int startPosition;
     int endPosition;
@@ -30,12 +31,14 @@ public class OutputMafRow {
     MutationNames mutationNames;
     String sampleName;
     AlleleFrequency alleleFrequency;
+    ChromosomeCoordinates chromosomeCoordinates;
 
-    public OutputMafRow(String resultatInVal, String geneNameInVal, String sampleName, String alleleFrequency, String coverage) {
+    public OutputMafRow(String resultatInVal, String geneNameInVal, String sampleName, String alleleFrequency, String coverage, String refSeq) {
         mutationNames = new MutationNames(resultatInVal);
         this.geneName = geneNameInVal;
         this.sampleName = sampleName;
         this.alleleFrequency = new AlleleFrequency(alleleFrequency, coverage);
+        chromosomeCoordinates = new ChromosomeCoordinates(refSeq, mutationNames.getNucleotideMutation());
     }
 
     public String getIgnoreMe() {
@@ -43,15 +46,15 @@ public class OutputMafRow {
     }
 
     public String getChromosome() {
-        return chromosome;
+        return chromosomeCoordinates.getChromosome();
     }
 
     public int getStartPosition() {
-        return startPosition;
+        return chromosomeCoordinates.getStartPostion();
     }
 
     public int getEndPosition() {
-        return endPosition;
+        return chromosomeCoordinates.getEndPosition();
     }
 
     public String getGeneName() {

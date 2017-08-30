@@ -90,10 +90,11 @@ public class LoadValForVal {
         List<String> geneCol = excel.getColumn("Gène");
         List<String> alleleFrequencyCol = excel.getColumn("Fr. allélique");
         List<String> coverageCol = excel.getColumn("Couvert.");
+        List<String> refSeqCol = excel.getColumn("Référence");
         List<OutputMafRow> outCol = new ArrayList<>();
 
         for (int r = 1; r < resultatCol.size(); r++) {
-            outCol.add(new OutputMafRow(resultatCol.get(r), geneCol.get(r), sampleName,alleleFrequencyCol.get(r),coverageCol.get(r)  ));
+            outCol.add(new OutputMafRow(resultatCol.get(r), geneCol.get(r), sampleName,alleleFrequencyCol.get(r),coverageCol.get(r), refSeqCol. get(r)  ));
         }
 
         printList(convertToRowList(outCol));
