@@ -71,6 +71,24 @@ public class MutationNamesTest {
     }
 
     @Test
+    public void testDoubleMissenseMutation() {
+        MutationNames i = new MutationNames();
+        assertTrue(i.setMutationsFromCell("c.[14A>G; 35G>A]\n p.[K5R;G12D]")); //H1710240-1A
+
+//        MutationNames i = new MutationNames("c.[14A>G; 35G>A]\n p.[K5R;G12D]");
+//        //System.out.println(i);
+        assertEquals(i.getNucleotideMutation(), "c.[14A>G; 35G>A]");
+        assertEquals(i.getProteinMutation(), "p.[K5R;G12D]");
+       assertNull(i.getNucleotideMutationWithoutCoordinates() );
+        assertEquals(i.getRefAllele(), "");
+        assertEquals(i.getAltAllele(), "");
+        assertNull(i.getRefAA());
+        assertNull(i.getAltAA());
+        assertNull(i.getVariantClassification());
+
+    }
+
+    @Test
     public void testNonstopMutation() {
 
         MutationNames i = new MutationNames("c.885A>C\n (p.X295Y)");

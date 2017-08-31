@@ -1,103 +1,151 @@
->PatientView:processRequest
-16:29:53.761    SELECT 1
-
->PatientView:validate
->XXXXXX  getCancerStudyByStableId: acc_tcga_chuv3
-java.lang.Thread.getStackTrace(Thread.java:1556)
-org.mskcc.cbio.portal.dao.DaoCancerStudy.printStack(DaoCancerStudy.java:327)
-org.mskcc.cbio.portal.dao.DaoCancerStudy.getCancerStudyByStableId(DaoCancerStudy.java:373)
-org.mskcc.cbio.portal.servlet.PatientView.validate(PatientView.java:202)
-org.mskcc.cbio.portal.servlet.PatientView.processRequest(PatientView.java:127)
-org.mskcc.cbio.portal.servlet.PatientView.doGet(PatientView.java:585)
-16:29:53.763    SELECT 1
-
-16:29:53.764    SELECT * FROM  cancer_study where CANCER_STUDY_IDENTIFIER='acc_tcga_chuv3'
-
-<XXXXXX  getCancerStudyByStableId: CancerStudy [studyID=170, name=Adrenocortical Carcinoma (TCGA, Provisional), description=TCGA Adrenocortical Carcinoma; raw data at the <A HREF="https://tcga-data.nci.nih.gov/">NCI</A>., cancerStudyIdentifier=acc_tcga_chuv3, typeOfCancerId=acc, publicStudy=true]
->PatientView:validate:cancerStudy: CancerStudy [studyID=170, name=Adrenocortical Carcinoma (TCGA, Provisional), description=TCGA Adrenocortical Carcinoma; raw data at the <A HREF="https://tcga-data.nci.nih.gov/">NCI</A>., cancerStudyIdentifier=acc_tcga_chuv3, typeOfCancerId=acc, publicStudy=true]
->DaoSample:getSampleByCancerStudyAndSampleIdInDatabase: cancerStudyId:170; stableSampleId: Mix_cell-line32
-16:29:53.765    SELECT * FROM sample s join patient p on s.PATIENT_ID=p.INTERNAL_ID where s.STABLE_ID='Mix_cell-line32' and p.CANCER_STUDY_ID=170
-
->DaoSample:getSampleByCancerStudyAndSampleIdInDatabase: Sample{internalId=38745, stableId=Mix_cell-line32, sampleType=Primary Solid Tumor, internalPatientId=37970, cancerTypeId=acc}
->PatientView:validate:_sample: Sample{internalId=38745, stableId=Mix_cell-line32, sampleType=Primary Solid Tumor, internalPatientId=37970, cancerTypeId=acc}
->XXXXXX  getCancerStudyByStableId: acc_tcga_chuv3
-java.lang.Thread.getStackTrace(Thread.java:1556)
-org.mskcc.cbio.portal.dao.DaoCancerStudy.printStack(DaoCancerStudy.java:327)
-org.mskcc.cbio.portal.dao.DaoCancerStudy.getCancerStudyByStableId(DaoCancerStudy.java:373)
-org.mskcc.cbio.portal.util.internal.AccessControlImpl.isAccessibleCancerStudy(AccessControlImpl.java:124)
-org.mskcc.cbio.portal.servlet.PatientView.validate(PatientView.java:268)
-org.mskcc.cbio.portal.servlet.PatientView.processRequest(PatientView.java:127)
-16:29:53.766    SELECT 1
-
-16:29:53.767    SELECT * FROM  cancer_study where CANCER_STUDY_IDENTIFIER='acc_tcga_chuv3'
-
-<XXXXXX  getCancerStudyByStableId: CancerStudy [studyID=170, name=Adrenocortical Carcinoma (TCGA, Provisional), description=TCGA Adrenocortical Carcinoma; raw data at the <A HREF="https://tcga-data.nci.nih.gov/">NCI</A>., cancerStudyIdentifier=acc_tcga_chuv3, typeOfCancerId=acc, publicStudy=true]
-16:29:53.767    SELECT 1
-
-16:29:53.768    SELECT EXISTS (SELECT 1 FROM `copy_number_seg` WHERE `CANCER_STUDY_ID`=170)
-
->DaoSample:getSampleByCancerStudyAndSampleIdInDatabase: cancerStudyId:170; stableSampleId: Mix_cell-line32
-16:29:53.769    SELECT * FROM sample s join patient p on s.PATIENT_ID=p.INTERNAL_ID where s.STABLE_ID='Mix_cell-line32' and p.CANCER_STUDY_ID=170
-
->DaoSample:getSampleByCancerStudyAndSampleIdInDatabase: Sample{internalId=38745, stableId=Mix_cell-line32, sampleType=Primary Solid Tumor, internalPatientId=37970, cancerTypeId=acc}
->XXXXXX  getCancerStudyByStableId: acc_tcga_chuv3
-java.lang.Thread.getStackTrace(Thread.java:1556)
-org.mskcc.cbio.portal.dao.DaoCancerStudy.printStack(DaoCancerStudy.java:327)
-org.mskcc.cbio.portal.dao.DaoCancerStudy.getCancerStudyByStableId(DaoCancerStudy.java:373)
-org.mskcc.cbio.portal.web_api.GetGeneticProfiles.getGeneticProfiles(GetGeneticProfiles.java:58)
-org.mskcc.cbio.portal.model.CancerStudy.getGeneticProfiles(CancerStudy.java:210)
-org.mskcc.cbio.portal.model.CancerStudy.getMutationProfile(CancerStudy.java:249)
-16:29:53.770    SELECT 1
-
-16:29:53.771    SELECT * FROM  cancer_study where CANCER_STUDY_IDENTIFIER='acc_tcga_chuv3'
-
-<XXXXXX  getCancerStudyByStableId: CancerStudy [studyID=170, name=Adrenocortical Carcinoma (TCGA, Provisional), description=TCGA Adrenocortical Carcinoma; raw data at the <A HREF="https://tcga-data.nci.nih.gov/">NCI</A>., cancerStudyIdentifier=acc_tcga_chuv3, typeOfCancerId=acc, publicStudy=true]
->getMutationProfile: caseId: Mix_cell-line32; geneticProfiles: [org.mskcc.cbio.portal.model.GeneticProfile@2b9c702d[geneticProfileId=536,stableId=acc_tcga_chuv3_mutations,cancerStudyId=170,geneticAlterationType=MUTATION_EXTENDED,datatype=MAF,profileName=Mutations,profileDescription=Mutation data from whole exome sequencing.,targetLine=<null>,showProfileInAnalysisTab=true,otherMetadataFields=<null>]]
->getMutationProfile1: caseId: Mix_cell-line32; geneticProfile : org.mskcc.cbio.portal.model.GeneticProfile@2b9c702d[geneticProfileId=536,stableId=acc_tcga_chuv3_mutations,cancerStudyId=170,geneticAlterationType=MUTATION_EXTENDED,datatype=MAF,profileName=Mutations,profileDescription=Mutation data from whole exome sequencing.,targetLine=<null>,showProfileInAnalysisTab=true,otherMetadataFields=<null>]
->acceptableCaseId: caseId: Mix_cell-line32; geneticProfile: org.mskcc.cbio.portal.model.GeneticProfile@2b9c702d[geneticProfileId=536,stableId=acc_tcga_chuv3_mutations,cancerStudyId=170,geneticAlterationType=MUTATION_EXTENDED,datatype=MAF,profileName=Mutations,profileDescription=Mutation data from whole exome sequencing.,targetLine=<null>,showProfileInAnalysisTab=true,otherMetadataFields=<null>]
-11-Jul-2017 16:29:53.772 SEVERE [http-nio-8080-exec-3] org.apache.catalina.core.StandardWrapperValve.invoke Servlet.service() for servlet [patient_view] in context with path [/cbioportal-1.5.0] threw exception
- java.lang.NullPointerException
-        at org.mskcc.cbio.portal.model.CancerStudy.acceptableCaseId(CancerStudy.java:244)
-        at org.mskcc.cbio.portal.model.CancerStudy.getMutationProfile(CancerStudy.java:229)
-        at org.mskcc.cbio.portal.model.CancerStudy.getMutationProfile(CancerStudy.java:249)
-        at org.mskcc.cbio.portal.servlet.PatientView.validate(PatientView.java:288)
-        at org.mskcc.cbio.portal.servlet.PatientView.processRequest(PatientView.java:127)
-        at org.mskcc.cbio.portal.servlet.PatientView.doGet(PatientView.java:585)
-        at javax.servlet.http.HttpServlet.service(HttpServlet.java:635)
-        at javax.servlet.http.HttpServlet.service(HttpServlet.java:742)
-        at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:230)
-        at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:165)
-        at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:52)
-        at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:192)
-        at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:165)
-        at org.mskcc.cbio.portal.util.XssFilter.doFilter(XssFilter.java:65)
-        at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:192)
-        at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:165)
-        at org.springframework.security.web.FilterChainProxy.doFilterInternal(FilterChainProxy.java:186)
-        at org.springframework.security.web.FilterChainProxy.doFilter(FilterChainProxy.java:160)
-        at org.springframework.web.filter.DelegatingFilterProxy.invokeDelegate(DelegatingFilterProxy.java:344)
-        at org.springframework.web.filter.DelegatingFilterProxy.doFilter(DelegatingFilterProxy.java:261)
-        at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:192)
-        at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:165)
-        at org.apache.catalina.filters.CorsFilter.handleNonCORS(CorsFilter.java:419)
-        at org.apache.catalina.filters.CorsFilter.doFilter(CorsFilter.java:169)
-        at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:192)
-        at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:165)
-        at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:198)
-        at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:96)
-        at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:478)
-        at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:140)
-        at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:80)
-        at org.apache.catalina.valves.AbstractAccessLogValve.invoke(AbstractAccessLogValve.java:624)
-        at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:87)
-        at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:341)
-        at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:799)
-        at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:66)
-        at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:861)
-        at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1455)
-        at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:49)
-        at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
-        at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
-        at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:61)
-        at java.lang.Thread.run(Thread.java:745)
-
+String[] input={"NM_000249.3:c.1153C>T",
+"NM_002253.2:c.2935G>A",
+"NM_004333.4:c.1799T>A",
+"NM_000546.5:c.286_308delinsCCTG",
+"NM_000038.4:c.2626C>T",
+"NM_000546.5:c.730G>A",
+"NM_005359.5:c.340dup",
+"NM_020975.4:c.1942G>A",
+"NM_004333.4:c.1405G>A",
+"NM_000546.5:c.818G>T",
+"NM_006182.2:c.1323G>A",
+"NM_000321.2:c.947A>T",
+"NM_000546.5:c.853G>A",
+"NM_006218.2:c.1031T>G",
+"NM_006218.2:c.1173A>G",
+"NM_004333.4:c.1785T>G",
+"NM_000546.5:c.833C>T",
+"NM_000546.5:c.535C>T",
+"NM_000321.2:c.987del",
+"NM_000314.4:c.71A>T",
+"NM_004333.4:c.1798_1799delinsAA",
+"NM_005359.5:c.353C>T",
+"NM_005359.5:c.1157G>T",
+"NM_000455.4:c.975_976delinsTT",
+"NM_000546.5:c.733G>A",
+"NM_000077.4:c.166_176delinsG",
+"NM_000546.5:c.493C>T",
+"NM_005359.5:c.320dup",
+"NM_002524.3:c.155T>C",
+"NM_004333.4:c.1400C>T",
+"NM_033360.3:c.182A>G",
+"NM_000546.5:c.487T>C",
+"NM_000142.4:c.1150T>C",
+"NM_000455.4:c.598-2A>T",
+"NM_004333.4:c.1742A>G",
+"NM_006218.2:c.263G>A",
+"NM_000546.5:c.560-1G>A",
+"NM_000038.4:c.3949G>C",
+"NM_058195.3*:c.292C>T",
+"NM_001014432.1:c.49G>A",
+"NM_000546.5:c.1024C>T",
+"NM_002253.2:c.1416A>T",
+"NM_000051.3:c.1035G>T",
+"NM_000546.5:c.638G>A",
+"NM_000546.5:c.707A>G",
+"NM_000546.5:c.742C>T",
+"NM_005343.2:c.37G>C",
+"NM_033360.3:c.35G>T",
+"NM_000051.3:c.998C>T",
+"NM_005157.4:c.740A>G",
+"NM_006218.2:c.1624G>A",
+"NM_002524.3:c.182A>G",
+"NM_033360.3:c.35G>A",
+"NM_033360.3:c.35G>C",
+"NM_002253.2:c.794C>T",
+"NM_006218.2:c.3140A>G",
+"NM_000077.4:c.210del",
+"NM_000546.5:c.524G>A",
+"NM_000314.4:c.389G>A",
+"NM_020975.4:c.2302G>A",
+"NM_000546.5:c.731G>A",
+"NM_000546.5:c.581T>A",
+"NM_000038.4:c.4328delC",
+"NM_000222.2:c.1686G>C",
+"NM_000314.4:c.968dup",
+"NM_000321.2:c.1030C>T",
+"NM_005359.5:c.346C>T",
+"NM_000546.5:c.613T>A",
+"NM_000038.4:c.3920T>A",
+"NM_000038.4:c.3956del",
+"NM_000546.5:c.527G>T",
+"NM_000546.5:c.706T>C",
+"NM_001127500.1:c.3029C>T",
+"NM_033360.3:c.38G>A",
+"NM_000051.3:c.1229T>C",
+"NM_006218.2:c.323G>T",
+"NM_000546.5:c.586C>T",
+"NM_000546.5:c.584T>C",
+"NM_000546.5:c.844C>T",
+"NM_000455.4:c.595del",
+"NM_002524.3:c.181C>A",
+"NM_000038.4:c.3927_3931del",
+"NM_000546.5:c.578A>T",
+"NM_001904.3:c.134C>T",
+"NM_000546.5:c.734G>A",
+"NM_004119.2:c.1781T>C",
+"NM_005373.2:c.1547A>T",
+"NM_000546.5:c.754_762del",
+"NM_000546.5:c.468_469del",
+"NM_004119.2:c.1385G>C",
+"NM_005228.3:c.326G>A",
+"NM_002067.2:c.626A>T",
+"NM_002524.3:c.35G>A",
+"NM_000546.5:c.510_511delinsTT",
+"NM_006218.2:c.1035T>A",
+"NM_000546.5:c.722C>T",
+"NM_000546.5:c.215C>G",
+"NM_000038.4:c.4277del",
+"NM_000077.4:c.250G>A",
+"NM_000077.4:c.296G>C",
+"NM_000222.2:c.1621A>C",
+"NM_004304.3:c.3617C>T",
+"NM_000314.4:c.376G>A",
+"NM_000546.5:c.743G>A",
+"NM_004448.3:c.2617G>C",
+"NM_000051.3:c.1814A>G",
+"NM_000038.4:c.4033G>T",
+"NM_000455.4:c.115_116delinsGC",
+"NM_000546.5:c.400T>C",
+"NM_006218.2:c.1633G>A",
+"NM_002834.3:c.226G>A",
+"NM_000546.5:c.839G>A",
+"NM_006218.2:c.344G>C",
+"NM_000546.5:c.916C>T",
+"NM_000077.4:c.341C>T",
+"NM_002253.2:c.3405-2A>T",
+"NM_033360.3:c.436G>A",
+"NM_005631.4 :c.580G>A",
+"NM_000546.5:c.559+1G>A",
+"NM_002755.3:c.171G>T",
+"NM_000321.2:c.1727C>G",
+"NM_000314.4:c.373A>T",
+"NM_000546.5:c.528C>G",
+"NM_000077.4:c.237_238delinsGT",
+"NM_001127500.1:c.1124A>G",
+"NM_033632.3:c.1513C>G",
+"NM_004360.3:c.1203_1208del",
+"NM_002524.3:c.[14A>G; 35G>A]",
+"NM_005896.3:c.394C>T",
+"NM_033360.3:c.34G>C",
+"NM_000546.5:c.749C>T",
+"NM_000546.5:c.821T>C",
+"NM_033360.3:c.34G>A",
+"NM_023110.2:c.396_398dup",
+"NM_000077.4:c.247C>T",
+"NM_002524.3:c.38G>T",
+"NM_000051.3:c.5188C>T",
+"NM_000455.4:c.587G>T",
+"NM_000546.5:c.817C>T",
+"NM_000077.4:c.179C>A",
+"NM_022970.3:c.755C>G",
+"NM_000051.3:c.1009C>T",
+"NM_000038.4:c.3340C>T",
+"NM_033360.3:c.34G>T",
+"NM_001014432.1:c.57C>G",
+"NM_000314.4:c.532_534del",
+"NM_000546.5:c.523C>G",
+"NM_000546.5:c.716_718dup",
+"NM_000051.3:c.5071A>C",
+"NM_000314.4:c.388C>G",
+"NM_006182.2:c.383G>A"};

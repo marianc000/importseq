@@ -11,13 +11,11 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import utils.CollectionUtils;
-import static utils.CollectionUtils.printList;
+import static utils.CollectionUtils.printCollection;
 import utils.FileUtils;
 
 public class LoadValForVal {
@@ -60,7 +58,7 @@ public class LoadValForVal {
     }
     Map<String, Set<String>> geneMutationsMap;
 
-    private void selectGeneRows(ExcelOperations excel) {
+   public static void selectGeneRows(ExcelOperations excel) {
         List<String> hCol = excel.getColumn("H");
         List<String> geneCol = excel.getColumn("Gène");
         List<String> resultatCol = excel.getColumn("Résultat");
@@ -74,13 +72,16 @@ public class LoadValForVal {
                 excel.removeRow(r);
                 continue;
             }
-
+            if (resultatCol.get(r).isEmpty()) { // Aucune mutation identifiée in Gene column, see H1703976-1C
+                excel.removeRow(r);
+                continue;
+            }
             if ("wild type".equals(resultatCol.get(r))) { // some files are aberrant have rows with empty values in H col
                 excel.removeRow(r);
             }
 
         }
-        excel.printDocument("selectGeneRows");
+       // excel.printDocument("selectGeneRows");
     }
 
     public String NUCLEOTIDE_MUTATION_COLUMN = "nucleotideMutation", PROTEIN_MUTATION_COLUMN = "proteinMutation";
@@ -97,7 +98,7 @@ public class LoadValForVal {
             outCol.add(new OutputMafRow(resultatCol.get(r), geneCol.get(r), sampleName,alleleFrequencyCol.get(r),coverageCol.get(r), refSeqCol. get(r)  ));
         }
 
-        printList(convertToRowList(outCol));
+        printCollection(convertToRowList(outCol));
         System.out.println(OutputMafRow.getHeaders());
 
         return outCol;

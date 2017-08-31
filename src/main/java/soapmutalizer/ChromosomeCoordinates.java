@@ -16,20 +16,22 @@ import java.util.regex.Pattern;
  */
 public class ChromosomeCoordinates {
 
+    public static int FAILED = 0;
+
     static Mutalyzer port = new MutalyzerService().getMutalyzer();
     //  NC_000004.11:g.55972974T>A
-    String chromosome;
-    int startPosition, endPosition;
+    String chromosome = String.valueOf(FAILED);
+    int startPosition = FAILED, endPosition = FAILED;
 
     public String getChromosome() {
         return chromosome;
     }
 
     public int getStartPostion() {
-        return startPosition;
+        return /*String.valueOf*/ (startPosition);
     }
 
-    public void setPosition(String val) {
+    public final void setPosition(String val) {
         if (val.contains("_")) {
             String[] startEnd = val.split(Pattern.quote("_"));
             startPosition = Integer.valueOf(startEnd[0]);
@@ -40,23 +42,36 @@ public class ChromosomeCoordinates {
     }
 
     public int getEndPosition() {
-        return endPosition;
+        return /*String.valueOf*/ (endPosition);
     }
 
     public ChromosomeCoordinates() {
     }
 
+    public static String combineRefSeqWithNucleotideMutation(String transcript, String nucleotideMutation) {
+        return transcript + ":" + nucleotideMutation;
+    }
+
     public ChromosomeCoordinates(String transcript, String nucleotideMutation) {
-        String combined = transcript + ":" + nucleotideMutation;
-        String response = numberConversion(combined);
-        chromosome = extractChromosomeFromResponse(response);
-        setPosition(extractCoordinateFromResponse(response));
+        String refSeqWithNucleotideMutation = (combineRefSeqWithNucleotideMutation(transcript, nucleotideMutation));
+        System.out.println(">ChromosomeCoordinates: refSeqWithNucleotideMutation=" + refSeqWithNucleotideMutation);
+        if (isMutationComplex(nucleotideMutation)) {
+             System.out.println("<ChromosomeCoordinates: refSeqWithNucleotideMutation=" + refSeqWithNucleotideMutation+"; mutation is complex");
+            return;
+        }
+        String response = numberConversion(refSeqWithNucleotideMutation);
+        if (!response.isEmpty()) {
+            System.out.println(">>ChromosomeCoordinates: refSeqWithNucleotideMutation=" + refSeqWithNucleotideMutation + "; response=" + response);
+            chromosome = extractChromosomeFromResponse(response);
+            setPosition(extractCoordinateFromResponse(response));
+        }
     }
 //NC_000015.9:g.66727455G>T
 //NC_000004.11:g.55972974T>A
 //NC_000005.9:g.112175619delC
 
     final String numberConversion(String variant) {
+        System.out.println(">ChromosomeCoordinates:numberConversion variant=" + variant);
         return port.numberConversion("hg19", variant, null).getString().get(0);
     }
 
@@ -68,15 +83,23 @@ public class ChromosomeCoordinates {
     Pattern numbersOnlyPattern = Pattern.compile("g\\.([0-9_]+)\\D+");
 
     final String extractCoordinateFromResponse(String val) {
-        System.out.println("val=" + val);
+         System.out.println(">extractCoordinateFromResponse:val=" + val);
         String r = val.split(Pattern.quote(":"))[1];
 
         Matcher m = numbersOnlyPattern.matcher(r);
         if (m.matches()) {
-            System.out.println("matches");
+            //  System.out.println("matches");
             return (m.group(1));
         }
 
-        throw new RuntimeException("Cannot extract coordinate from: " + r);
+        throw new RuntimeException("Cannot extract coordinate from: " + r+"; for: "+val);
+    }
+    Pattern complexMutationPattern = Pattern.compile("c\\.\\[.+;.+\\]");
+
+    final boolean isMutationComplex(String nucleotideMutation) { //c.[14A>G; 35G>A]
+        System.out.println(">isMutationComplex: val=" + nucleotideMutation);
+
+        Matcher m = complexMutationPattern.matcher(nucleotideMutation);
+        return (m.matches());
     }
 }

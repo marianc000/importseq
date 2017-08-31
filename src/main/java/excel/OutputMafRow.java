@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import soapmutalizer.ChromosomeCoordinates;
+import static soapmutalizer.ChromosomeCoordinates.combineRefSeqWithNucleotideMutation;
 
 /**
  *
@@ -32,13 +33,19 @@ public class OutputMafRow {
     String sampleName;
     AlleleFrequency alleleFrequency;
     ChromosomeCoordinates chromosomeCoordinates;
+    String refSeqWithNucleotideMutation;
 
     public OutputMafRow(String resultatInVal, String geneNameInVal, String sampleName, String alleleFrequency, String coverage, String refSeq) {
         mutationNames = new MutationNames(resultatInVal);
         this.geneName = geneNameInVal;
         this.sampleName = sampleName;
         this.alleleFrequency = new AlleleFrequency(alleleFrequency, coverage);
+        refSeqWithNucleotideMutation = combineRefSeqWithNucleotideMutation(refSeq, mutationNames.getNucleotideMutation()); // save it to maf to have original data
         chromosomeCoordinates = new ChromosomeCoordinates(refSeq, mutationNames.getNucleotideMutation());
+    }
+
+    public String getRefSeqWithNucleotideMutation() {
+        return refSeqWithNucleotideMutation;
     }
 
     public String getIgnoreMe() {
@@ -49,12 +56,12 @@ public class OutputMafRow {
         return chromosomeCoordinates.getChromosome();
     }
 
-    public int getStartPosition() {
-        return chromosomeCoordinates.getStartPostion();
+    public String getStartPosition() {
+        return String.valueOf(chromosomeCoordinates.getStartPostion());
     }
 
-    public int getEndPosition() {
-        return chromosomeCoordinates.getEndPosition();
+    public String getEndPosition() {
+        return String.valueOf(chromosomeCoordinates.getEndPosition());
     }
 
     public String getGeneName() {
@@ -78,7 +85,11 @@ public class OutputMafRow {
     }
 
     public String getVariantClassification() {
-        return mutationNames.getVariantClassification().toString();
+        if (mutationNames.getVariantClassification() != null) {
+            return mutationNames.getVariantClassification().toString();
+        } else {
+            return "failed";
+        }
     }
 
     public String getAaMutation() { // HGVSp_Short
@@ -100,10 +111,10 @@ public class OutputMafRow {
     public String toMafRow() {
         return getIgnoreMe() + "\t" + getChromosome() + "\t" + getStartPosition() + "\t" + getEndPosition() + "\t" + getRefAllele() + "\t" + getTumorAllele()
                 + "\t" + getGeneName() + "\t" + getRefCount() + "\t" + getAltCount() + "\t" + getVariantClassification() + "\t"
-                + getAaMutation() + "\t" + getValidated() + "\t" + getSampleName();
+                + getAaMutation() + "\t" + getValidated() + "\t" + getSampleName() + "\t" + getRefSeqWithNucleotideMutation();
     }
 
-    static String[] headers = {"IgnoreMe", "Chromosome", "Start_Position", "End_Position", "Reference_Allele", "Tumor_Seq_Allele1", "Hugo_Symbol", "t_ref_count", "t_alt_count", "Variant_Classification", "HGVSp_Short", "Validation_Status", "Tumor_Sample_Barcode"};
+    static String[] headers = {"IgnoreMe", "Chromosome", "Start_Position", "End_Position", "Reference_Allele", "Tumor_Seq_Allele1", "Hugo_Symbol", "t_ref_count", "t_alt_count", "Variant_Classification", "HGVSp_Short", "Validation_Status", "Tumor_Sample_Barcode", "RefSeqNucleotideMutationInVal"};
 
     static String getHeaders() {
         return String.join("\t", headers);

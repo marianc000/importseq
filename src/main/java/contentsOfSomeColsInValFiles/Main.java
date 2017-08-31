@@ -2,14 +2,15 @@ package contentsOfSomeColsInValFiles;
 
 import contentsOfFirstValColumn.*;
 import excel.ExcelOperations;
-import excel.LoadRROTable;
+import static excel.LoadValForVal.selectGeneRows;
+import excel.MutationNames;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import static soapmutalizer.ChromosomeCoordinates.combineRefSeqWithNucleotideMutation;
+import static utils.CollectionUtils.printCollection;
 
 /**
  *
@@ -19,53 +20,32 @@ public class Main {
 
     ExcelOperations excel = new ExcelOperations();
 
-    void importEverything(Set<Path> mutationFilePaths) throws Exception {
-        LoadVal lv = new LoadVal();
-        Set<String> set = new HashSet<>();Set<String> aucuneSet = new HashSet<>();
+ 
+
+    void extractValues(Set<Path> mutationFilePaths) throws Exception {
+
+        Set<String> set = new HashSet<>();
+
         for (Path sourceFilePath : mutationFilePaths) {
-         //   System.out.println(sourceFilePath);
+            //   System.out.println(sourceFilePath);
             excel.loadDocument(sourceFilePath.toString());
+            selectGeneRows(excel);
+            excel.printDocument(sourceFilePath.toString());
+            List<String> resultatCol = excel.getColumn("Résultat");
 
-            List<String> geneCol = excel.getColumn("Gène");
-            List<String> hCol = excel.getColumn("H");
+            List<String> refSeqCol = excel.getColumn("Référence");
 
-            for (int r = geneCol.size() - 1; r > 0; r--) {
-                String hCell = hCol.get(r);
-                if ("G".equals(hCell) || hCell.isEmpty()) { // some files are aberrant have rows with empty values in H col
-                    // excel.removeRow(r);
-                    continue;
-                }
-
-                String gene = geneCol.get(r);
-
-                if (gene.isEmpty()) {
-                    continue;
-                }
-                set.add(gene);
-                if (gene.contains("Aucune")) {
-                    aucuneSet.add(sourceFilePath.toString());
-                }
+            for (int r = 1; r < resultatCol.size() - 1; r++) { // first row is headers
+                MutationNames mn = new MutationNames(resultatCol.get(r));
+                String fused = combineRefSeqWithNucleotideMutation(refSeqCol.get(r), mn.getNucleotideMutation());
+                set.add(fused);
             }
-
         }
         //  printSet(set);  
-        System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-        List<String> l = new ArrayList<>(set);
-        Collections.sort(l);
-        for (String s : l) {
-            System.out.println(s);
-        }
-        printSet(aucuneSet);
-    }
 
-    void printSet(Set<String> set) {
-        System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-        for (String s : set) {
-            System.out.println(s);
-        }
-        System.out.println("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
+        printCollection(set);
     }
-    LoadRROTable rro;
+ 
 
     public void runImport() throws Exception {
 
@@ -75,10 +55,10 @@ public class Main {
         Set<String> samplesInFiles = ff.getSampleNames();
         System.out.println("Samples in files: " + samplesInFiles.size());
 
-        importEverything(mutationFilePaths);
+        extractValues(mutationFilePaths);
     }
 
-    static String SOURCE_FILE_DIR = "C:\\Projects\\cBioPortal\\data sample\\SECOND SAMPLES\\";
+    static String SOURCE_FILE_DIR = "C:\\Projects\\cBioPortal\\data sample\\SECOND SAMPLES\\original";
 
     // static String SOURCE_FILE_DIR = "C:\\Projects\\cBioPortal\\data sample\\test\\";
     public static void main(String... args) throws Exception {

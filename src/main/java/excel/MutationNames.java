@@ -15,11 +15,15 @@ import marian.caikovski.mutations.VariantClassification;
  */
 public final class MutationNames {
 
-    String proteinMutation, nucleotideMutation, refAllele, altAllele, refAA, altAA, nucleotideMutationWithoutCoordinates;
+    String proteinMutation, nucleotideMutation, refAllele="", altAllele="", refAA, altAA, nucleotideMutationWithoutCoordinates;
 
     VariantClassification variantClassification;
 
+    MutationNames() { //for tests
+    }
+
     public MutationNames(String proteinAndNucleotideMutation) {
+        System.out.println(">MutationNames: proteinAndNucleotideMutation=" + proteinAndNucleotideMutation);
         setMutationsFromCell(proteinAndNucleotideMutation);
 
         if (setNucleotideMutationWithoutCoordinates()) {
@@ -160,9 +164,23 @@ public final class MutationNames {
     }
 
     static Pattern mutationCellInValPattern = Pattern.compile("(c\\..+)\\((.+)\\)", Pattern.DOTALL);
+    static Pattern mutationCellInValPatternSpecial = Pattern.compile("(c\\..+) (p\\..+)", Pattern.DOTALL);
 
     boolean setMutationsFromCell(String s) {
-        Matcher m = mutationCellInValPattern.matcher(s);
+
+        if (setMutationsFromCellHelper(mutationCellInValPattern, s)) {
+            return true;
+        }
+// special case
+        if (setMutationsFromCellHelper(mutationCellInValPatternSpecial, s)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    boolean setMutationsFromCellHelper(Pattern p, String s) {
+        Matcher m = p.matcher(s);
         if (m.matches()) {
             this.proteinMutation = m.group(2);
             this.nucleotideMutation = m.group(1).trim();

@@ -5,6 +5,7 @@
  */
 package utils;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -24,9 +25,9 @@ public class CollectionUtils {
         }
     }
 
-    public static void printList(List<String> l) {
+    public static void printCollection(Collection<String> l) {
         for (String s : l) {
-            System.out.print(s);
+            System.out.println(s);
         }
     }
 }

@@ -212,7 +212,7 @@ public class ExcelOperations {
 
     }
 
-    void printDocument(String title) {
+   public void printDocument(String title) {
         System.out.println(">>> " + title);
         printDocument(doc);
         System.out.println("<<< " + title);
