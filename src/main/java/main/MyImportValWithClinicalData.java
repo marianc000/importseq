@@ -5,6 +5,7 @@
  */
 package main;
 
+import clean.CleanStudy;
 import excel.LoadRROTable;
 import files.FileFinder;
 import folder.ExcelAdaptorForValImport;
@@ -18,6 +19,7 @@ import java.util.Map;
 import java.util.Set;
 
 import persistence.MyAddCaseList;
+import persistence.MyCancerStudy;
 import persistence.MyClinicalAttribute;
 import static persistence.MyConnection.getConnection;
 import persistence.MyDaoClinicalData;
@@ -45,7 +47,7 @@ public class MyImportValWithClinicalData {
 
         try (Connection con = getConnection()) {
             con.setAutoCommit(false);
-            int cancerStudyId = cd.getCancerStudyId(con, RRO_STUDY_NAME);
+            int cancerStudyId = MyCancerStudy.getCancerStudyId(con, RRO_STUDY_NAME);
 
             List<MyClinicalAttribute> columnAttrs = cd.grabAttrs(con, headers, cancerStudyId);
 
@@ -58,7 +60,7 @@ public class MyImportValWithClinicalData {
     }
 
     void importMutationFile(Connection con, Path sourceFilePath, List<MyClinicalAttribute> columnAttrs, int cancerStudyId) throws Exception {
-      //  System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>importMutationFile: sourceFilePath=" + sourceFilePath.getFileName());
+        System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>importMutationFile: sourceFilePath=" + sourceFilePath.getFileName());
 
         String sampleName = FileUtils.getSampleName(sourceFilePath);
         Map<String, List<String>> refextNipMap = rro.getRefextNipMap();
@@ -71,20 +73,20 @@ public class MyImportValWithClinicalData {
             throw new RuntimeException("sample names differ");
         }
 
-        //  int sampleId = cd.addSample(con, cancerStudyId, patientNameInFile, sampleName);
-        //  importClinicalDataValues(con, row, columnAttrs, sampleId);
+        int sampleId = cd.addSample(con, cancerStudyId, patientNameInFile, sampleName);
+        importClinicalDataValues(con, row, columnAttrs, sampleId);
         Path dataFilePath = new ExcelAdaptorForValImport().run(sourceFilePath.toString());
 
         File dataFile = dataFilePath.toFile();
         //   System.out.println("dataFile: " + dataFile);
 
-        //   MyImportProfileData pd = new MyImportProfileData();
-        //   MyAddCaseList cl = new MyAddCaseList();
-        //   int geneticProfileId = cd.getGeneticProfileId(con, cancerStudyId);
-        //   pd.run(con, geneticProfileId, dataFile, sampleId);
-        //  cl.addSampleToList(con, cancerStudyId, sampleId);
+        MyImportProfileData pd = new MyImportProfileData();
+        MyAddCaseList cl = new MyAddCaseList();
+        int geneticProfileId = cd.getGeneticProfileId(con, cancerStudyId);
+        pd.run(con, geneticProfileId, dataFile, sampleId);
+        cl.addSampleToList(con, cancerStudyId, sampleId);
         //  throw new RuntimeException("not readY!!!!");
-        //    System.out.println("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<importMutationFile: sourceFilePath=" + sourceFilePath.getFileName());
+        System.out.println("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<importMutationFile: sourceFilePath=" + sourceFilePath.getFileName());
     }
 
     void importClinicalDataValues(Connection con, List<String> row, List<MyClinicalAttribute> columnAttrs, int internalSampleId) throws Exception {
@@ -141,13 +143,13 @@ public class MyImportValWithClinicalData {
     }
 
     static String RRO_FILE_PATH = "C:\\Projects\\cBioPortal\\data sample\\SECOND SAMPLES\\20170725 RRO CBIO exportMCunmodified.xlsx";
-   // static String SOURCE_FILE_DIR = "C:\\Projects\\cBioPortal\\data sample\\SECOND SAMPLES\\corrected\\H1702318-1A.hg19_coding01.Tab.xlsx";
+    // static String SOURCE_FILE_DIR = "C:\\Projects\\cBioPortal\\data sample\\SECOND SAMPLES\\corrected\\H1702318-1A.hg19_coding01.Tab.xlsx";
     static String SOURCE_FILE_DIR = "C:\\Projects\\cBioPortal\\data sample\\SECOND SAMPLES\\corrected\\";
     public static String RRO_STUDY_NAME = "aca_chuv_val";
 
     // static String SOURCE_FILE_DIR = "C:\\Projects\\cBioPortal\\data sample\\test\\";
     public static void main(String... args) throws Exception {
-        //    new CleanStudy().clean(RRO_STUDY_NAME);
+        new CleanStudy().clean(RRO_STUDY_NAME);
         new MyImportValWithClinicalData().runImport(RRO_FILE_PATH);
     }
 }

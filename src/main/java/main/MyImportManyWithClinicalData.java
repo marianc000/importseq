@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Set;
 
 import persistence.MyAddCaseList;
+import persistence.MyCancerStudy;
 import persistence.MyClinicalAttribute;
 import static persistence.MyConnection.getConnection;
 import persistence.MyDaoClinicalData;
@@ -57,7 +58,7 @@ public class MyImportManyWithClinicalData {
 
         try (Connection con = getConnection()) {
             con.setAutoCommit(false);
-            int cancerStudyId = cd.getCancerStudyId(con, RRO_STUDY_NAME);
+            int cancerStudyId = MyCancerStudy.getCancerStudyId(con, RRO_STUDY_NAME);
 
             List<MyClinicalAttribute> columnAttrs = cd.grabAttrs(con, headers, cancerStudyId);
 

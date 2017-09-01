@@ -52,14 +52,14 @@ public class MyImportClinicalDataTest {
 
     @Test
     public void testGetCancerStudyId() throws SQLException {
-        Integer id = i.getCancerStudyId(con, STUDY_NAME);
+        Integer id = MyCancerStudy.getCancerStudyId(con, STUDY_NAME);
         System.out.println(id);
         assertNotNull(id);
     }
 
     @Test
     public void testGetGeneticProfileId() throws SQLException {
-        Integer id = i.getCancerStudyId(con, STUDY_NAME);
+        Integer id = MyCancerStudy.getCancerStudyId(con, STUDY_NAME);
         Integer pid = i.getGeneticProfileId(con, id);
         System.out.println(pid);
         assertNotNull(id);
@@ -67,14 +67,14 @@ public class MyImportClinicalDataTest {
 
     @Test
     public void testDoesSampleIdExistInCancerStudy() throws SQLException {
-        Integer id = i.getCancerStudyId(con, STUDY_NAME);
+        Integer id = MyCancerStudy.getCancerStudyId(con, STUDY_NAME);
         assertTrue(i.doesSampleIdExistInCancerStudy(con, id, SAMPLE_NAME));
         assertFalse(i.doesSampleIdExistInCancerStudy(con, id, "gggggggggg"));
     }
 
     @Test
     public void testGetPatientInternalId() throws SQLException {
-        Integer id = i.getCancerStudyId(con, STUDY_NAME);
+        Integer id = MyCancerStudy.getCancerStudyId(con, STUDY_NAME);
         Integer patientId = i.getPatientInternalId(con, id, PATIENT_NAME);
         System.out.println(patientId);
         assertNotNull(patientId);

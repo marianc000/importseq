@@ -14,6 +14,7 @@ import java.nio.file.Paths;
 import java.sql.Connection;
 
 import persistence.MyAddCaseList;
+import persistence.MyCancerStudy;
 import static persistence.MyConnection.getConnection;
 import persistence.MyImportClinicalData;
 import persistence.MyImportProfileData;
@@ -46,7 +47,7 @@ public class MyImport {
     void importFile(Connection con, String sourceFilePath) throws Exception {
         String sampleName = getSampleName(Paths.get(sourceFilePath));
         MyImportClinicalData cd = new MyImportClinicalData(p.getTargetStudyName());
-        int cancerStudyId = cd.getCancerStudyId(con, p.getTargetStudyName());
+        int cancerStudyId = MyCancerStudy.getCancerStudyId(con, p.getTargetStudyName());
         if (cd.doesSampleIdExistInCancerStudy(con, cancerStudyId, sampleName)) {
             throw new RuntimeException("sample " + sampleName + " for patient" + sampleName + " already exist, skipping");
         }

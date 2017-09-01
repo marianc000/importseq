@@ -9,6 +9,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import static main.MyImportManyWithClinicalData.RRO_STUDY_NAME;
+import persistence.MyCancerStudy;
 import static persistence.MyConnection.getConnection;
 import persistence.MyImportClinicalData;
 
@@ -36,10 +37,9 @@ public class CleanStudy {
 // DELETE FROM cancer_study WHERE CANCER_STUDY_ID=179;
 //	
     public void clean(String studyName) throws SQLException {
-        cd = new MyImportClinicalData(studyName);
         try (Connection con = getConnection()) {
             con.setAutoCommit(false);
-            int cancerStudyId = cd.getCancerStudyId(con, RRO_STUDY_NAME);
+            int cancerStudyId = MyCancerStudy.getCancerStudyId(con, studyName);
             for (String s : sqls) {
                 String sql = s.replaceAll("179", String.valueOf(cancerStudyId));
                 System.out.println(sql);
@@ -50,6 +50,8 @@ public class CleanStudy {
             con.commit();
         }
     }
+    
+ 
 //
 //    public static void main(String... args) throws IOException, InvalidFormatException, SQLException {
 //        new CleanStudy().clean();
