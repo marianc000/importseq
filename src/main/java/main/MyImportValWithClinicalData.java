@@ -60,7 +60,7 @@ public class MyImportValWithClinicalData {
     }
 
     void importMutationFile(Connection con, Path sourceFilePath, List<MyClinicalAttribute> columnAttrs, int cancerStudyId) throws Exception {
-        System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>importMutationFile: sourceFilePath=" + sourceFilePath.getFileName());
+    //    System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>importMutationFile: sourceFilePath=" + sourceFilePath.getFileName());
 
         String sampleName = FileUtils.getSampleName(sourceFilePath);
         Map<String, List<String>> refextNipMap = rro.getRefextNipMap();
@@ -76,21 +76,21 @@ public class MyImportValWithClinicalData {
       //  int sampleId = cd.addSample(con, cancerStudyId, patientNameInFile, sampleName);
       //  importClinicalDataValues(con, row, columnAttrs, sampleId);
 
-        Path dataFilePath = new ExcelAdaptorForValImport(sourceFilePath.toString()).run();
+        Path dataFilePath = new ExcelAdaptorForValImport().run(sourceFilePath.toString());
 
         File dataFile = dataFilePath.toFile();
-        System.out.println("dataFile: " + dataFile);
+     //   System.out.println("dataFile: " + dataFile);
 
-        MyImportProfileData pd = new MyImportProfileData();
-        MyAddCaseList cl = new MyAddCaseList();
+     //   MyImportProfileData pd = new MyImportProfileData();
+     //   MyAddCaseList cl = new MyAddCaseList();
 
-        int geneticProfileId = cd.getGeneticProfileId(con, cancerStudyId);
+     //   int geneticProfileId = cd.getGeneticProfileId(con, cancerStudyId);
 
      //   pd.run(con, geneticProfileId, dataFile, sampleId);
 
       //  cl.addSampleToList(con, cancerStudyId, sampleId);
         //  throw new RuntimeException("not readY!!!!");
-        System.out.println("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<importMutationFile: sourceFilePath=" + sourceFilePath.getFileName());
+    //    System.out.println("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<importMutationFile: sourceFilePath=" + sourceFilePath.getFileName());
 
     }
 

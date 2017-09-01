@@ -5,13 +5,10 @@
  */
 package clean;
 
-import excel.LoadRROTable;
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import static main.MyImportManyWithClinicalData.RRO_STUDY_NAME;
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import static persistence.MyConnection.getConnection;
 import persistence.MyImportClinicalData;
 

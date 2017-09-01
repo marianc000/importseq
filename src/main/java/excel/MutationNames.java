@@ -17,13 +17,13 @@ public final class MutationNames {
 
     String proteinMutation, nucleotideMutation, refAllele="", altAllele="", refAA, altAA, nucleotideMutationWithoutCoordinates;
 
-    VariantClassification variantClassification;
+    VariantClassification variantClassification=VariantClassification.FAILED;
 
     MutationNames() { //for tests
     }
 
     public MutationNames(String proteinAndNucleotideMutation) {
-        System.out.println(">MutationNames: proteinAndNucleotideMutation=" + proteinAndNucleotideMutation);
+       // System.out.println(">MutationNames: proteinAndNucleotideMutation=" + proteinAndNucleotideMutation);
         setMutationsFromCell(proteinAndNucleotideMutation);
 
         if (setNucleotideMutationWithoutCoordinates()) {
@@ -36,7 +36,7 @@ public final class MutationNames {
     public VariantClassification getVariantClassification() {
         return variantClassification;
     }
-
+ 
     public String getRefAA() {
         return refAA;
     }
@@ -91,7 +91,7 @@ public final class MutationNames {
     static String SPLICING_AA_CHANGE_IN_VAL = "Splicing";
 
     boolean setAAChange() {
-        System.out.println(">setAAChange: " + getProteinMutation());
+       // System.out.println(">setAAChange: " + getProteinMutation());
         if (getProteinMutation().equals(SPLICING_AA_CHANGE_IN_VAL)) { //"c.3405-2A>T\n (Splicing)"
             return false;
         }
@@ -107,7 +107,7 @@ public final class MutationNames {
     static Pattern missenseNucleotideMutationWithoutCoordinatesPattern = Pattern.compile("([A-Z])>([A-Z])");
 
     boolean setRefAltAllelesForMissenseMutation() {
-        System.out.println(">setRefAltAllelesForMissenseMutation: " + getNucleotideMutationWithoutCoordinates());
+      //  System.out.println(">setRefAltAllelesForMissenseMutation: " + getNucleotideMutationWithoutCoordinates());
         Matcher m = missenseNucleotideMutationWithoutCoordinatesPattern.matcher(getNucleotideMutationWithoutCoordinates());
         if (m.matches()) {
             refAllele = m.group(1);
@@ -130,7 +130,7 @@ public final class MutationNames {
     static String FRAMESHIFT_MARK = "fs";
 
     boolean setRefAltAllelesForDeletion() {
-        System.out.println("setRefAltAllelesForDeletion: " + getNucleotideMutationWithoutCoordinates());
+      //  System.out.println("setRefAltAllelesForDeletion: " + getNucleotideMutationWithoutCoordinates());
         Matcher m = deletionNucleotideMutationWithoutCoordinatesPattern.matcher(getNucleotideMutationWithoutCoordinates());
         if (m.matches()) {
             refAllele = m.group(1); // TODO:it can be null, call ref retriever

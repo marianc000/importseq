@@ -7,6 +7,7 @@ package utils;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -29,5 +30,20 @@ public class CollectionUtils {
         for (String s : l) {
             System.out.println(s);
         }
+    }
+
+    public static void printCollection(Collection<String> l, String title) {
+        System.out.println(">>>" + title);
+        printCollection(l);
+        System.out.println("<<<" + title);
+    }
+
+    public static void printMap(Map map) {
+        System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+        for (Object k : map.keySet()) {
+            System.out.println(k + "\t" + map.get(k));
+        }
+        System.out.println(map.size());
+        System.out.println("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
     }
 }

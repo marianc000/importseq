@@ -5,9 +5,11 @@
  */
 package excel;
 
+import static excel.OutputMafRow.convertToRowList;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
@@ -20,6 +22,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Cell;
+import utils.FileUtils;
 import static utils.FileUtils.saveDocument;
 
 /**
@@ -28,12 +31,6 @@ import static utils.FileUtils.saveDocument;
  */
 public class LoadTabForVal {
 
-    public LoadTabForVal(String sourceFilePath) throws IOException {
-        this();
-        this.sourceFilePath = sourceFilePath;
-    }
-
-    String sourceFilePath;
     //  static String sourceFilePath = "C:\\Projects\\cBioPortal\\data sample\\H1975.hg19_coding01.TabTest.xlsx";
     static String canonicalMapFileName = "/isoform_overrides_uniprot.txt";
     static String AA_CHANGE_COLUMN = "AAChange.refGene";
@@ -41,42 +38,12 @@ public class LoadTabForVal {
     static String CHROMOSOME_COLUMN = "Chr";
     static String START_POSITION_COLUMN = "Start";
     static String END_POSITION_COLUMN = "End";
-
-    static String EXONIC_FUNC_REFGENE = "ExonicFunc.refGene";
+    static String EXONIC_FUNC_REFGENE_COLUMN = "ExonicFunc.refGene";
     static String IGNORED_COLUMN = "#version 2.4";
-    static String VALIDATION_COLUMN = "chuvValidation";
-    static String SAMPLE_NAME_COLUMN = "chuvFileName";
-    //  List<List<String>> doc;
-
-    public Path getOutputFilePath() {
-        return Paths.get(sourceFilePath + ".out");
-    }
-
-    String getCellValue(Cell cell) {
-        if (cell == null) {
-            // System.out.println("WARNING: cell is null");
-            return "";
-        }
-        switch (cell.getCellTypeEnum()) {
-            case STRING:
-                return cell.getRichStringCellValue().getString();
-
-            case NUMERIC:
-                double d = cell.getNumericCellValue();
-                if (Math.floor(d) == d) { // integer
-                    return String.valueOf(new Double(cell.getNumericCellValue()).intValue());
-                } else {
-                    return String.valueOf(new Double(cell.getNumericCellValue()).floatValue());
-                }
-
-            case BLANK:
-                return "";
-            case BOOLEAN:
-            case FORMULA:
-            default:
-                throw new RuntimeException("this should not happen: type: " + cell.getCellTypeEnum() + "; val: " + cell.getStringCellValue());
-        }
-    }
+    static String REF_ALLELE_COLUMN = "Ref";
+    static String ALT_ALLELE_COLUMN = "Alt";
+    static String REF_COUNT_COLUMN = "Read1";
+    static String ALT_COUNT_COLUMN = "Read2";
 
     void filterAAChangeColumn() {
         List<String> col = excel.getColumn(AA_CHANGE_COLUMN);
@@ -139,7 +106,7 @@ public class LoadTabForVal {
     }
     Map<String, String> exonicFuncRefGene_VariantClassificationMap, sourceTargetHeaders;
 
-    private LoadTabForVal() throws IOException {
+    public LoadTabForVal() throws IOException {
         loadCanonicalGeneMap(canonicalMapFileName);
 
         exonicFuncRefGene_VariantClassificationMap = new HashMap<>();
@@ -158,35 +125,19 @@ public class LoadTabForVal {
                 put(CHROMOSOME_COLUMN, "Chromosome");
                 put(START_POSITION_COLUMN, "Start_Position");
                 put(END_POSITION_COLUMN, "End_Position");
-                put(EXONIC_FUNC_REFGENE, "Variant_Classification");
-                put("Ref", "Reference_Allele");
-                put("Alt", "Tumor_Seq_Allele1");
-                put("Read1", "t_ref_count");
-                put("Read2", "t_alt_count");
+                put(EXONIC_FUNC_REFGENE_COLUMN, "Variant_Classification");
+                put(REF_ALLELE_COLUMN, "Reference_Allele");
+                put(ALT_ALLELE_COLUMN, "Tumor_Seq_Allele1");
+                put(REF_COUNT_COLUMN, "t_ref_count");
+                put(ALT_COUNT_COLUMN, "t_alt_count");
                 put(AA_CHANGE_COLUMN, "HGVSp_Short");
-                put(VALIDATION_COLUMN, "Validation_Status");
-                put(SAMPLE_NAME_COLUMN, "Tumor_Sample_Barcode");
-                put(IGNORED_COLUMN, "IgnoreMe");
             }
         };
 
     }
 
-//Silent
-//Translation_Start_Site
-//Nonstop_Mutation
-//3'UTR
-//3'Flank
-//5'UTR
-//5'Flank
-//IGR1 
-//Intron
-//RNA
-//Targeted_Region
-//De_novo_Start_InFrame
-//De_novo_Start_OutOfFrame.     
     void replaceExonicFunction() {
-        List<String> col = excel.getColumn(EXONIC_FUNC_REFGENE);
+        List<String> col = excel.getColumn(EXONIC_FUNC_REFGENE_COLUMN);
 
         for (int c = 1; c < col.size(); c++) {
 
@@ -216,7 +167,7 @@ public class LoadTabForVal {
         return list;
     }
 
-    void loadCanonicalGeneMap(String fileName) throws IOException {
+    final void loadCanonicalGeneMap(String fileName) throws IOException {
         List<String> l = loadList(fileName);
         for (int c = l.size() - 1; c >= 0; c--) {
             String row = l.get(c);
@@ -246,89 +197,62 @@ public class LoadTabForVal {
 //    }
     ExcelOperations excel = new ExcelOperations();
 
-    public Map<String, Map<String, List<String>>> makeMap() throws IOException, InvalidFormatException {
-        Map<String, Map<String, List<String>>> map = new HashMap<>();
+    public Map<String, Map<String, OutputMafRow>> makeMap() throws IOException, InvalidFormatException {
+        Map<String, Map<String, OutputMafRow>> map = new HashMap<>();
         for (int c = 1; c < excel.getColumn(GENE_COLUMN).size(); c++) {
             String gene = excel.getColumn(GENE_COLUMN).get(c);
             String mutation = excel.getColumn(AA_CHANGE_COLUMN).get(c);
+            String chromosome = excel.getColumn(CHROMOSOME_COLUMN).get(c);
+            int startPosition = Integer.valueOf(excel.getColumn(START_POSITION_COLUMN).get(c));
+            int endPosition = Integer.valueOf(excel.getColumn(END_POSITION_COLUMN).get(c));
+            String refAllele = excel.getColumn(REF_ALLELE_COLUMN).get(c);
+            String tumorAllele = excel.getColumn(ALT_ALLELE_COLUMN).get(c);
+            int refCount = Integer.valueOf(excel.getColumn(REF_COUNT_COLUMN).get(c));
+            int altCount = Integer.valueOf(excel.getColumn(ALT_COUNT_COLUMN).get(c));
+            String variantClassification = excel.getColumn(EXONIC_FUNC_REFGENE_COLUMN).get(c);
 
             if (map.get(gene) == null) {
                 map.put(gene, new HashMap<>());
             }
-            Map<String, List<String>> mutationMap = map.get(gene);
-            mutationMap.put(mutation, excel.getRow(c));
+            Map<String, OutputMafRow> mutationMap = map.get(gene);
+
+            //OutputMafRow(String chromosome, int startPosition, int endPosition, String refAllele, String tumorAllele, String geneName, int refCount, int altCount, String variantClassification, String aaMutation)
+            OutputMafRow row = new OutputMafRow(chromosome, startPosition, endPosition, refAllele, tumorAllele, gene, refCount, altCount, variantClassification, mutation);
+            mutationMap.put(mutation, row);
         }
         return map;
     }
 
-    public Path run() throws IOException, InvalidFormatException {
+    public List<OutputMafRow> convertMapToList(Map<String, Map<String, OutputMafRow>> map) {
+
+        List<OutputMafRow> l = new LinkedList<>();
+        for (Map<String, OutputMafRow> m : map.values()) {
+            l.addAll(m.values());
+        }
+
+        return l;
+    }
+
+    public Map<String, Map<String, OutputMafRow>> run(String sourceFilePath) throws IOException, InvalidFormatException {
 
         excel.loadDocument(sourceFilePath);
-
-        List<OutputMafRow> mafRows = new LoadValForVal().run(sourceFilePath.replace("coding01.Tab", "coding01.Val"));
 
         // printDocument();
         filterColumns();
 
         filterAAChangeColumn();
+        adjustStopCodonsInAAChangeColumn();
         replaceExonicFunction();
-        Map<String, Map<String, List<String>>> geneMutationRowInTabMap = makeMap();
-        
-        for (int c = 0; c < excel.getColumn(GENE_COLUMN).size(); c++) {
-            String gene = excel.getColumn(GENE_COLUMN).get(c);
-            String mutation = excel.getColumn(AA_CHANGE_COLUMN).get(c);
-            String mutationType = excel.getColumn(EXONIC_FUNC_REFGENE).get(c);
-            String chromosome = excel.getColumn(CHROMOSOME_COLUMN).get(c);
-            Set<String> validMutations = geneValidMutationsMap.get(gene);
-            System.out.println("gene: " + gene + "; mutation: " + mutation + "; validMutations: " + validMutations);
-            if (validMutations != null) {
+        Map<String, Map<String, OutputMafRow>> geneMutationRowInTabMap = makeMap();
 
-                boolean validated = validMutations.remove(mutation);
-
-                if (!validated) {
-                    // try to replace * by X
-                    String mutation2 = transformStopMutationName(mutation);
-                    validated = validMutations.remove(transformStopMutationName(mutation2));
-                    System.out.println("mutation2: " + mutation2 + "; validMutations: " + validMutations);
-                }
-                if (!validated) { // splicing, no mutation in protein
-                    if (mutation.isEmpty() && mutationType.equals("Splice_Site")) {
-                        validated = validMutations.remove("Splicing");
-                    }
-                }
-                if (!validated) {
-                    for (String validMutation : validMutations) { //p.L252_I254del
-                        String transformedValidMutation = transformDeletionMutationName(validMutation); //p.252_254del
-                        if (mutation.equals(transformedValidMutation)) {
-                            validated = validMutations.remove(validMutation);
-                            break;
-                        }
-                    }
-                }
-
-                if (validated) {
-                    validationCol.set(c, "Validated in Val file");
-                    if (validMutations.isEmpty()) {
-                        geneValidMutationsMap.remove(gene);
-                    }
-                }
-            }
+        List<OutputMafRow> l = convertMapToList(geneMutationRowInTabMap);
+       
+        if (l.size() + 1 != excel.getColumn(GENE_COLUMN).size()) { 
+            System.out.println(l.size() + "; " + excel.getColumn(GENE_COLUMN).size());
+            throw new RuntimeException("Aberrant row number");
         }
-        //   LoadRROTable.printMap(geneValidMutationsMap);
-        if (!geneValidMutationsMap.isEmpty()) {
-            // throw new RuntimeException("map is not empty");
-            System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" + sourceFilePath);
-            System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!map is not empty");
-            LoadRROTable.printMap(geneValidMutationsMap);
-            System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-        }
-
-        addColumn(SAMPLE_NAME_COLUMN, getSampleName(sourceFilePath));
-        insertColumn(IGNORED_COLUMN, "");
-        insertHeaders();
-        //  printDocument();
-        saveDocument(getOutputFilePath(), doc);
-        return getOutputFilePath();
+        Files.write(FileUtils.getOutputFilePath(sourceFilePath), convertToRowList(l));
+        return geneMutationRowInTabMap;
     }
     Pattern delMutationPattern = Pattern.compile("p\\.[A-Z]\\d+_[A-Z]\\d+del");
 
@@ -350,7 +274,17 @@ public class LoadTabForVal {
         return nameInTab;
     }
 
+    void adjustStopCodonsInAAChangeColumn() { // in val * in tab X
+        List<String> col = excel.getColumn(AA_CHANGE_COLUMN);
+
+        for (int c = 1; c < col.size(); c++) {
+            String val = col.get(c);
+
+            col.set(c, transformStopMutationName(val));
+        }
+    }
+
     public static void main(String... args) throws IOException, InvalidFormatException {
-        new LoadTabForVal("C:\\Projects\\cBioPortal\\data sample\\Mix_cell-line.hg19_coding01.Tab.xlsx").run();
+        new LoadTabForVal().run("C:\\Projects\\cBioPortal\\data sample\\SECOND SAMPLES\\corrected\\H1702318-1A.hg19_coding01.Tab.xlsx");
     }
 }

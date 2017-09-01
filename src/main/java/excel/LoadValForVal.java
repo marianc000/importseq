@@ -16,7 +16,7 @@ import static utils.CollectionUtils.printCollection;
 import utils.FileUtils;
 
 public class LoadValForVal {
- 
+
     public static void selectGeneRows(ExcelOperations excel) {
         List<String> hCol = excel.getColumn("H");
         List<String> geneCol = excel.getColumn("Gène");
@@ -41,7 +41,7 @@ public class LoadValForVal {
         }
         // excel.printDocument("selectGeneRows");
     }
- 
+
     private List<OutputMafRow> convertToMafRowList(ExcelOperations excel, String sampleName) {
         List<String> resultatCol = excel.getColumn("Résultat");
         List<String> geneCol = excel.getColumn("Gène");
@@ -55,7 +55,7 @@ public class LoadValForVal {
             outCol.add(new OutputMafRow(resultatCol.get(r), cleanGeneName(geneCol.get(r)), sampleName, alleleFrequencyCol.get(r), coverageCol.get(r), refSeqCol.get(r)));
         }
 
-        printCollection(convertToRowList(outCol));
+   //     printCollection(convertToRowList(outCol));
         return outCol;
 
     }
@@ -71,7 +71,7 @@ public class LoadValForVal {
 
         String sampleName = FileUtils.convertFilePathToSampleName(filePath);
         List<OutputMafRow> rows = convertToMafRowList(excel, sampleName);
-        Files.write(Paths.get(filePath + ".out2"), convertToRowList(rows));
+        Files.write(FileUtils.getOutputFilePath(filePath), convertToRowList(rows));
         return rows;
     }
 

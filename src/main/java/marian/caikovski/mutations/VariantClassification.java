@@ -11,6 +11,7 @@ package marian.caikovski.mutations;
  */
 public enum VariantClassification {
     // missense
+    FAILED("failed"),
     MISSENSE_MUTATION("Missense_Mutation"),//
     NONSENSE_MUTATION("Nonsense_Mutation"),//
     NONSTOP_MUTATION("Nonstop_Mutation"),//

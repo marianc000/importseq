@@ -69,4 +69,10 @@ public class FileUtils {
         }
         Files.write(path, content);
     }
+    
+    
+    public static Path getOutputFilePath(String sourceFilePath) {
+        return Paths.get(sourceFilePath + ".out");
+    }
+
 }

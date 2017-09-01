@@ -12,6 +12,7 @@ import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -24,6 +25,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
+import static utils.CollectionUtils.printCollection;
 
 /**
  *
@@ -110,52 +112,11 @@ public class ExcelOperations {
         return null;
     }
 
-    void filterAAChangeColumn() {
-        List<String> col = getColumn(AA_CHANGE_COLUMN);
-
-        for (int c = 1; c < col.size(); c++) {
-            String val = col.get(c);
-
-            String[] variants = val.split(Pattern.quote(","));
-            String aaChange = null;
-            for (String variant : variants) {
-                String[] vals = variant.split(Pattern.quote(":"));
-                if (vals.length == 1) {
-                    aaChange = "";
-                    break;
-                } else {
-                    String transcript = vals[1];
-                    if (!transcript.startsWith("NM")) {
-                        throw new RuntimeException("Transcript name: " + transcript);
-                    }
-
-                    if (cannonicalTranscripts.contains(transcript)) {
-                        aaChange = vals[4];
-                        break;
-                    }
-                }
-            }
-            if (aaChange == null) {
-                throw new RuntimeException("canonical transcript not found: ");
-            }
-            col.set(c, aaChange);
-        }
-    }
+ 
 
     Map<String, String> exonicFuncRefGene_VariantClassificationMap, sourceTargetHeaders;
 
-    void replaceExonicFunction() {
-        List<String> col = getColumn(EXONIC_FUNC_REFGENE);
-
-        for (int c = 1; c < col.size(); c++) {
-
-            String replacement = exonicFuncRefGene_VariantClassificationMap.get(col.get(c));
-            if (replacement == null) {
-                replacement = "";
-            }
-            col.set(c, replacement);
-        }
-    }
+ 
 
     public List<List<String>> loadDocument(String fileName) throws IOException, InvalidFormatException {
         doc = new LinkedList<>();
@@ -201,18 +162,29 @@ public class ExcelOperations {
         }
     }
 
-    void filterColumns() {
+    public void filterColumns(Set<String> headerSet) {
 
         for (int col = doc.size() - 1; col >= 0; col--) {
-            if (!sourceTargetHeaders.keySet().contains(doc.get(col).get(0))) {
+            if (!headerSet.contains(doc.get(col).get(0))) {
                 doc.remove(col);
             }
         }
-        System.out.println(sourceTargetHeaders.size() == doc.size());
+        if (headerSet.size() != doc.size()) {
+            printCollection(headerSet, "headerSet");
+
+            printCollection(getRow(0), "TabHeaders");
+
+            for (String s : getRow(0)) {
+                headerSet.remove(s);
+            }
+            printCollection(headerSet, "headerSet2");
+            throw new RuntimeException("column number differs");
+
+        }
 
     }
 
-   public void printDocument(String title) {
+    public void printDocument(String title) {
         System.out.println(">>> " + title);
         printDocument(doc);
         System.out.println("<<< " + title);
@@ -291,24 +263,6 @@ public class ExcelOperations {
             }
             col.add(1, header);
         }
-    }
-
-    public Path run() throws IOException, InvalidFormatException {
-        //  loadDocument(sourceFilePath);
-        // printDocument();
-        filterColumns();
-
-        filterAAChangeColumn();
-        replaceExonicFunction();
-
-        addColumn(VALIDATION_COLUMN, "Not validated");
-        //   addColumn(SAMPLE_NAME_COLUMN, getSampleName(sourceFilePath));
-        insertColumn(IGNORED_COLUMN, "");
-        insertHeaders();
-        //  printDocument();
-        //   saveDocument(getOutputFilePath());
-        //   return getOutputFilePath();
-        return null;
     }
 
 //    public static void main(String... args) throws IOException, InvalidFormatException {

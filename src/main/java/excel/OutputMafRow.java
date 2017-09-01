@@ -6,6 +6,7 @@
 package excel;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import soapmutalizer.ChromosomeCoordinates;
@@ -29,39 +30,55 @@ public class OutputMafRow {
     String aaMutation;
     String validated = "Validated";
     String fileName;
-    MutationNames mutationNames;
+
     String sampleName;
-    AlleleFrequency alleleFrequency;
-    ChromosomeCoordinates chromosomeCoordinates;
+
     String refSeqWithNucleotideMutation;
 
-    public OutputMafRow(String resultatInVal, String geneNameInVal, String sampleName, String alleleFrequency, String coverage, String refSeq) {
-        mutationNames = new MutationNames(resultatInVal);
-        this.geneName = geneNameInVal;
+    public OutputMafRow(String resultatInVal, String geneNameInVal, String sampleName, String alleleFrequencyStr, String coverage, String refSeq) {
+        MutationNames mutationNames = new MutationNames(resultatInVal);
+
         this.sampleName = sampleName;
-        this.alleleFrequency = new AlleleFrequency(alleleFrequency, coverage);
+        AlleleFrequency alleleFrequency = new AlleleFrequency(alleleFrequencyStr, coverage);
         refSeqWithNucleotideMutation = combineRefSeqWithNucleotideMutation(refSeq, mutationNames.getNucleotideMutation()); // save it to maf to have original data
-        chromosomeCoordinates = new ChromosomeCoordinates(refSeq, mutationNames.getNucleotideMutation());
+        ChromosomeCoordinates chromosomeCoordinates = new ChromosomeCoordinates(refSeq, mutationNames.getNucleotideMutation());
+
+        init(chromosomeCoordinates.getChromosome(), chromosomeCoordinates.getStartPostion(), chromosomeCoordinates.getEndPosition(),
+                mutationNames.getRefAllele(), mutationNames.getAltAllele(), geneNameInVal, alleleFrequency.getRefCountAsInt(), alleleFrequency.getAltCountAsInt(),
+                mutationNames.getVariantClassification().toString(), mutationNames.getProteinMutation());
+    }
+
+    public OutputMafRow(String chromosome, int startPosition, int endPosition, String refAllele, String tumorAllele, String geneName, int refCount, int altCount, String variantClassification, String aaMutation) {
+        init(chromosome, startPosition, endPosition, refAllele, tumorAllele, geneName, refCount, altCount, variantClassification, aaMutation);
+    }
+
+    private void init(String chromosome, int startPosition, int endPosition, String refAllele, String tumorAllele, String geneName, int refCount, int altCount, String variantClassification, String aaMutation) {
+        this.chromosome = chromosome;
+        this.startPosition = startPosition;
+        this.endPosition = endPosition;
+        this.refAllele = refAllele;
+        this.tumorAllele = tumorAllele;
+        this.geneName = geneName;
+        this.refCount = refCount;
+        this.altCount = altCount;
+        this.variantClassification = variantClassification;
+        this.aaMutation = aaMutation;
     }
 
     public String getRefSeqWithNucleotideMutation() {
         return refSeqWithNucleotideMutation;
     }
 
-    public String getIgnoreMe() {
-        return "";
-    }
-
     public String getChromosome() {
-        return chromosomeCoordinates.getChromosome();
+        return chromosome;
     }
 
     public String getStartPosition() {
-        return String.valueOf(chromosomeCoordinates.getStartPostion());
+        return String.valueOf(startPosition);
     }
 
     public String getEndPosition() {
-        return String.valueOf(chromosomeCoordinates.getEndPosition());
+        return String.valueOf(endPosition);
     }
 
     public String getGeneName() {
@@ -69,31 +86,27 @@ public class OutputMafRow {
     }
 
     public String getRefAllele() {
-        return mutationNames.getRefAllele(); // TODO: it is not set for mutations other than substitions, it could be recovered from ncbi
+        return refAllele; // TODO: it is not set for mutations other than substitions, it could be recovered from ncbi
     }
 
     public String getTumorAllele() {
-        return mutationNames.getAltAllele();
+        return tumorAllele;
     }
 
-    public String getRefCount() {
-        return alleleFrequency.getRefCount();
+    public int getRefCount() {
+        return refCount;
     }
 
-    public String getAltCount() {
-        return alleleFrequency.getAltCount();
+    public int getAltCount() {
+        return altCount;
     }
 
     public String getVariantClassification() {
-        if (mutationNames.getVariantClassification() != null) {
-            return mutationNames.getVariantClassification().toString();
-        } else {
-            return "failed";
-        }
+        return variantClassification;
     }
 
     public String getAaMutation() { // HGVSp_Short
-        return mutationNames.getProteinMutation();
+        return aaMutation;
     }
 
     public String getValidated() {
@@ -109,18 +122,18 @@ public class OutputMafRow {
     }
 
     public String toMafRow() {
-        return getIgnoreMe() + "\t" + getChromosome() + "\t" + getStartPosition() + "\t" + getEndPosition() + "\t" + getRefAllele() + "\t" + getTumorAllele()
+        return getChromosome() + "\t" + getStartPosition() + "\t" + getEndPosition() + "\t" + getRefAllele() + "\t" + getTumorAllele()
                 + "\t" + getGeneName() + "\t" + getRefCount() + "\t" + getAltCount() + "\t" + getVariantClassification() + "\t"
                 + getAaMutation() + "\t" + getValidated() + "\t" + getSampleName() + "\t" + getRefSeqWithNucleotideMutation();
     }
 
-    static String[] headers = {"IgnoreMe", "Chromosome", "Start_Position", "End_Position", "Reference_Allele", "Tumor_Seq_Allele1", "Hugo_Symbol", "t_ref_count", "t_alt_count", "Variant_Classification", "HGVSp_Short", "Validation_Status", "Tumor_Sample_Barcode", "RefSeqNucleotideMutationInVal"};
+    static String[] headers = {"Chromosome", "Start_Position", "End_Position", "Reference_Allele", "Tumor_Seq_Allele1", "Hugo_Symbol", "t_ref_count", "t_alt_count", "Variant_Classification", "HGVSp_Short", "Validation_Status", "Tumor_Sample_Barcode", "RefSeqNucleotideMutationInVal"};
 
     static String getHeaders() {
         return String.join("\t", headers);
     }
 
-    public static List<String> convertToRowList(List<OutputMafRow> l) {
+    public static List<String> convertToRowList(Collection<OutputMafRow> l) {
         List<String> rows = new LinkedList<>();
         String[] firstRow = new String[headers.length];
         Arrays.fill(firstRow, "");
@@ -131,5 +144,12 @@ public class OutputMafRow {
             rows.add(o.toMafRow());
         }
         return rows;
+    }
+
+    public static void printCollection(Collection<OutputMafRow> l, String title) {
+        System.out.println(title);
+        for (OutputMafRow row : l) {
+            System.out.println(row.toMafRow());
+        }
     }
 }

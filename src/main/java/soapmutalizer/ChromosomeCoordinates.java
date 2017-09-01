@@ -54,14 +54,14 @@ public class ChromosomeCoordinates {
 
     public ChromosomeCoordinates(String transcript, String nucleotideMutation) {
         String refSeqWithNucleotideMutation = (combineRefSeqWithNucleotideMutation(transcript, nucleotideMutation));
-        System.out.println(">ChromosomeCoordinates: refSeqWithNucleotideMutation=" + refSeqWithNucleotideMutation);
+       // System.out.println(">ChromosomeCoordinates: refSeqWithNucleotideMutation=" + refSeqWithNucleotideMutation);
         if (isMutationComplex(nucleotideMutation)) {
              System.out.println("<ChromosomeCoordinates: refSeqWithNucleotideMutation=" + refSeqWithNucleotideMutation+"; mutation is complex");
             return;
         }
         String response = numberConversion(refSeqWithNucleotideMutation);
         if (!response.isEmpty()) {
-            System.out.println(">>ChromosomeCoordinates: refSeqWithNucleotideMutation=" + refSeqWithNucleotideMutation + "; response=" + response);
+          // System.out.println(">>ChromosomeCoordinates: refSeqWithNucleotideMutation=" + refSeqWithNucleotideMutation + "; response=" + response);
             chromosome = extractChromosomeFromResponse(response);
             setPosition(extractCoordinateFromResponse(response));
         }
@@ -71,7 +71,7 @@ public class ChromosomeCoordinates {
 //NC_000005.9:g.112175619delC
 
     final String numberConversion(String variant) {
-        System.out.println(">ChromosomeCoordinates:numberConversion variant=" + variant);
+       // System.out.println(">ChromosomeCoordinates:numberConversion variant=" + variant);
         return port.numberConversion("hg19", variant, null).getString().get(0);
     }
 
@@ -83,7 +83,7 @@ public class ChromosomeCoordinates {
     Pattern numbersOnlyPattern = Pattern.compile("g\\.([0-9_]+)\\D+");
 
     final String extractCoordinateFromResponse(String val) {
-         System.out.println(">extractCoordinateFromResponse:val=" + val);
+       //  System.out.println(">extractCoordinateFromResponse:val=" + val);
         String r = val.split(Pattern.quote(":"))[1];
 
         Matcher m = numbersOnlyPattern.matcher(r);
@@ -97,7 +97,7 @@ public class ChromosomeCoordinates {
     Pattern complexMutationPattern = Pattern.compile("c\\.\\[.+;.+\\]");
 
     final boolean isMutationComplex(String nucleotideMutation) { //c.[14A>G; 35G>A]
-        System.out.println(">isMutationComplex: val=" + nucleotideMutation);
+     //   System.out.println(">isMutationComplex: val=" + nucleotideMutation);
 
         Matcher m = complexMutationPattern.matcher(nucleotideMutation);
         return (m.matches());
