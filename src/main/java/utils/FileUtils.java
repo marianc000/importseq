@@ -44,7 +44,7 @@ public class FileUtils {
     public static String getSampleName(Path path) {
         String fileName = path.getFileName().toString();
         String sampleName = fileName.substring(0, fileName.indexOf("."));
-        System.out.println("sampleName: " + sampleName);
+     //   System.out.println("sampleName: " + sampleName);
         if (sampleName == null || sampleName.isEmpty()) {
             throw new RuntimeException("Cannot extract a sample name from path " + path);
         }

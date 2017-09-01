@@ -141,11 +141,11 @@ public class ExcelOperations {
                     doc.get(colNum).add(cellVal);
                 }
             } else {
-                System.out.println("!!!!!!!!!!!!!!!!!!!!!!!! row " + rowNum + " is null, total rows=" + sheet.getLastRowNum() + "; file=" + fileName);
+               // System.out.println("!!!!!!!!!!!!!!!!!!!!!!!! row " + rowNum + " is null, total rows=" + sheet.getLastRowNum() + "; file=" + fileName);
             }
         }
         wb.close();
-        System.out.println("loaded rows: " + sheet.getLastRowNum());
+       // System.out.println("loaded rows: " + sheet.getLastRowNum());
         return doc;
     }
 

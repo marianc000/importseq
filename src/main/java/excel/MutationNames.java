@@ -15,15 +15,15 @@ import marian.caikovski.mutations.VariantClassification;
  */
 public final class MutationNames {
 
-    String proteinMutation, nucleotideMutation, refAllele="", altAllele="", refAA, altAA, nucleotideMutationWithoutCoordinates;
+    String proteinMutation, nucleotideMutation, refAllele = "", altAllele = "", refAA, altAA, nucleotideMutationWithoutCoordinates;
 
-    VariantClassification variantClassification=VariantClassification.FAILED;
+    VariantClassification variantClassification = VariantClassification.FAILED;
 
     MutationNames() { //for tests
     }
 
     public MutationNames(String proteinAndNucleotideMutation) {
-       // System.out.println(">MutationNames: proteinAndNucleotideMutation=" + proteinAndNucleotideMutation);
+        // System.out.println(">MutationNames: proteinAndNucleotideMutation=" + proteinAndNucleotideMutation);
         setMutationsFromCell(proteinAndNucleotideMutation);
 
         if (setNucleotideMutationWithoutCoordinates()) {
@@ -36,7 +36,7 @@ public final class MutationNames {
     public VariantClassification getVariantClassification() {
         return variantClassification;
     }
- 
+
     public String getRefAA() {
         return refAA;
     }
@@ -59,6 +59,10 @@ public final class MutationNames {
         if (setRefAltAllelesForDuplication()) {
             return;
         }
+        if (setRefAltAllelesForDeletionInsertion()) {
+            return;
+        }
+
     }
 
     public String getNucleotideMutationWithoutCoordinates() {
@@ -91,7 +95,7 @@ public final class MutationNames {
     static String SPLICING_AA_CHANGE_IN_VAL = "Splicing";
 
     boolean setAAChange() {
-       // System.out.println(">setAAChange: " + getProteinMutation());
+        // System.out.println(">setAAChange: " + getProteinMutation());
         if (getProteinMutation().equals(SPLICING_AA_CHANGE_IN_VAL)) { //"c.3405-2A>T\n (Splicing)"
             return false;
         }
@@ -107,7 +111,7 @@ public final class MutationNames {
     static Pattern missenseNucleotideMutationWithoutCoordinatesPattern = Pattern.compile("([A-Z])>([A-Z])");
 
     boolean setRefAltAllelesForMissenseMutation() {
-      //  System.out.println(">setRefAltAllelesForMissenseMutation: " + getNucleotideMutationWithoutCoordinates());
+        //  System.out.println(">setRefAltAllelesForMissenseMutation: " + getNucleotideMutationWithoutCoordinates());
         Matcher m = missenseNucleotideMutationWithoutCoordinatesPattern.matcher(getNucleotideMutationWithoutCoordinates());
         if (m.matches()) {
             refAllele = m.group(1);
@@ -115,6 +119,7 @@ public final class MutationNames {
             setAAChange();
             if (getProteinMutation().equals(SPLICING_AA_CHANGE_IN_VAL)) {
                 variantClassification = VariantClassification.SPLICE_SITE;
+                proteinMutation = "";
             } else if (getAltAA().equals("*") || getAltAA().equals("X")) {
                 variantClassification = VariantClassification.NONSENSE_MUTATION;
             } else if (getRefAA().equals("*") || getRefAA().equals("X")) {
@@ -127,10 +132,10 @@ public final class MutationNames {
         return false;
     }
     static Pattern deletionNucleotideMutationWithoutCoordinatesPattern = Pattern.compile("del([A-Z]*)");
-    static String FRAMESHIFT_MARK = "fs";
+    static String FRAMESHIFT_MARK = "*";
 
     boolean setRefAltAllelesForDeletion() {
-      //  System.out.println("setRefAltAllelesForDeletion: " + getNucleotideMutationWithoutCoordinates());
+        //  System.out.println("setRefAltAllelesForDeletion: " + getNucleotideMutationWithoutCoordinates());
         Matcher m = deletionNucleotideMutationWithoutCoordinatesPattern.matcher(getNucleotideMutationWithoutCoordinates());
         if (m.matches()) {
             refAllele = m.group(1); // TODO:it can be null, call ref retriever
@@ -144,7 +149,24 @@ public final class MutationNames {
         }
         return false;
     }
+    static Pattern deletionInsertionNucleotideMutationWithoutCoordinatesPattern = Pattern.compile("delins([A-Z]*)");
 
+    boolean setRefAltAllelesForDeletionInsertion() {
+
+        Matcher m = deletionInsertionNucleotideMutationWithoutCoordinatesPattern.matcher(getNucleotideMutationWithoutCoordinates());
+        if (m.matches()) {
+            refAllele = "";
+            altAllele = m.group(1);
+
+            if (getProteinMutation().contains(FRAMESHIFT_MARK)) {
+                variantClassification = VariantClassification.FRAME_SHIFT_DEL;
+            } else {
+                variantClassification = VariantClassification.IN_FRAME_DEL;
+            }
+            return true;
+        }
+        return false;
+    }
     static Pattern duplicationNucleotideMutationWithoutCoordinatesPattern = Pattern.compile("dup([A-Z]*)");
     //  static String DUPLICATION_MARK = "dup";
 

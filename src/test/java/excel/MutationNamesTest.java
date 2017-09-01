@@ -79,12 +79,12 @@ public class MutationNamesTest {
 //        //System.out.println(i);
         assertEquals(i.getNucleotideMutation(), "c.[14A>G; 35G>A]");
         assertEquals(i.getProteinMutation(), "p.[K5R;G12D]");
-       assertNull(i.getNucleotideMutationWithoutCoordinates() );
+        assertNull(i.getNucleotideMutationWithoutCoordinates());
         assertEquals(i.getRefAllele(), "");
         assertEquals(i.getAltAllele(), "");
         assertNull(i.getRefAA());
         assertNull(i.getAltAA());
-        assertNull(i.getVariantClassification());
+        assertEquals(i.getVariantClassification(), VariantClassification.FAILED);
 
     }
 
@@ -104,7 +104,7 @@ public class MutationNamesTest {
         MutationNames i = new MutationNames("c.3405-2A>T\n (Splicing)");
         //System.out.println(i);
         assertEquals(i.getNucleotideMutation(), "c.3405-2A>T");
-        assertEquals(i.getProteinMutation(), "Splicing");
+        assertEquals(i.getProteinMutation(), "");
         assertEquals(i.getNucleotideMutationWithoutCoordinates(), "A>T");
         assertEquals(i.getRefAllele(), "A");
         assertEquals(i.getAltAllele(), "T");
@@ -119,7 +119,7 @@ public class MutationNamesTest {
         i = new MutationNames("c.559+1G>A\n (Splicing)");
         //System.out.println(i);
         assertEquals(i.getNucleotideMutation(), "c.559+1G>A");
-        assertEquals(i.getProteinMutation(), "Splicing");
+        assertEquals(i.getProteinMutation(), "");
         assertEquals(i.getNucleotideMutationWithoutCoordinates(), "G>A");
         assertEquals(i.getRefAllele(), "G");
         assertEquals(i.getAltAllele(), "A");
@@ -174,6 +174,75 @@ public class MutationNamesTest {
         assertEquals(i.getNucleotideMutationWithoutCoordinates(), "del");
         assertEquals(i.getRefAllele(), "");
         assertEquals(i.getAltAllele(), "-");
+        assertNull(i.getRefAA());
+        assertNull(i.getAltAA());
+        assertEquals(VariantClassification.IN_FRAME_DEL, i.getVariantClassification());
+    }
+
+    @Test
+    public void testFrameshiftDeletionInsertion() {
+
+        MutationNames i = new MutationNames("c.237_238delinsGT\n (p.R80*)");
+
+        assertEquals(i.getNucleotideMutation(), "c.237_238delinsGT");
+        assertEquals(i.getProteinMutation(), "p.R80*");
+        assertEquals(i.getNucleotideMutationWithoutCoordinates(), "delinsGT");
+        assertEquals(i.getRefAllele(), "");
+        assertEquals(i.getAltAllele(), "GT");
+        assertNull(i.getRefAA());
+        assertNull(i.getAltAA());
+        assertEquals(VariantClassification.FRAME_SHIFT_DEL, i.getVariantClassification());
+
+        i = new MutationNames("c.166_176delinsG\n (p.S56Gfs*87)");
+
+        assertEquals(i.getNucleotideMutation(), "c.166_176delinsG");
+        assertEquals(i.getProteinMutation(), "p.S56Gfs*87");
+        assertEquals(i.getNucleotideMutationWithoutCoordinates(), "delinsG");
+        assertEquals(i.getRefAllele(), "");
+        assertEquals(i.getAltAllele(), "G");
+        assertNull(i.getRefAA());
+        assertNull(i.getAltAA());
+        assertEquals(VariantClassification.FRAME_SHIFT_DEL, i.getVariantClassification());
+
+        i = new MutationNames("c.510_511delinsTT\n (p.E171*)");
+        assertEquals(i.getNucleotideMutation(), "c.510_511delinsTT");
+        assertEquals(i.getProteinMutation(), "p.E171*");
+        assertEquals(i.getNucleotideMutationWithoutCoordinates(), "delinsTT");
+        assertEquals(i.getRefAllele(), "");
+        assertEquals(i.getAltAllele(), "TT");
+        assertNull(i.getRefAA());
+        assertNull(i.getAltAA());
+        assertEquals(VariantClassification.FRAME_SHIFT_DEL, i.getVariantClassification());
+
+        i = new MutationNames("c.286_308delinsCCTG\n (p.S96Pfs*21)");
+        assertEquals(i.getNucleotideMutation(), "c.286_308delinsCCTG");
+        assertEquals(i.getProteinMutation(), "p.S96Pfs*21");
+        assertEquals(i.getNucleotideMutationWithoutCoordinates(), "delinsCCTG");
+        assertEquals(i.getRefAllele(), "");
+        assertEquals(i.getAltAllele(), "CCTG");
+        assertNull(i.getRefAA());
+        assertNull(i.getAltAA());
+        assertEquals(VariantClassification.FRAME_SHIFT_DEL, i.getVariantClassification());
+    }
+
+    @Test
+    public void testInFrameDeletionInsertion() {
+        MutationNames i = new MutationNames("c.115_116delinsGC\n (p.R39A)");
+        assertEquals(i.getNucleotideMutation(), "c.115_116delinsGC");
+        assertEquals(i.getProteinMutation(), "p.R39A");
+        assertEquals(i.getNucleotideMutationWithoutCoordinates(), "delinsGC");
+        assertEquals(i.getRefAllele(), "");
+        assertEquals(i.getAltAllele(), "GC");
+        assertNull(i.getRefAA());
+        assertNull(i.getAltAA());
+        assertEquals(VariantClassification.IN_FRAME_DEL, i.getVariantClassification());
+
+        i = new MutationNames("c.1798_1799delinsAA\n (p.V600K)");
+        assertEquals(i.getNucleotideMutation(), "c.1798_1799delinsAA");
+        assertEquals(i.getProteinMutation(), "p.V600K");
+        assertEquals(i.getNucleotideMutationWithoutCoordinates(), "delinsAA");
+        assertEquals(i.getRefAllele(), "");
+        assertEquals(i.getAltAllele(), "AA");
         assertNull(i.getRefAA());
         assertNull(i.getAltAA());
         assertEquals(VariantClassification.IN_FRAME_DEL, i.getVariantClassification());

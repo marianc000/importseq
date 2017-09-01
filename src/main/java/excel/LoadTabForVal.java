@@ -12,6 +12,8 @@ import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -199,6 +201,7 @@ public class LoadTabForVal {
 
     public Map<String, Map<String, OutputMafRow>> makeMap() throws IOException, InvalidFormatException {
         Map<String, Map<String, OutputMafRow>> map = new HashMap<>();
+        correction = 0;
         for (int c = 1; c < excel.getColumn(GENE_COLUMN).size(); c++) {
             String gene = excel.getColumn(GENE_COLUMN).get(c);
             String mutation = excel.getColumn(AA_CHANGE_COLUMN).get(c);
@@ -218,7 +221,30 @@ public class LoadTabForVal {
 
             //OutputMafRow(String chromosome, int startPosition, int endPosition, String refAllele, String tumorAllele, String geneName, int refCount, int altCount, String variantClassification, String aaMutation)
             OutputMafRow row = new OutputMafRow(chromosome, startPosition, endPosition, refAllele, tumorAllele, gene, refCount, altCount, variantClassification, mutation);
+            if (mutationMap.get(mutation) != null) {
+                //  throw new RuntimeException("mutation exists: " + row.toMafRow());
+                correction++;
+            }
             mutationMap.put(mutation, row);
+        }
+        return map;
+    }
+
+    int correction;
+
+    public Map<String, Map<String, OutputMafRow>> makeMapFromList(List<OutputMafRow> l) throws IOException, InvalidFormatException {
+        Map<String, Map<String, OutputMafRow>> map = new HashMap<>();
+        for (OutputMafRow r : l) {
+
+            String gene = r.getGeneName();
+            String mutation = r.getAaMutation();
+
+            if (map.get(gene) == null) {
+                map.put(gene, new HashMap<>());
+            }
+            Map<String, OutputMafRow> mutationMap = map.get(gene);
+
+            mutationMap.put(mutation, r);
         }
         return map;
     }
@@ -246,10 +272,13 @@ public class LoadTabForVal {
         Map<String, Map<String, OutputMafRow>> geneMutationRowInTabMap = makeMap();
 
         List<OutputMafRow> l = convertMapToList(geneMutationRowInTabMap);
-       
-        if (l.size() + 1 != excel.getColumn(GENE_COLUMN).size()) { 
-            System.out.println(l.size() + "; " + excel.getColumn(GENE_COLUMN).size());
-            throw new RuntimeException("Aberrant row number");
+
+        if (l.size() + 1 != excel.getColumn(GENE_COLUMN).size()) {
+            int difference = excel.getColumn(GENE_COLUMN).size() - (l.size() + 1) - correction; // H1706047-1A because of splicing empty value
+
+            if (difference != 0) {
+                throw new RuntimeException("Aberrant row number: " + difference);
+            }
         }
         Files.write(FileUtils.getOutputFilePath(sourceFilePath), convertToRowList(l));
         return geneMutationRowInTabMap;
@@ -285,6 +314,6 @@ public class LoadTabForVal {
     }
 
     public static void main(String... args) throws IOException, InvalidFormatException {
-        new LoadTabForVal().run("C:\\Projects\\cBioPortal\\data sample\\SECOND SAMPLES\\corrected\\H1702318-1A.hg19_coding01.Tab.xlsx");
+        new LoadTabForVal().run("C:\\Projects\\cBioPortal\\data sample\\SECOND SAMPLES\\corrected\\H1706047-1A.hg19_coding01.Tab.xlsx");
     }
 }

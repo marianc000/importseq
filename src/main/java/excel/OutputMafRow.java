@@ -5,10 +5,13 @@
  */
 package excel;
 
+import static excel.MutationNames.aaChangeForMissenseNucleotideMutation;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import soapmutalizer.ChromosomeCoordinates;
 import static soapmutalizer.ChromosomeCoordinates.combineRefSeqWithNucleotideMutation;
 
@@ -35,9 +38,12 @@ public class OutputMafRow {
 
     String refSeqWithNucleotideMutation;
 
+    public OutputMafRow() { // for tests
+    }
+
     public OutputMafRow(String resultatInVal, String geneNameInVal, String sampleName, String alleleFrequencyStr, String coverage, String refSeq) {
         MutationNames mutationNames = new MutationNames(resultatInVal);
-
+        refSeq = cleanRefSeq(refSeq);
         this.sampleName = sampleName;
         AlleleFrequency alleleFrequency = new AlleleFrequency(alleleFrequencyStr, coverage);
         refSeqWithNucleotideMutation = combineRefSeqWithNucleotideMutation(refSeq, mutationNames.getNucleotideMutation()); // save it to maf to have original data
@@ -46,6 +52,10 @@ public class OutputMafRow {
         init(chromosomeCoordinates.getChromosome(), chromosomeCoordinates.getStartPostion(), chromosomeCoordinates.getEndPosition(),
                 mutationNames.getRefAllele(), mutationNames.getAltAllele(), geneNameInVal, alleleFrequency.getRefCountAsInt(), alleleFrequency.getAltCountAsInt(),
                 mutationNames.getVariantClassification().toString(), mutationNames.getProteinMutation());
+    }
+
+  final  String cleanRefSeq(String refSeq) {
+        return refSeq.replaceAll("\\*$", "");
     }
 
     public OutputMafRow(String chromosome, int startPosition, int endPosition, String refAllele, String tumorAllele, String geneName, int refCount, int altCount, String variantClassification, String aaMutation) {

@@ -27,7 +27,7 @@ public class ExcelAdaptorForValImport {
     void printMessage(OutputMafRow rowInVal, Map<String, OutputMafRow> mutationsInTab, String msg) {
         System.out.println(msg + ":\n" + rowInVal.toMafRow());
         printCollection(mutationsInTab.values(), "MUTATIONS FOR THE SAME GENE IN TAB: ");
-        System.out.println( );
+        System.out.println();
     }
 
     public Path run(String sourceTabFilePath) throws IOException, InvalidFormatException {
@@ -45,10 +45,14 @@ public class ExcelAdaptorForValImport {
             if (rowInTab == null) {
                 msg += "NOT FOUND";
             } else {
-               // mutationsInTab.remove(rowInVal.getAaMutation());
-
+                // mutationsInTab.remove(rowInVal.getAaMutation());
                 if (!rowInTab.getChromosome().equals(rowInVal.getChromosome())) {
-                    msg += "CHROMOSOME; ";
+                    if (rowInVal.getChromosome().equals("0")) {
+                        String refSeq = rowInVal.getRefSeqWithNucleotideMutation();
+                        if (!(refSeq.startsWith("NM_033360.3") || refSeq.startsWith("NM_005896.3")|| refSeq.startsWith("NM_004448.3"))) {
+                            msg += "CHROMOSOME; ";
+                        }
+                    }
                 }
                 if (!rowInTab.getVariantClassification().equals(rowInVal.getVariantClassification())) {
                     msg += "VARIANT_CLASSIFICATION; ";
@@ -136,6 +140,6 @@ public class ExcelAdaptorForValImport {
     }
 
     public static void main(String... args) throws IOException, InvalidFormatException {
-        new ExcelAdaptorForValImport().run("C:\\Projects\\cBioPortal\\data sample\\SECOND SAMPLES\\corrected\\H1702318-1A.hg19_coding01.Tab.xlsx");
+        new ExcelAdaptorForValImport().run("C:\\Projects\\cBioPortal\\data sample\\SECOND SAMPLES\\corrected\\H1706047-1A.hg19_coding01.Tab.xlsx");
     }
 }

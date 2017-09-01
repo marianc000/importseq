@@ -8,11 +8,9 @@ package excel;
 import static excel.OutputMafRow.convertToRowList;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import static utils.CollectionUtils.printCollection;
 import utils.FileUtils;
 
 public class LoadValForVal {
