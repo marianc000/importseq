@@ -36,7 +36,7 @@ public class MyImportValWithClinicalData {
 
     MyProperties p;
 
-    public MyImportValWithClinicalData() throws IOException {
+    public MyImportValWithClinicalData()   {
 
     }
 
@@ -59,6 +59,15 @@ public class MyImportValWithClinicalData {
         }
     }
 
+    String removeLeadingZeros(String str) {
+        try {
+            int id = Integer.parseUnsignedInt(str);
+            return String.valueOf(id);
+        } catch (Exception ex) {
+            return str;
+        }
+    }
+
     void importMutationFile(Connection con, Path sourceFilePath, List<MyClinicalAttribute> columnAttrs, int cancerStudyId) throws Exception {
         System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>importMutationFile: sourceFilePath=" + sourceFilePath.getFileName());
 
@@ -67,7 +76,7 @@ public class MyImportValWithClinicalData {
         List<String> row = refextNipMap.get(sampleName);
         // System.out.println(">importMutationFile: row=" + row);
         String sampleNameInFile = row.get(rro.getRefextHeaderIndex());
-        String patientNameInFile = row.get(rro.getNipHeaderIndex());
+        String patientNameInFile = removeLeadingZeros(row.get(rro.getNipHeaderIndex()));
         // System.out.println(">importMutationFile: " + sourceFilePath.getFileName() + "; sampleName=" + sampleNameInFile + "; patientName=" + patientNameInFile);
         if (!sampleName.equals(sampleNameInFile)) {
             throw new RuntimeException("sample names differ");

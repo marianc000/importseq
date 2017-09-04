@@ -36,7 +36,7 @@ public class MyImportManyWithClinicalData {
 
     MyProperties p;
 
-    public MyImportManyWithClinicalData() throws IOException {
+    public MyImportManyWithClinicalData()   {
 
     }
 

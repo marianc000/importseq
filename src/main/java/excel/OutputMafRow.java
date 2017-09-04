@@ -36,7 +36,7 @@ public class OutputMafRow {
 
     String sampleName;
 
-    String refSeqWithNucleotideMutation;
+    String refSeqWithNucleotideMutation, refSeqWithOriginalNucleotideProteinMutation;
 
     public OutputMafRow() { // for tests
     }
@@ -47,6 +47,7 @@ public class OutputMafRow {
         this.sampleName = sampleName;
         AlleleFrequency alleleFrequency = new AlleleFrequency(alleleFrequencyStr, coverage);
         refSeqWithNucleotideMutation = combineRefSeqWithNucleotideMutation(refSeq, mutationNames.getNucleotideMutation()); // save it to maf to have original data
+        refSeqWithOriginalNucleotideProteinMutation = combineRefSeqWithNucleotideMutation(refSeq, mutationNames.getProteinAndNucleotideMutation());
         ChromosomeCoordinates chromosomeCoordinates = new ChromosomeCoordinates(refSeq, mutationNames.getNucleotideMutation());
 
         init(chromosomeCoordinates.getChromosome(), chromosomeCoordinates.getStartPostion(), chromosomeCoordinates.getEndPosition(),
@@ -54,7 +55,7 @@ public class OutputMafRow {
                 mutationNames.getVariantClassification().toString(), mutationNames.getProteinMutation());
     }
 
-  final  String cleanRefSeq(String refSeq) {
+    final String cleanRefSeq(String refSeq) {
         return refSeq.replaceAll("\\*$", "");
     }
 
@@ -120,7 +121,8 @@ public class OutputMafRow {
     }
 
     public String getValidated() {
-        return "Validated";
+      //  return "Validated";
+      return refSeqWithOriginalNucleotideProteinMutation;
     }
 
     public String getFileName() {

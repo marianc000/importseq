@@ -16,7 +16,7 @@ import java.util.regex.Pattern;
  */
 public class ChromosomeCoordinates {
 
-    public static int FAILED = 0;
+    public static int FAILED = 1;
 
     static Mutalyzer port = new MutalyzerService().getMutalyzer();
     //  NC_000004.11:g.55972974T>A

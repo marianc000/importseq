@@ -18,12 +18,26 @@ public final class MutationNames {
     String proteinMutation, nucleotideMutation, refAllele = "", altAllele = "", refAA, altAA, nucleotideMutationWithoutCoordinates;
 
     VariantClassification variantClassification = VariantClassification.FAILED;
+    String proteinAndNucleotideMutation;
 
     MutationNames() { //for tests
     }
 
+    public String getProteinAndNucleotideMutation() {
+        return proteinAndNucleotideMutation;
+    }
+
+    static int MAX_VALIDATION_STATUS_COLUMN_LENGTH=55; //   I  changed length of mutation.validation_status in the database from 25 to 55
+    public void setProteinAndNucleotideMutation(String proteinAndNucleotideMutation) {
+        this.proteinAndNucleotideMutation = proteinAndNucleotideMutation.replaceAll("\n| ", "") ;
+        if (this.proteinAndNucleotideMutation.length()>MAX_VALIDATION_STATUS_COLUMN_LENGTH){
+            this.proteinAndNucleotideMutation =this.proteinAndNucleotideMutation.substring(0,MAX_VALIDATION_STATUS_COLUMN_LENGTH);
+        }
+    }
+
     public MutationNames(String proteinAndNucleotideMutation) {
         // System.out.println(">MutationNames: proteinAndNucleotideMutation=" + proteinAndNucleotideMutation);
+        setProteinAndNucleotideMutation(proteinAndNucleotideMutation);
         setMutationsFromCell(proteinAndNucleotideMutation);
 
         if (setNucleotideMutationWithoutCoordinates()) {

@@ -274,4 +274,17 @@ public class MutationNamesTest {
         assertEquals(VariantClassification.FRAME_SHIFT_INS, i.getVariantClassification());
     }
 
+    @Test
+    // changed length of mutation.validation_status in the database to 55
+    public void testSetProteinAndNucleotideMutation() {
+        MutationNames i = new MutationNames("c.115_116delinsGC\n (p.R39A)");
+        assertEquals(i.getProteinAndNucleotideMutation(), "c.115_116delinsGC(p.R39A)");
+
+        i = new MutationNames("c.1798_1799delinsAA\n (p.V600K)");
+        assertEquals(i.getProteinAndNucleotideMutation(), "c.1798_1799delinsAA(p.V600K)");
+
+        i.setProteinAndNucleotideMutation("1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890");
+        assertEquals(i.getProteinAndNucleotideMutation(), "1234567890123456789012345678901234567890123456789012345");
+    }
+
 }
