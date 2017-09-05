@@ -216,6 +216,7 @@ public class MyImportExtendedMutationData {
                     mutation.setStartPosition(record.getStartPosition());
                     mutation.setEndPosition(record.getEndPosition());
                     mutation.setValidationStatus(record.getValidationStatus());
+                      mutation.setMyTest(record.getMyTest());
                     mutation.setMutationStatus(record.getMutationStatus());
                     mutation.setFunctionalImpactScore(functionalImpactScore);
                     mutation.setFisValue(fisValue);

@@ -356,6 +356,15 @@ public final class MyExtendedMutation {
     private int tumorRefCount;
     private int normalAltCount;
     private int normalRefCount;
+    String myTest;
+
+    public String getMyTest() {
+        return myTest;
+    }
+
+    public void setMyTest(String myTest) {
+        this.myTest = myTest;
+    }
 
     public MyExtendedMutation() {
         this(new MutationEvent());

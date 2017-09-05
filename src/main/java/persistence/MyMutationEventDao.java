@@ -9,7 +9,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
- 
+
 /**
  *
  * @author mcaikovs
@@ -49,7 +49,7 @@ public class MyMutationEventDao {
         long entrezId = rs.getLong("ENTREZ_GENE_ID");
         MyCanonicalGene gene = MyDaoGeneOptimized.getInstance(con).getGene(entrezId);
         // System.out.println(">extractMutationEvent: gene=" + gene);
-        
+
         event.setGene(gene);
         event.setChr(rs.getString("CHR"));
         event.setStartPosition(rs.getLong("START_POSITION"));

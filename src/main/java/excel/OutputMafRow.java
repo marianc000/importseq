@@ -5,15 +5,17 @@
  */
 package excel;
 
-import static excel.MutationNames.aaChangeForMissenseNucleotideMutation;
+import static excel.MutationNames.MAX_VALIDATION_STATUS_COLUMN_LENGTH;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import static persistence.MyMafUtil.MY_TEST;
 import soapmutalizer.ChromosomeCoordinates;
 import static soapmutalizer.ChromosomeCoordinates.combineRefSeqWithNucleotideMutation;
+import utils.StringUtils;
 
 /**
  *
@@ -32,16 +34,24 @@ public class OutputMafRow {
     String variantClassification;
     String aaMutation;
     String validated = "Validated";
-    String fileName;
+    String fileName, comment = "";
 
     String sampleName;
 
-    String refSeqWithNucleotideMutation, refSeqWithOriginalNucleotideProteinMutation;
+    String refSeqWithNucleotideMutation, refSeqWithOriginalNucleotideProteinMutation="";
 
     public OutputMafRow() { // for tests
     }
 
-    public OutputMafRow(String resultatInVal, String geneNameInVal, String sampleName, String alleleFrequencyStr, String coverage, String refSeq) {
+    public String getComment() {
+        return comment.replace('é','e').replace('ê','e');
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
+    public OutputMafRow(String resultatInVal, String geneNameInVal, String sampleName, String alleleFrequencyStr, String coverage, String refSeq, String comment) {
         MutationNames mutationNames = new MutationNames(resultatInVal);
         refSeq = cleanRefSeq(refSeq);
         this.sampleName = sampleName;
@@ -49,10 +59,12 @@ public class OutputMafRow {
         refSeqWithNucleotideMutation = combineRefSeqWithNucleotideMutation(refSeq, mutationNames.getNucleotideMutation()); // save it to maf to have original data
         refSeqWithOriginalNucleotideProteinMutation = combineRefSeqWithNucleotideMutation(refSeq, mutationNames.getProteinAndNucleotideMutation());
         ChromosomeCoordinates chromosomeCoordinates = new ChromosomeCoordinates(refSeq, mutationNames.getNucleotideMutation());
+        setComment(comment);
 
         init(chromosomeCoordinates.getChromosome(), chromosomeCoordinates.getStartPostion(), chromosomeCoordinates.getEndPosition(),
                 mutationNames.getRefAllele(), mutationNames.getAltAllele(), geneNameInVal, alleleFrequency.getRefCountAsInt(), alleleFrequency.getAltCountAsInt(),
                 mutationNames.getVariantClassification().toString(), mutationNames.getProteinMutation());
+        //  System.out.println(this.toString());
     }
 
     final String cleanRefSeq(String refSeq) {
@@ -121,10 +133,14 @@ public class OutputMafRow {
     }
 
     public String getValidated() {
-      //  return "Validated";
-      return refSeqWithOriginalNucleotideProteinMutation;
+        //  return "Validated";
+        // return refSeqWithOriginalNucleotideProteinMutation;
+      //  System.out.println(">" + comment + "; " + comment.length()+"; "+comment.getBytes().length+"; "+new String (comment.getBytes(StandardCharsets.US_ASCII)).length());
+        String r = StringUtils.truncate(getComment().replace("'", "''"), MAX_VALIDATION_STATUS_COLUMN_LENGTH-1);
+      //  System.out.println("<r" + comment + "; " + r.length());
+        return r;
     }
-
+//Polymorphismes connus au sein de la population g�n�rale
     public String getFileName() {
         return fileName;
     }
@@ -133,13 +149,22 @@ public class OutputMafRow {
         return sampleName;
     }
 
+    public String getRefSeqWithOriginalNucleotideProteinMutation() {
+        return StringUtils.truncate(refSeqWithOriginalNucleotideProteinMutation, MAX_VALIDATION_STATUS_COLUMN_LENGTH);
+    }
+
     public String toMafRow() {
         return getChromosome() + "\t" + getStartPosition() + "\t" + getEndPosition() + "\t" + getRefAllele() + "\t" + getTumorAllele()
                 + "\t" + getGeneName() + "\t" + getRefCount() + "\t" + getAltCount() + "\t" + getVariantClassification() + "\t"
-                + getAaMutation() + "\t" + getValidated() + "\t" + getSampleName() + "\t" + getRefSeqWithNucleotideMutation();
+                + getAaMutation() + "\t" + getValidated() + "\t" + getSampleName() + "\t" + getRefSeqWithNucleotideMutation() + "\t" + getRefSeqWithOriginalNucleotideProteinMutation();
     }
 
-    static String[] headers = {"Chromosome", "Start_Position", "End_Position", "Reference_Allele", "Tumor_Seq_Allele1", "Hugo_Symbol", "t_ref_count", "t_alt_count", "Variant_Classification", "HGVSp_Short", "Validation_Status", "Tumor_Sample_Barcode", "RefSeqNucleotideMutationInVal"};
+    @Override
+    public String toString() {
+        return "OutputMafRow{" + "chromosome=" + chromosome + ", geneName=" + geneName + ", aaMutation=" + aaMutation + ", validated=" + validated + ", comment=" + getComment() + ", sampleName=" + sampleName + ", refSeqWithOriginalNucleotideProteinMutation=" + getRefSeqWithOriginalNucleotideProteinMutation() + '}';
+    }
+
+    static String[] headers = {"Chromosome", "Start_Position", "End_Position", "Reference_Allele", "Tumor_Seq_Allele1", "Hugo_Symbol", "t_ref_count", "t_alt_count", "Variant_Classification", "HGVSp_Short", "Validation_Status", "Tumor_Sample_Barcode", "RefSeqNucleotideMutationInVal", MY_TEST};
 
     static String getHeaders() {
         return String.join("\t", headers);

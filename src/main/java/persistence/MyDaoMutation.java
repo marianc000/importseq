@@ -1,8 +1,6 @@
 package persistence;
 
-
 import java.sql.*;
- 
 
 /**
  * Data access object for Mutation table
@@ -11,7 +9,7 @@ public final class MyDaoMutation {
 
     public static final String NAN = "NaN";
 
-    static String mutationSql = " insert into mutation(MUTATION_EVENT_ID,GENETIC_PROFILE_ID,SAMPLE_ID,ENTREZ_GENE_ID,CENTER,SEQUENCER,MUTATION_STATUS,VALIDATION_STATUS,TUMOR_SEQ_ALLELE1,TUMOR_SEQ_ALLELE2,MATCHED_NORM_SAMPLE_BARCODE,MATCH_NORM_SEQ_ALLELE1,MATCH_NORM_SEQ_ALLELE2,TUMOR_VALIDATION_ALLELE1,TUMOR_VALIDATION_ALLELE2,MATCH_NORM_VALIDATION_ALLELE1,MATCH_NORM_VALIDATION_ALLELE2,VERIFICATION_STATUS,SEQUENCING_PHASE,SEQUENCE_SOURCE,VALIDATION_METHOD,SCORE,BAM_FILE,TUMOR_ALT_COUNT,TUMOR_REF_COUNT,NORMAL_ALT_COUNT,NORMAL_REF_COUNT ) values(";
+    static String mutationSql = " insert into mutation(MUTATION_EVENT_ID,GENETIC_PROFILE_ID,SAMPLE_ID,ENTREZ_GENE_ID,CENTER,SEQUENCER,MUTATION_STATUS,VALIDATION_STATUS,TUMOR_SEQ_ALLELE1,TUMOR_SEQ_ALLELE2,MATCHED_NORM_SAMPLE_BARCODE,MATCH_NORM_SEQ_ALLELE1,MATCH_NORM_SEQ_ALLELE2,TUMOR_VALIDATION_ALLELE1,TUMOR_VALIDATION_ALLELE2,MATCH_NORM_VALIDATION_ALLELE1,MATCH_NORM_VALIDATION_ALLELE2,VERIFICATION_STATUS,SEQUENCING_PHASE,SEQUENCE_SOURCE,VALIDATION_METHOD,SCORE,BAM_FILE,TUMOR_ALT_COUNT,TUMOR_REF_COUNT,NORMAL_ALT_COUNT,NORMAL_REF_COUNT,MY_TEST) values(";
 
     static String getMutationInsertSql(MyExtendedMutation mutation) {
         String sql = mutationSql
@@ -41,8 +39,9 @@ public final class MyDaoMutation {
                 + Integer.toString(mutation.getTumorAltCount()) + ","
                 + Integer.toString(mutation.getTumorRefCount()) + ","
                 + Integer.toString(mutation.getNormalAltCount()) + ","
-                + Integer.toString(mutation.getNormalRefCount()) + ")";
-      //  // System.out.println(">getMutationInsertSql: " + sql);
+                + Integer.toString(mutation.getNormalRefCount()) + ","
+                + wrapString(mutation.getMyTest()) + ")";
+        //  // System.out.println(">getMutationInsertSql: " + sql);
         return sql;
     }
 
@@ -105,7 +104,7 @@ public final class MyDaoMutation {
         return mySql;
     }
 
-    public static int addMutationEvent(Connection con, MyExtendedMutation.MutationEvent event) throws  SQLException {
+    public static int addMutationEvent(Connection con, MyExtendedMutation.MutationEvent event) throws SQLException {
         // System.out.println(">addMutationEvent");
 
         String sql = getInsertMutationEventSql(event);

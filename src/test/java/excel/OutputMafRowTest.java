@@ -15,22 +15,30 @@ import org.junit.Test;
  * @author mcaikovs
  */
 public class OutputMafRowTest {
-    
+
     public OutputMafRowTest() {
     }
-    
+
     @Before
     public void setUp() {
     }
-    
+
     @After
     public void tearDown() {
     }
 
     @Test
     public void testCleanRefSeq() {
-        OutputMafRow  i=new OutputMafRow() ;
-        assertEquals(i.cleanRefSeq("NM_058195.3*"),"NM_058195.3"); assertEquals(i.cleanRefSeq("NM_000455.4"),"NM_000455.4");
+        OutputMafRow i = new OutputMafRow();
+        assertEquals(i.cleanRefSeq("NM_058195.3*"), "NM_058195.3");
+        assertEquals(i.cleanRefSeq("NM_000455.4"), "NM_000455.4");
     }
-    
+
+    @Test
+    public void testSetComment() {
+        OutputMafRow i = new OutputMafRow();
+        String s = "Mutations d'intérêt clinique";
+        i.setComment(s);
+        assertEquals(i.getComment(), "Mutations d'interet clinique");
+    }
 }

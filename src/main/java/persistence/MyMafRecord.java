@@ -26,6 +26,7 @@ public class MyMafRecord
     private String tumorSampleID;
     private String mutationStatus;
     private String validationStatus;
+    private String myTest;
     private String sequencer;
     private String dbSnpValStatus;
     private String matchedNormSampleBarcode;
@@ -236,6 +237,14 @@ public class MyMafRecord
 
     public void setValidationStatus(String validationStatus) {
         this.validationStatus = validationStatus;
+    }
+
+    public String getMyTest() {
+        return myTest;
+    }
+
+    public void setMyTest(String myTest) {
+        this.myTest = myTest;
     }
     
     public String getSequencer() {

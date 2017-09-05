@@ -1,6 +1,12 @@
 package persistence;
 
 import java.util.HashMap;
+import static persistence.MyTabDelimitedFileUtil.getPartFloat2;
+import static persistence.MyTabDelimitedFileUtil.getPartInt;
+import static persistence.MyTabDelimitedFileUtil.getPartLong;
+import static persistence.MyTabDelimitedFileUtil.getPartPercentage;
+import static persistence.MyTabDelimitedFileUtil.getPartString;
+import static persistence.MyTabDelimitedFileUtil.getPartStringAllowEmpty;
 
 /**
  * Utility Class for Parsing MAF Files.
@@ -36,6 +42,7 @@ public class MyMafUtil {
     public static final String MATCH_NORM_VALIDATION_ALLELE2 = "Match_Norm_Validation_Allele2";
     public static final String VERIFICATION_STATUS = "Verification_Status";
     public static final String VALIDATION_STATUS = "Validation_Status";
+    public static final String MY_TEST = "My_Test";
     public static final String MUTATION_STATUS = "Mutation_Status";
     public static final String SEQUENCING_PHASE = "Sequencing_Phase";
     public static final String SEQUENCE_SOURCE = "Sequence_Source";
@@ -132,6 +139,7 @@ public class MyMafUtil {
     private int tumorSampleIndex = -1;
     private int mutationStatusIndex = -1; // MUTATION_STATUS
     private int validationStatusIndex = -1; // VALIDATION_STATUS
+    private int myTestIndex = -1; // VALIDATION_STATUS
     private int sequencerIndex = -1; // SEQUENCER
     private int dbSnpValStatusIndex = -1; // DB_SNP_VAL_STATUS
     private int matchedNormSampleBarcodeIndex = -1; // MATCHED_NORM_SAMPLE_BARCODE
@@ -263,6 +271,8 @@ public class MyMafUtil {
                 mutationStatusIndex = i;
             } else if (header.equalsIgnoreCase(VALIDATION_STATUS)) {
                 validationStatusIndex = i;
+            } else if (header.equalsIgnoreCase(MY_TEST)) {
+                myTestIndex = i;
             } else if (header.equalsIgnoreCase(SEQUENCER)) {
                 sequencerIndex = i;
             } else if (header.equalsIgnoreCase(AMINO_ACID_CHANGE)) {
@@ -401,102 +411,103 @@ public class MyMafUtil {
         MyMafRecord record = new MyMafRecord();
 
         // standard MAF cols
-        record.setCenter(MyTabDelimitedFileUtil.getPartString(centerIndex, parts));
-        record.setChr(MyTabDelimitedFileUtil.getPartString(chrIndex, parts));
-        record.setStartPosition(MyTabDelimitedFileUtil.getPartLong(startPositionIndex, parts));
-        record.setEndPosition(MyTabDelimitedFileUtil.getPartLong(endPositionIndex, parts));
+        record.setCenter(getPartString(centerIndex, parts));
+        record.setChr(getPartString(chrIndex, parts));
+        record.setStartPosition(getPartLong(startPositionIndex, parts));
+        record.setEndPosition(getPartLong(endPositionIndex, parts));
         // store the literal value of the gene ID column for later parsing
-        record.setGivenEntrezGeneId(MyTabDelimitedFileUtil.getPartStringAllowEmpty(entrezGeneIdIndex, parts));
+        record.setGivenEntrezGeneId(getPartStringAllowEmpty(entrezGeneIdIndex, parts));
         // NA may be an actual gene symbol, so use "" for missing values
-        record.setHugoGeneSymbol(MyTabDelimitedFileUtil.getPartStringAllowEmpty(hugoGeneSymbolIndex, parts));
-        record.setNcbiBuild(MyTabDelimitedFileUtil.getPartString(ncbiIndex, parts));
-        record.setReferenceAllele(MyTabDelimitedFileUtil.getPartString(referenceAlleleIndex, parts));
-        record.setStrand(MyTabDelimitedFileUtil.getPartString(strandIndex, parts));
-        record.setDbSNP_RS(MyTabDelimitedFileUtil.getPartString(dbSNPIndex, parts));
-        record.setTumorSampleID(MyTabDelimitedFileUtil.getPartString(tumorSampleIndex, parts));
-        record.setTumorSeqAllele1(MyTabDelimitedFileUtil.getPartString(tumorSeqAllele1Index, parts));
-        record.setTumorSeqAllele2(MyTabDelimitedFileUtil.getPartString(tumorSeqAllele2Index, parts));
-        record.setVariantClassification(MyTabDelimitedFileUtil.getPartString(variantClassificationIndex, parts));
-        record.setVariantType(MyTabDelimitedFileUtil.getPartString(variantTypeIndex, parts));
-        record.setMutationStatus(MyTabDelimitedFileUtil.getPartString(mutationStatusIndex, parts));
-        record.setValidationStatus(MyTabDelimitedFileUtil.getPartString(validationStatusIndex, parts));
-        record.setSequencer(MyTabDelimitedFileUtil.getPartString(sequencerIndex, parts));
-        record.setDbSnpValStatus(MyTabDelimitedFileUtil.getPartString(dbSnpValStatusIndex, parts));
-        record.setMatchedNormSampleBarcode(MyTabDelimitedFileUtil.getPartString(matchedNormSampleBarcodeIndex, parts));
-        record.setMatchNormSeqAllele1(MyTabDelimitedFileUtil.getPartString(matchNormSeqAllele1Index, parts));
-        record.setMatchNormSeqAllele2(MyTabDelimitedFileUtil.getPartString(matchNormSeqAllele2Index, parts));
-        record.setTumorValidationAllele1(MyTabDelimitedFileUtil.getPartString(tumorValidationAllele1Index, parts));
-        record.setTumorValidationAllele2(MyTabDelimitedFileUtil.getPartString(tumorValidationAllele2Index, parts));
-        record.setMatchNormValidationAllele1(MyTabDelimitedFileUtil.getPartString(matchNormValidationAllele1Index, parts));
-        record.setMatchNormValidationAllele2(MyTabDelimitedFileUtil.getPartString(matchNormValidationAllele2Index, parts));
-        record.setVerificationStatus(MyTabDelimitedFileUtil.getPartString(verificationStatusIndex, parts));
-        record.setSequencingPhase(MyTabDelimitedFileUtil.getPartString(sequencingPhaseIndex, parts));
-        record.setSequenceSource(MyTabDelimitedFileUtil.getPartString(sequenceSourceIndex, parts));
-        record.setValidationMethod(MyTabDelimitedFileUtil.getPartString(validationMethodIndex, parts));
-        record.setScore(MyTabDelimitedFileUtil.getPartString(scoreIndex, parts));
-        record.setBamFile(MyTabDelimitedFileUtil.getPartString(bamFileIndex, parts));
+        record.setHugoGeneSymbol(getPartStringAllowEmpty(hugoGeneSymbolIndex, parts));
+        record.setNcbiBuild(getPartString(ncbiIndex, parts));
+        record.setReferenceAllele(getPartString(referenceAlleleIndex, parts));
+        record.setStrand(getPartString(strandIndex, parts));
+        record.setDbSNP_RS(getPartString(dbSNPIndex, parts));
+        record.setTumorSampleID(getPartString(tumorSampleIndex, parts));
+        record.setTumorSeqAllele1(getPartString(tumorSeqAllele1Index, parts));
+        record.setTumorSeqAllele2(getPartString(tumorSeqAllele2Index, parts));
+        record.setVariantClassification(getPartString(variantClassificationIndex, parts));
+        record.setVariantType(getPartString(variantTypeIndex, parts));
+        record.setMutationStatus(getPartString(mutationStatusIndex, parts));
+        record.setValidationStatus(getPartString(validationStatusIndex, parts));
+        record.setMyTest(getPartString(myTestIndex, parts));
+        record.setSequencer(getPartString(sequencerIndex, parts));
+        record.setDbSnpValStatus(getPartString(dbSnpValStatusIndex, parts));
+        record.setMatchedNormSampleBarcode(getPartString(matchedNormSampleBarcodeIndex, parts));
+        record.setMatchNormSeqAllele1(getPartString(matchNormSeqAllele1Index, parts));
+        record.setMatchNormSeqAllele2(getPartString(matchNormSeqAllele2Index, parts));
+        record.setTumorValidationAllele1(getPartString(tumorValidationAllele1Index, parts));
+        record.setTumorValidationAllele2(getPartString(tumorValidationAllele2Index, parts));
+        record.setMatchNormValidationAllele1(getPartString(matchNormValidationAllele1Index, parts));
+        record.setMatchNormValidationAllele2(getPartString(matchNormValidationAllele2Index, parts));
+        record.setVerificationStatus(getPartString(verificationStatusIndex, parts));
+        record.setSequencingPhase(getPartString(sequencingPhaseIndex, parts));
+        record.setSequenceSource(getPartString(sequenceSourceIndex, parts));
+        record.setValidationMethod(getPartString(validationMethodIndex, parts));
+        record.setScore(getPartString(scoreIndex, parts));
+        record.setBamFile(getPartString(bamFileIndex, parts));
 
-        record.setAminoAcidChange(MyTabDelimitedFileUtil.getPartString(aminoAcidChangeIndex, parts));
+        record.setAminoAcidChange(getPartString(aminoAcidChangeIndex, parts));
 
         // allele frequency (count) columns
-        record.setTumorAltCount(MyTabDelimitedFileUtil.getPartInt(tumorAltCountIndex, parts));
-        record.setTumorRefCount(MyTabDelimitedFileUtil.getPartInt(tumorRefCountIndex, parts));
-        record.setNormalAltCount(MyTabDelimitedFileUtil.getPartInt(normalAltCountIndex, parts));
-        record.setNormalRefCount(MyTabDelimitedFileUtil.getPartInt(normalRefCountIndex, parts));
-        record.setTTotCov(MyTabDelimitedFileUtil.getPartInt(tTotCovIndex, parts));
-        record.setTVarCov(MyTabDelimitedFileUtil.getPartInt(tVarCovIndex, parts));
-        record.setNTotCov(MyTabDelimitedFileUtil.getPartInt(nTotCovIndex, parts));
-        record.setNVarCov(MyTabDelimitedFileUtil.getPartInt(nVarCovIndex, parts));
-        record.setTumorDepth(MyTabDelimitedFileUtil.getPartInt(tumorDepthIndex, parts));
-        record.setTumorVaf(MyTabDelimitedFileUtil.getPartPercentage(tumorVafIndex, parts));
-        record.setNormalDepth(MyTabDelimitedFileUtil.getPartInt(normalDepthIndex, parts));
-        record.setNormalVaf(MyTabDelimitedFileUtil.getPartPercentage(normalVafIndex, parts));
+        record.setTumorAltCount(getPartInt(tumorAltCountIndex, parts));
+        record.setTumorRefCount(getPartInt(tumorRefCountIndex, parts));
+        record.setNormalAltCount(getPartInt(normalAltCountIndex, parts));
+        record.setNormalRefCount(getPartInt(normalRefCountIndex, parts));
+        record.setTTotCov(getPartInt(tTotCovIndex, parts));
+        record.setTVarCov(getPartInt(tVarCovIndex, parts));
+        record.setNTotCov(getPartInt(nTotCovIndex, parts));
+        record.setNVarCov(getPartInt(nVarCovIndex, parts));
+        record.setTumorDepth(getPartInt(tumorDepthIndex, parts));
+        record.setTumorVaf(getPartPercentage(tumorVafIndex, parts));
+        record.setNormalDepth(getPartInt(normalDepthIndex, parts));
+        record.setNormalVaf(getPartPercentage(normalVafIndex, parts));
 
         // custom annotator columns
-        record.setProteinChange(MyTabDelimitedFileUtil.getPartString(getColumnIndex(PROTEIN_CHANGE), parts));
-        record.setProteinPosition(MyTabDelimitedFileUtil.getPartString(getColumnIndex(PROTEIN_POSITION), parts));
-        record.setCodons(MyTabDelimitedFileUtil.getPartString(getColumnIndex(CODONS), parts));
-        record.setSwissprot(MyTabDelimitedFileUtil.getPartString(getColumnIndex(SWISSPROT), parts));
-        record.setRefSeq(MyTabDelimitedFileUtil.getPartString(getColumnIndex(REFSEQ), parts));
+        record.setProteinChange(getPartString(getColumnIndex(PROTEIN_CHANGE), parts));
+        record.setProteinPosition(getPartString(getColumnIndex(PROTEIN_POSITION), parts));
+        record.setCodons(getPartString(getColumnIndex(CODONS), parts));
+        record.setSwissprot(getPartString(getColumnIndex(SWISSPROT), parts));
+        record.setRefSeq(getPartString(getColumnIndex(REFSEQ), parts));
 
         // Mutation Assessor columns
-        record.setMaFuncImpact(MyTabDelimitedFileUtil.getPartString(maFImpactIndex, parts));
-        record.setMaFIS(MyTabDelimitedFileUtil.getPartFloat2(maFisIndex, parts)); // not using MyTabDelimitedFileUtil.getPartFloat, -1 may not be a safe value
-        record.setMaLinkVar(MyTabDelimitedFileUtil.getPartString(maLinkVarIndex, parts));
-        record.setMaLinkMsa(MyTabDelimitedFileUtil.getPartString(maLinkMsaIndex, parts));
-        record.setMaLinkPdb(MyTabDelimitedFileUtil.getPartString(maLinkPdbIndex, parts));
-        record.setMaProteinChange(MyTabDelimitedFileUtil.getPartString(maProteinChangeIndex, parts));
+        record.setMaFuncImpact(getPartString(maFImpactIndex, parts));
+        record.setMaFIS(getPartFloat2(maFisIndex, parts)); // not using getPartFloat, -1 may not be a safe value
+        record.setMaLinkVar(getPartString(maLinkVarIndex, parts));
+        record.setMaLinkMsa(getPartString(maLinkMsaIndex, parts));
+        record.setMaLinkPdb(getPartString(maLinkPdbIndex, parts));
+        record.setMaProteinChange(getPartString(maProteinChangeIndex, parts));
 
         // Oncotator columns
-        record.setOncotatorCosmicOverlapping(MyTabDelimitedFileUtil.getPartString(oncoCosmicOverlappingIndex, parts));
-        record.setOncotatorDbSnpRs(MyTabDelimitedFileUtil.getPartString(oncoDbSnpRsIndex, parts));
-        record.setOncotatorDbSnpValStatus(MyTabDelimitedFileUtil.getPartString(oncoDbSnpValStatusIndex, parts));
+        record.setOncotatorCosmicOverlapping(getPartString(oncoCosmicOverlappingIndex, parts));
+        record.setOncotatorDbSnpRs(getPartString(oncoDbSnpRsIndex, parts));
+        record.setOncotatorDbSnpValStatus(getPartString(oncoDbSnpValStatusIndex, parts));
 
-        record.setOncotatorProteinChange(MyTabDelimitedFileUtil.getPartString(oncoProteinChangeIndex, parts));
-        record.setOncotatorVariantClassification(MyTabDelimitedFileUtil.getPartString(oncoVariantClassificationIndex, parts));
-        record.setOncotatorGeneSymbol(MyTabDelimitedFileUtil.getPartString(oncoGeneSymbolIndex, parts));
-        record.setOncotatorRefseqMrnaId(MyTabDelimitedFileUtil.getPartString(oncoRefseqMrnaIdIndex, parts));
-        record.setOncotatorRefseqProtId(MyTabDelimitedFileUtil.getPartString(oncoRefseqProtIdIndex, parts));
-        record.setOncotatorUniprotName(MyTabDelimitedFileUtil.getPartString(oncoUniprotNameIndex, parts));
-        record.setOncotatorUniprotAccession(MyTabDelimitedFileUtil.getPartString(oncoUniprotAccessionIndex, parts));
-        record.setOncotatorCodonChange(MyTabDelimitedFileUtil.getPartString(oncoCodonChangeIndex, parts));
-        record.setOncotatorTranscriptChange(MyTabDelimitedFileUtil.getPartString(oncoTranscriptChangeIndex, parts));
-        record.setOncotatorExonAffected(MyTabDelimitedFileUtil.getPartInt(oncoExonAffectedIndex, parts));
-        record.setOncotatorProteinPosStart(MyTabDelimitedFileUtil.getPartInt(oncoProteinPosStartIndex, parts));
-        record.setOncotatorProteinPosEnd(MyTabDelimitedFileUtil.getPartInt(oncoProteinPosEndIndex, parts));
+        record.setOncotatorProteinChange(getPartString(oncoProteinChangeIndex, parts));
+        record.setOncotatorVariantClassification(getPartString(oncoVariantClassificationIndex, parts));
+        record.setOncotatorGeneSymbol(getPartString(oncoGeneSymbolIndex, parts));
+        record.setOncotatorRefseqMrnaId(getPartString(oncoRefseqMrnaIdIndex, parts));
+        record.setOncotatorRefseqProtId(getPartString(oncoRefseqProtIdIndex, parts));
+        record.setOncotatorUniprotName(getPartString(oncoUniprotNameIndex, parts));
+        record.setOncotatorUniprotAccession(getPartString(oncoUniprotAccessionIndex, parts));
+        record.setOncotatorCodonChange(getPartString(oncoCodonChangeIndex, parts));
+        record.setOncotatorTranscriptChange(getPartString(oncoTranscriptChangeIndex, parts));
+        record.setOncotatorExonAffected(getPartInt(oncoExonAffectedIndex, parts));
+        record.setOncotatorProteinPosStart(getPartInt(oncoProteinPosStartIndex, parts));
+        record.setOncotatorProteinPosEnd(getPartInt(oncoProteinPosEndIndex, parts));
 
-        record.setOncotatorProteinChangeBestEffect(MyTabDelimitedFileUtil.getPartString(oncoProteinChangeBeIndex, parts));
-        record.setOncotatorVariantClassificationBestEffect(MyTabDelimitedFileUtil.getPartString(oncoVariantClassificationBeIndex, parts));
-        record.setOncotatorGeneSymbolBestEffect(MyTabDelimitedFileUtil.getPartString(oncoGeneSymbolBeIndex, parts));
-        record.setOncotatorRefseqMrnaIdBestEffect(MyTabDelimitedFileUtil.getPartString(oncoRefseqMrnaIdBeIndex, parts));
-        record.setOncotatorRefseqProtIdBestEffect(MyTabDelimitedFileUtil.getPartString(oncoRefseqProtIdBeIndex, parts));
-        record.setOncotatorUniprotNameBestEffect(MyTabDelimitedFileUtil.getPartString(oncoUniprotNameBeIndex, parts));
-        record.setOncotatorUniprotAccessionBestEffect(MyTabDelimitedFileUtil.getPartString(oncoUniprotAccessionBeIndex, parts));
-        record.setOncotatorCodonChangeBestEffect(MyTabDelimitedFileUtil.getPartString(oncoCodonChangeBeIndex, parts));
-        record.setOncotatorTranscriptChangeBestEffect(MyTabDelimitedFileUtil.getPartString(oncoTranscriptChangeBeIndex, parts));
-        record.setOncotatorExonAffectedBestEffect(MyTabDelimitedFileUtil.getPartInt(oncoExonAffectedBeIndex, parts));
-        record.setOncotatorProteinPosStartBestEffect(MyTabDelimitedFileUtil.getPartInt(oncoProteinPosStartBeIndex, parts));
-        record.setOncotatorProteinPosEndBestEffect(MyTabDelimitedFileUtil.getPartInt(oncoProteinPosEndBeIndex, parts));
+        record.setOncotatorProteinChangeBestEffect(getPartString(oncoProteinChangeBeIndex, parts));
+        record.setOncotatorVariantClassificationBestEffect(getPartString(oncoVariantClassificationBeIndex, parts));
+        record.setOncotatorGeneSymbolBestEffect(getPartString(oncoGeneSymbolBeIndex, parts));
+        record.setOncotatorRefseqMrnaIdBestEffect(getPartString(oncoRefseqMrnaIdBeIndex, parts));
+        record.setOncotatorRefseqProtIdBestEffect(getPartString(oncoRefseqProtIdBeIndex, parts));
+        record.setOncotatorUniprotNameBestEffect(getPartString(oncoUniprotNameBeIndex, parts));
+        record.setOncotatorUniprotAccessionBestEffect(getPartString(oncoUniprotAccessionBeIndex, parts));
+        record.setOncotatorCodonChangeBestEffect(getPartString(oncoCodonChangeBeIndex, parts));
+        record.setOncotatorTranscriptChangeBestEffect(getPartString(oncoTranscriptChangeBeIndex, parts));
+        record.setOncotatorExonAffectedBestEffect(getPartInt(oncoExonAffectedBeIndex, parts));
+        record.setOncotatorProteinPosStartBestEffect(getPartInt(oncoProteinPosStartBeIndex, parts));
+        record.setOncotatorProteinPosEndBestEffect(getPartInt(oncoProteinPosEndBeIndex, parts));
 
         fixEndPointForInsertion(record);
 

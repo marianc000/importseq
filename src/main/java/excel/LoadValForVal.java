@@ -40,6 +40,23 @@ public class LoadValForVal {
         // excel.printDocument("selectGeneRows");
     }
 
+    static String MY_COMMENT_COLUMN_HEADER = "MyComment";
+
+    public static void addCommentColumn(ExcelOperations excel) {
+        excel.addColumn(MY_COMMENT_COLUMN_HEADER, "");
+        List<String> hCol = excel.getColumn("H");
+        List<String> geneCol = excel.getColumn("Gène");
+        List<String> commentsCol = excel.getColumn(MY_COMMENT_COLUMN_HEADER);
+        String currentComment = "";
+        for (int r = 1; r < hCol.size(); r++) {
+            if ("T1".equals(hCol.get(r))) { // some files are aberrant have rows with empty values in H col
+                currentComment = geneCol.get(r);
+            }
+            commentsCol.set(r, currentComment);
+        }
+        //  excel.printDocument("addCommentColumn");
+    }
+
     private List<OutputMafRow> convertToMafRowList(ExcelOperations excel, String sampleName) {
         List<String> resultatCol = excel.getColumn("Résultat");
         List<String> geneCol = excel.getColumn("Gène");
@@ -48,12 +65,12 @@ public class LoadValForVal {
         List<String> coverageCol = excel.getColumn("Couvert.");
         List<String> refSeqCol = excel.getColumn("Référence");
         List<OutputMafRow> outCol = new ArrayList<>();
-
+        List<String> commentsCol = excel.getColumn(MY_COMMENT_COLUMN_HEADER);
         for (int r = 1; r < resultatCol.size(); r++) {
-            outCol.add(new OutputMafRow(resultatCol.get(r), cleanGeneName(geneCol.get(r)), sampleName, alleleFrequencyCol.get(r), coverageCol.get(r), refSeqCol.get(r)));
+            outCol.add(new OutputMafRow(resultatCol.get(r), cleanGeneName(geneCol.get(r)), sampleName, alleleFrequencyCol.get(r), coverageCol.get(r), refSeqCol.get(r), commentsCol.get(r)));
         }
 
-   //     printCollection(convertToRowList(outCol));
+        //     printCollection(convertToRowList(outCol));
         return outCol;
 
     }
@@ -65,6 +82,7 @@ public class LoadValForVal {
     public List<OutputMafRow> run(String filePath) throws IOException, InvalidFormatException {
         ExcelOperations excel = new ExcelOperations();
         excel.loadDocument(filePath);
+        addCommentColumn(excel);
         selectGeneRows(excel);
 
         String sampleName = FileUtils.convertFilePathToSampleName(filePath);
@@ -74,6 +92,6 @@ public class LoadValForVal {
     }
 
     public static void main(String... args) throws IOException, InvalidFormatException {
-        new LoadValForVal().run("C:\\Projects\\cBioPortal\\data sample\\SECOND SAMPLES\\corrected\\H1702318-1A.hg19_coding01.Val.xlsx");
+        new LoadValForVal().run("C:\\Projects\\cBioPortal\\data sample\\SECOND SAMPLES\\corrected\\H1707765-1A.hg19_coding01.Val.xlsx");
     }
 }
