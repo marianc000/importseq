@@ -95,7 +95,7 @@ public final class MutationNames {
         return nucleotideMutation;
     }
 
-    static Pattern nucleotideMutationWithoutCoordinatesPattern = Pattern.compile("c\\.\\d+([-+_]\\d+)*(\\D+)"); // c.3405-2A>T, c.396_398dup
+   public static Pattern nucleotideMutationWithoutCoordinatesPattern = Pattern.compile("c\\.\\d+([-+_]\\d+)*(\\D+)"); // c.3405-2A>T, c.396_398dup
 
     boolean setNucleotideMutationWithoutCoordinates() {
         Matcher m = nucleotideMutationWithoutCoordinatesPattern.matcher(getNucleotideMutation());
@@ -105,6 +105,7 @@ public final class MutationNames {
         }
         return false;
     }
+    
     static Pattern aaChangeForMissenseNucleotideMutation = Pattern.compile("p\\.([A-Z])\\d+([*a-zA-Z].*)");
     static String SPLICING_AA_CHANGE_IN_VAL = "Splicing";
 
@@ -122,7 +123,7 @@ public final class MutationNames {
         throw new RuntimeException("cannot isolate aa change");
     }
 
-    static Pattern missenseNucleotideMutationWithoutCoordinatesPattern = Pattern.compile("([A-Z])>([A-Z])");
+   public  static Pattern missenseNucleotideMutationWithoutCoordinatesPattern = Pattern.compile("([A-Z])>([A-Z])");
 
     boolean setRefAltAllelesForMissenseMutation() {
         //  System.out.println(">setRefAltAllelesForMissenseMutation: " + getNucleotideMutationWithoutCoordinates());
@@ -145,7 +146,7 @@ public final class MutationNames {
         }
         return false;
     }
-    static Pattern deletionNucleotideMutationWithoutCoordinatesPattern = Pattern.compile("del([A-Z]*)");
+ public    static Pattern deletionNucleotideMutationWithoutCoordinatesPattern = Pattern.compile("del([A-Z]*)");
     static String FRAMESHIFT_MARK = "*";
 
     boolean setRefAltAllelesForDeletion() {
@@ -163,7 +164,7 @@ public final class MutationNames {
         }
         return false;
     }
-    static Pattern deletionInsertionNucleotideMutationWithoutCoordinatesPattern = Pattern.compile("delins([A-Z]*)");
+public     static Pattern deletionInsertionNucleotideMutationWithoutCoordinatesPattern = Pattern.compile("delins([A-Z]*)");
 
     boolean setRefAltAllelesForDeletionInsertion() {
 

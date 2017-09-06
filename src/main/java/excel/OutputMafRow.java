@@ -62,7 +62,7 @@ public class OutputMafRow {
         setComment(comment);
 
         init(chromosomeCoordinates.getChromosome(), chromosomeCoordinates.getStartPostion(), chromosomeCoordinates.getEndPosition(),
-                mutationNames.getRefAllele(), mutationNames.getAltAllele(), geneNameInVal, alleleFrequency.getRefCountAsInt(), alleleFrequency.getAltCountAsInt(),
+                chromosomeCoordinates.getRefAllele(), chromosomeCoordinates.getAltAllele(), geneNameInVal, alleleFrequency.getRefCountAsInt(), alleleFrequency.getAltCountAsInt(),
                 mutationNames.getVariantClassification().toString(), mutationNames.getProteinMutation());
         //  System.out.println(this.toString());
     }

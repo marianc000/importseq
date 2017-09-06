@@ -12,6 +12,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 import org.junit.Ignore;
 import static soapmutalizer.ChromosomeCoordinates.FAILED;
+import static soapmutalizer.ChromosomeCoordinates.FAILED_CHROMOSOME;
 
 /**
  *
@@ -30,7 +31,6 @@ public class ChromosomeCoordinatesTest {
     public void tearDown() {
     }
 
-    @Ignore
     @Test
     public void testExtractChromosomeFromResponse() {
         ChromosomeCoordinates i = new ChromosomeCoordinates();
@@ -45,7 +45,6 @@ public class ChromosomeCoordinatesTest {
 
     }
 
-    @Ignore
     @Test
     public void testNumberConversion() {
         ChromosomeCoordinates i = new ChromosomeCoordinates();
@@ -63,25 +62,23 @@ public class ChromosomeCoordinatesTest {
         assertEquals("NC_000008.10:g.38285914_38285916dup", r);
     }
 
-    @Ignore
     @Test
     public void testExtractCoordinateFromResponse() {
         ChromosomeCoordinates i = new ChromosomeCoordinates();
-        String r = i.extractCoordinateFromResponse("NC_000015.9:g.66727455G>T");
+        String r = i.extractCoordinateFromNucleotideMutation("g.66727455G>T");
         System.out.println(r);
         assertEquals("66727455", r);
-        r = i.extractCoordinateFromResponse("NC_000004.11:g.55972974T>A");
+        r = i.extractCoordinateFromNucleotideMutation("g.55972974T>A");
         System.out.println(r);
         assertEquals("55972974", r);
-        r = i.extractCoordinateFromResponse("NC_000005.9:g.112175619delC");
+        r = i.extractCoordinateFromNucleotideMutation("g.112175619delC");
         System.out.println(r);
         assertEquals("112175619", r);
-        r = i.extractCoordinateFromResponse("NC_000008.10:g.38285914_38285916dup");
+        r = i.extractCoordinateFromNucleotideMutation("g.38285914_38285916dup");
         System.out.println(r);
         assertEquals("38285914_38285916", r);
     }
 
-    @Ignore
     @Test
     public void testConstructor() {
         ChromosomeCoordinates i = new ChromosomeCoordinates("NM_002755.3", "c.171G>T");
@@ -104,17 +101,72 @@ public class ChromosomeCoordinatesTest {
         assertEquals(38285916, i.getEndPosition());
         assertEquals("8", i.getChromosome());
     }
+    // 
 
-    @Ignore
+    @Test
+    public void testConstructor2() {
+        //NM_002253.2:c.2935G>A	NC_000004.11:g.55961005C>T
+        ChromosomeCoordinates i = new ChromosomeCoordinates("NM_002253.2", "c.2935G>A");
+        assertEquals(55961005, i.getStartPostion());
+        assertEquals(55961005, i.getEndPosition());
+        assertEquals("4", i.getChromosome());
+        assertEquals("C", i.getRefAllele());
+        assertEquals("T", i.getAltAllele());
+        // NM_000249.3:c.1153C>T	NC_000003.11:g.37067242C>T
+        i = new ChromosomeCoordinates("NM_000249.3", "c.1153C>T");
+        assertEquals("C", i.getRefAllele());
+        assertEquals("T", i.getAltAllele());
+        //  NM_000546.5:c.286_308delinsCCTG	NC_000017.10:g.7579379_7579401delinsCAGG
+        i = new ChromosomeCoordinates("NM_000546.5", "c.286_308delinsCCTG");
+        assertEquals("", i.getRefAllele());
+        assertEquals("CAGG", i.getAltAllele());
+        //NM_005359.5:c.340dup	NC_000018.9:g.48575146dup
+        i = new ChromosomeCoordinates("NM_005359.5", "c.340dup");
+        assertEquals("-", i.getRefAllele());
+        assertEquals("", i.getAltAllele());
+        //NM_000321.2:c.987del	NC_000013.10:g.48941677del
+        i = new ChromosomeCoordinates("NM_000321.2", "c.987del");
+        assertEquals("", i.getRefAllele());
+        assertEquals("-", i.getAltAllele());
+        //NM_004333.4:c.1798_1799delinsAA	NC_000007.13:g.140453136_140453137delinsTT
+        i = new ChromosomeCoordinates("NM_004333.4", "c.1798_1799delinsAA");
+        assertEquals("", i.getRefAllele());
+        assertEquals("TT", i.getAltAllele());
+        // NM_000038.4:c.4328delC	NC_000005.9:g.112175619delC
+        i = new ChromosomeCoordinates("NM_000038.4", "c.4328delC");
+        assertEquals("C", i.getRefAllele());
+        assertEquals("-", i.getAltAllele());
+        //NM_000314.4:c.968dup	NC_000010.10:g.89720817dup
+        i = new ChromosomeCoordinates("NM_000314.4", "c.968dup");
+        assertEquals("-", i.getRefAllele());
+        assertEquals("", i.getAltAllele());
+        //NM_000038.4:c.3927_3931del	NC_000005.9:g.112175218_112175222del
+        i = new ChromosomeCoordinates("NM_000038.4", "c.3927_3931del");
+        assertEquals("", i.getRefAllele());
+        assertEquals("-", i.getAltAllele());
+        // NM_023110.2:c.396_398dup	NC_000008.10:g.38285914_38285916dup
+        i = new ChromosomeCoordinates("NM_023110.2", "c.396_398dup");
+        assertEquals("-", i.getRefAllele());
+        assertEquals("", i.getAltAllele());
+        //NM_000077.4:c.179C>A	NC_000009.11:g.21971179G>T
+        i = new ChromosomeCoordinates("NM_000077.4", "c.179C>A");
+        assertEquals("G", i.getRefAllele());
+        assertEquals("T", i.getAltAllele());
+        //NM_000546.5:c.559+1G>A 
+        i = new ChromosomeCoordinates("NM_000546.5", "c.559+1G>A");
+        assertEquals("C", i.getRefAllele());
+        assertEquals("T", i.getAltAllele());
+    }
+
     @Test
     public void testEmptyResponse() {
         ChromosomeCoordinates i = new ChromosomeCoordinates("NM_033360.3", "c.34G>A");
         assertEquals(FAILED, i.getStartPostion());
-        assertEquals(String.valueOf(FAILED), i.getChromosome());
+        assertEquals(FAILED_CHROMOSOME, i.getChromosome());
         assertEquals(FAILED, i.getEndPosition());
     }
 
-    //@Ignore
+    //
     @Test
     public void testIsMutationComplex() {
         ChromosomeCoordinates i = new ChromosomeCoordinates();
@@ -124,18 +176,44 @@ public class ChromosomeCoordinatesTest {
         assertFalse(i.isMutationComplex("c.1385G>C"));
     }
 
-    // @Ignore
+    @Test
+    public void testSetRefAltAlleles() {
+        ChromosomeCoordinates i = new ChromosomeCoordinates();
+        assertTrue(i.isMutationComplex("c.[14A>G; 35G>A]"));
+        assertFalse(i.isMutationComplex("c.1513C>G"));
+        assertFalse(i.isMutationComplex("c.237_238delinsGT"));
+        assertFalse(i.isMutationComplex("c.1385G>C"));
+    }
+
+    @Test
+    public void testSetNucleotideMutationWithoutCoordinates() {
+        ChromosomeCoordinates i = new ChromosomeCoordinates();
+        String s = "g.105246543G>C";
+        assertEquals(i.setNucleotideMutationWithoutCoordinates(s), "G>C");
+        s = "g.108170506A>C";
+        assertEquals(i.setNucleotideMutationWithoutCoordinates(s), "A>C");
+        s = "g.89692904C>G";
+        assertEquals(i.setNucleotideMutationWithoutCoordinates(s), "C>G");
+        s = "g.7577563_7577565dup";
+        assertEquals(i.setNucleotideMutationWithoutCoordinates(s), "dup");
+        s = "g.89711914_89711916del";
+        assertEquals(i.setNucleotideMutationWithoutCoordinates(s), "del");
+        s = "g.21971120_21971121delinsAC";
+        assertEquals(i.setNucleotideMutationWithoutCoordinates(s), "delinsAC");
+    }
+
+    // 
     @Test
     public void testAllValuesCanBeProcessed() {
         System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>testAllValuesCanBeProcessed: ");
         for (String s : input) {
-            System.out.println(">processing: " + s);
+            //   System.out.println(">processing: " + s);
             String[] refSeqWithNucleotideMutation = s.split(Pattern.quote(":"));
             ChromosomeCoordinates i = new ChromosomeCoordinates(refSeqWithNucleotideMutation[0], refSeqWithNucleotideMutation[1]);
 
             if (FAILED == (i.getStartPostion())) {
                 System.out.println("XXX FAILED: " + s);
-                assertEquals(String.valueOf(FAILED), i.getChromosome());
+                assertEquals(FAILED_CHROMOSOME, i.getChromosome());
                 assertEquals(FAILED, i.getEndPosition());
             }
         }
