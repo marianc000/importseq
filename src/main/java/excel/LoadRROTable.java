@@ -159,6 +159,10 @@ public class LoadRROTable {
         return refextNipMap;
     }
 
+    public Map<String, List<List<String>>> getNipSamplesMap() {
+        return nipSamplesMap;
+    }
+
     public static void main(String... args) throws IOException, InvalidFormatException {
         new LoadRROTable().init("C:\\Projects\\cBioPortal\\data sample\\SECOND SAMPLES\\20170725 RRO CBIO exportMCunmodified.xlsx");
     }
