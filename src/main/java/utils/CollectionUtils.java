@@ -8,6 +8,7 @@ package utils;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  *
@@ -45,5 +46,13 @@ public class CollectionUtils {
         }
         System.out.println(map.size());
         System.out.println("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
+    }
+
+    void printSet(Set<String> set) {
+        System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+        for (String s : set) {
+            System.out.println("'" + s + "'");
+        }
+        System.out.println("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
     }
 }

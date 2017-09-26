@@ -31,6 +31,7 @@ public class ExcelAdaptorForValImport {
     }
 
     public Path run(String sourceTabFilePath) throws IOException, InvalidFormatException {
+        System.out.println("sourceTabFilePath="+sourceTabFilePath);
         Map<String, Map<String, OutputMafRow>> tabMap = new LoadTabForVal().run(sourceTabFilePath);
         String sourceValFilePath = sourceTabFilePath.replace("coding01.Tab", "coding01.Val");
         List<OutputMafRow> mafRows = new LoadValForVal().run(sourceValFilePath);

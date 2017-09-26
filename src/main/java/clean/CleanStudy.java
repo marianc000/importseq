@@ -8,7 +8,6 @@ package clean;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import static main.MyImportManyWithClinicalData.RRO_STUDY_NAME;
 import persistence.MyCancerStudy;
 import static persistence.MyConnection.getConnection;
 import persistence.MyImportClinicalData;

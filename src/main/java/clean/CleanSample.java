@@ -19,38 +19,36 @@ import persistence.MyImportClinicalData;
 public class CleanSample {
 
     MyImportClinicalData cd;
-    String[] sqls = {"DELETE FROM sample_list_list WHERE LIST_ID IN (SELECT LIST_ID FROM sample_list WHERE CANCER_STUDY_ID=179)",
-        //  "DELETE FROM sample_list WHERE CANCER_STUDY_ID=179",
-        "DELETE FROM mutation_count WHERE GENETIC_PROFILE_ID IN (SELECT GENETIC_PROFILE_ID FROM genetic_profile WHERE CANCER_STUDY_ID=179)",
-        "DELETE FROM mutation WHERE GENETIC_PROFILE_ID IN (SELECT GENETIC_PROFILE_ID FROM genetic_profile WHERE CANCER_STUDY_ID=179)",
-        "DELETE FROM sample_profile WHERE GENETIC_PROFILE_ID IN (SELECT GENETIC_PROFILE_ID FROM genetic_profile WHERE CANCER_STUDY_ID=179)",
-        "DELETE FROM clinical_sample WHERE INTERNAL_ID IN (SELECT INTERNAL_ID FROM sample WHERE PATIENT_ID IN (SELECT INTERNAL_ID FROM patient WHERE CANCER_STUDY_ID=179))",
-        "DELETE FROM sample WHERE PATIENT_ID IN (SELECT INTERNAL_ID FROM patient WHERE CANCER_STUDY_ID=179)",
-        "DELETE FROM patient WHERE CANCER_STUDY_ID=179",
-        "DELETE FROM clinical_attribute_meta WHERE CANCER_STUDY_ID=179",
-        "DELETE FROM mutation_event WHERE NOT EXISTS (SELECT * FROM mutation WHERE mutation.MUTATION_EVENT_ID = mutation_event.MUTATION_EVENT_ID)"
+    String[] sqls = {"delete FROM  sample where INTERNAL_ID in(select INTERNAL_ID from ("
+        + "SELECT s.INTERNAL_ID FROM  sample s join patient p on s.PATIENT_ID=p.INTERNAL_ID "
+        + "where cancer_study_id=" + STUDY_ID_PLACEHOLDER + " and p.stable_id='" + PATIENT_ID_PLACEHOLDER + "' and s.stable_id='" + SAMPLE_ID_PLACEHOLDER + "') a)"
     };
-
+    static String STUDY_ID_PLACEHOLDER = "STUDY_ID_PLACEHOLDER", PATIENT_ID_PLACEHOLDER = "PATIENT_ID_PLACEHOLDER", SAMPLE_ID_PLACEHOLDER = "SAMPLE_ID_PLACEHOLDER";
 // 10:53:58.775	DELETE FROM genetic_alteration WHERE GENETIC_PROFILE_ID IN (SELECT GENETIC_PROFILE_ID FROM genetic_profile WHERE CANCER_STUDY_ID=179)
 // DELETE FROM genetic_profile_samples WHERE GENETIC_PROFILE_ID IN (SELECT GENETIC_PROFILE_ID FROM genetic_profile WHERE CANCER_STUDY_ID=179)
 // DELETE FROM cancer_study WHERE CANCER_STUDY_ID=179;
 //	
-    public void clean(String studyName) throws SQLException {
+
+    public void cleanSample(Connection con, int studyId, String patientId, String sampleId) throws SQLException {
+        System.out.println(">cleanSample: Removing sample: " + sampleId);
+        for (String s : sqls) {
+            String sql = s.replace(STUDY_ID_PLACEHOLDER, String.valueOf(studyId)).replace(PATIENT_ID_PLACEHOLDER, patientId).replace(SAMPLE_ID_PLACEHOLDER, sampleId);
+            System.out.println(sql);
+            try (PreparedStatement pstmt = con.prepareStatement(sql)) {
+                System.out.println("Removed "+pstmt.executeUpdate()+" rows");
+            }
+        }
+        System.out.println("<cleanSample: Removing sample: " + sampleId);
+    }
+
+    public void cleanSample(int studyId, String patientId, String sampleId) throws SQLException {
         try (Connection con = getConnection()) {
             con.setAutoCommit(false);
-            int cancerStudyId = MyCancerStudy.getCancerStudyId(con, studyName);
-            for (String s : sqls) {
-                String sql = s.replaceAll("179", String.valueOf(cancerStudyId));
-                System.out.println(sql);
-                try (PreparedStatement pstmt = con.prepareStatement(sql)) {
-                    System.out.println(pstmt.executeUpdate());
-                }
-            }
+            cleanSample(con, studyId, patientId, sampleId);
             con.commit();
         }
     }
-    
- 
+
 //
 //    public static void main(String... args) throws IOException, InvalidFormatException, SQLException {
 //        new CleanStudy().clean();

@@ -5,6 +5,8 @@
  */
 package utils;
 
+import files.MySourceFile;
+import java.nio.file.Paths;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -34,4 +36,12 @@ public class FileUtilsTest {
         assertEquals(convertFilePathToSampleName(s), "H1703061-1A");
     }
 
+    @Test
+    public void testGetFileDir() {
+        FileUtils i = new FileUtils(Paths.get("C:\\Projects\\cBioPortal\\data sample\\SECOND SAMPLES\\corrected"));
+
+        assertEquals(i.getImported(), Paths.get("C:\\Projects\\cBioPortal\\data sample\\SECOND SAMPLES\\corrected\\imported"));
+        assertEquals(i.getRejected(), Paths.get("C:\\Projects\\cBioPortal\\data sample\\SECOND SAMPLES\\corrected\\rejected"));
+
+    }
 }

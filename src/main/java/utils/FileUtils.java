@@ -26,6 +26,19 @@ public class FileUtils {
         this.rejected = rejected;
     }
 
+    public FileUtils(Path baseDir) {
+        this.imported = baseDir.resolve("imported");
+        this.rejected = baseDir.resolve("rejected");
+    }
+
+    public Path getImported() {
+        return imported;
+    }
+
+    public Path getRejected() {
+        return rejected;
+    }
+
     void moveFile(Path filePath, Path destination) throws IOException {
         System.out.println(">moveFile: " + filePath + " -> " + destination);
         Files.move(filePath, destination, REPLACE_EXISTING);
@@ -44,11 +57,15 @@ public class FileUtils {
     public static String getSampleName(Path path) {
         String fileName = path.getFileName().toString();
         String sampleName = fileName.substring(0, fileName.indexOf("."));
-     //   System.out.println("sampleName: " + sampleName);
+        //   System.out.println("sampleName: " + sampleName);
         if (sampleName == null || sampleName.isEmpty()) {
             throw new RuntimeException("Cannot extract a sample name from path " + path);
         }
         return sampleName;
+    }
+
+    public static String getSampleName(String path) {
+        return getSampleName(Paths.get(path));
     }
 
     public static String convertFilePathToSampleName(String filePath) {
@@ -69,8 +86,7 @@ public class FileUtils {
         }
         Files.write(path, content);
     }
-    
-    
+
     public static Path getOutputFilePath(String sourceFilePath) {
         return Paths.get(sourceFilePath + ".out");
     }

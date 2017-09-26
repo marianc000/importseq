@@ -1,5 +1,6 @@
 package main;
 
+import files.MatchingGeneticClinicalDataFiles;
 import java.nio.file.*;
 import static java.nio.file.StandardWatchEventKinds.*;
 import java.io.*;
@@ -36,19 +37,24 @@ public class WatchDirForVal {
         keys.put(key, dir);
     }
 
-    MyProperties p;
-    MyImport i;
+    //   MyProperties p;
+    MatchingGeneticClinicalDataFiles fileMatcher;
 
+    // Path sourceDir;
     public WatchDirForVal(MyProperties p) throws IOException {
-        this.p = p;
-        i = new MyImport(p);
+        this(p.getSourceDirPath());
+    }
+
+    WatchDirForVal(Path sourceDir) throws IOException {
+        //  this.sourceDir = sourceDir;
+        System.out.println(">WatchDirForVal: watching: " + sourceDir + "; exists=" + Files.exists(sourceDir) + "; isWritable=" + Files.isWritable(sourceDir) + "; isReadable=" + Files.isReadable(sourceDir));
+        fileMatcher = new MatchingGeneticClinicalDataFiles();
 
         this.watcher = FileSystems.getDefault().newWatchService();
         this.keys = new HashMap<>();
 
-        register(p.getSourceDirPath());
+        register(sourceDir);
     }
- 
 
     public void stop() throws IOException {
         System.out.println(">WatchDir:stop");
@@ -72,7 +78,7 @@ public class WatchDirForVal {
                     System.out.println("WatchDir:processEvents:exception: " + ex);
                     return;
                 }
-
+                System.err.println("event=" + key);
                 Path dir = keys.get(key);
                 if (dir == null) {
                     System.err.println("WatchDir:WatchKey not recognized!!");
@@ -134,8 +140,8 @@ public class WatchDirForVal {
 
     void waitUntilComplete(Path filePath) {
         System.out.println(">waitUntilComplete");
-        while (!isComplete(filePath)||!Files.isReadable(filePath)||!Files.isWritable(filePath)) {
-             System.out.println("waitUntilComplete:waiting");
+        while (!isComplete(filePath) || !Files.isReadable(filePath) || !Files.isWritable(filePath)) {
+            System.out.println("waitUntilComplete:waiting");
             try {
                 Thread.sleep(100);
             } catch (InterruptedException ex) {
@@ -153,7 +159,7 @@ public class WatchDirForVal {
         System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
         waitUntilComplete(filePath);
         try {
-            i.runImportWithFilePath(filePath);
+            fileMatcher.addFile(filePath);
         } catch (Exception e) {
             System.out.println("processFile exception: ");
             e.printStackTrace();
@@ -163,7 +169,8 @@ public class WatchDirForVal {
         System.out.println();
     }
 //
-//    public static void main(String[] args) throws IOException {
-//        new WatchDir().processEvents();
-//    }
+
+    public static void main(String[] args) throws IOException {
+        new WatchDirForVal(Paths.get("L:\\SHARE\\RRO_IPA_FILES")).processEvents();
+    }
 }

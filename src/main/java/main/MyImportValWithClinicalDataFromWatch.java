@@ -5,17 +5,17 @@
  */
 package main;
 
-import clean.CleanStudy;
+import clean.CleanSample;
 import excel.LoadRROTable;
-import files.FileFinder;
-import folder.ExcelAdaptorForValImport;
+import files.ClinicalDataFile;
+import files.ValFile;
+import folder.ExcelAdaptorForValImportFromWatch;
 import java.io.File;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Connection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import persistence.MyAddCaseList;
 import persistence.MyCancerStudy;
@@ -35,26 +35,25 @@ public class MyImportValWithClinicalDataFromWatch {
 
     MyProperties p;
 
-    public MyImportValWithClinicalDataFromWatch()   {
+    public MyImportValWithClinicalDataFromWatch() {
 
     }
 
     // static String STUDY_NAME = "acc_tcga_chuv3";
-    MyImportClinicalData cd = new MyImportClinicalData(RRO_STUDY_NAME);
+    MyImportClinicalData cd;
+// importEverything(studyName,valFilePath, clinicalRow, rro.getHeaders());
 
-    void importEverything(Set<Path> mutationFilePaths, Map<String, List<String>> refextNipMap, List<String> headers) throws Exception {
-
+    void importEverything(String studyName, Path valFilePath, List<String> headers) throws Exception {
+        cd = new MyImportClinicalData(studyName);
         try (Connection con = getConnection()) {
             con.setAutoCommit(false);
-            int cancerStudyId = MyCancerStudy.getCancerStudyId(con, RRO_STUDY_NAME);
+            int cancerStudyId = MyCancerStudy.getCancerStudyId(con, studyName);
 
             List<MyClinicalAttribute> columnAttrs = cd.grabAttrs(con, headers, cancerStudyId);
+            importMutationFile(con, valFilePath, columnAttrs, cancerStudyId);
 
-            for (Path sourceFilePath : mutationFilePaths) {
-                importMutationFile(con, sourceFilePath, columnAttrs, cancerStudyId);
-            }
             con.commit();
-            // con.rollback();
+            //   con.rollback();
         }
     }
 
@@ -80,10 +79,16 @@ public class MyImportValWithClinicalDataFromWatch {
         if (!sampleName.equals(sampleNameInFile)) {
             throw new RuntimeException("sample names differ");
         }
-
-        int sampleId = cd.addSample(con, cancerStudyId, patientNameInFile, sampleName);
+        int sampleId;
+        try {
+            sampleId = cd.addSample(con, cancerStudyId, patientNameInFile, sampleName);
+        } catch (Exception ex) {
+            System.out.println(">EX: " + ex);
+            new CleanSample().cleanSample(con, cancerStudyId, patientNameInFile, sampleName);
+            sampleId = cd.addSample(con, cancerStudyId, patientNameInFile, sampleName);
+        }
         importClinicalDataValues(con, row, columnAttrs, sampleId);
-        Path dataFilePath = new ExcelAdaptorForValImport().run(sourceFilePath.toString());
+        Path dataFilePath = new ExcelAdaptorForValImportFromWatch().run(sourceFilePath.toString());
 
         File dataFile = dataFilePath.toFile();
         //   System.out.println("dataFile: " + dataFile);
@@ -94,6 +99,7 @@ public class MyImportValWithClinicalDataFromWatch {
         pd.run(con, geneticProfileId, dataFile, sampleId);
         cl.addSampleToList(con, cancerStudyId, sampleId);
         //  throw new RuntimeException("not readY!!!!");
+        dataFile.delete();
         System.out.println("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<importMutationFile: sourceFilePath=" + sourceFilePath.getFileName());
     }
 
@@ -118,46 +124,31 @@ public class MyImportValWithClinicalDataFromWatch {
 
     }
 
-    void printSet(Set<String> set) {
-        System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-        for (String s : set) {
-            System.out.println("'" + s + "'");
-        }
-        System.out.println("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
-    }
     LoadRROTable rro;
 
-    public void runImport(String clinicalDataFilePath) throws Exception {
+    public void runImport(String clinicalDataFilePath, Path valFilePath, String studyName) throws Exception {
         rro = new LoadRROTable();
         rro.init(clinicalDataFilePath);
-        Map<String, List<String>> refextNipMap = rro.getRefextNipMap();
-        FileFinder ff = new FileFinder();
-        Set<Path> mutationFilePaths = ff.run(SOURCE_FILE_DIR);
-
-        Set<String> samplesInFiles = ff.getSampleNames();
-        System.out.println("Samples in files: " + samplesInFiles.size());
-
-        Set<String> samplesInRro = new HashSet<>(refextNipMap.keySet());
-
-        samplesInRro.removeAll(samplesInFiles);
-        System.out.println("Samples without files: " + samplesInRro);
-
-        samplesInFiles = ff.getSampleNames();
-        samplesInFiles.removeAll(refextNipMap.keySet());
-        System.out.println("Files without rro samples: " + samplesInFiles);
-        System.out.println("Files: " + mutationFilePaths.size());
-        System.out.println("Sample names: " + refextNipMap.size());
-        importEverything(mutationFilePaths, refextNipMap, rro.getHeaders());
+        importEverything(studyName, valFilePath, rro.getHeaders());
     }
 
-    static String RRO_FILE_PATH = "C:\\Projects\\cBioPortal\\data sample\\SECOND SAMPLES\\20170725 RRO CBIO exportMCunmodified.xlsx";
-    // static String SOURCE_FILE_DIR = "C:\\Projects\\cBioPortal\\data sample\\SECOND SAMPLES\\corrected\\H1702318-1A.hg19_coding01.Tab.xlsx";
-    static String SOURCE_FILE_DIR = "C:\\Projects\\cBioPortal\\data sample\\SECOND SAMPLES\\corrected\\";
-    public static String RRO_STUDY_NAME = "aca_chuv_val";
+    public void runImport(String clinicalDataFilePath, String valFilePath) throws Exception {
+        runImport(new ClinicalDataFile(clinicalDataFilePath), new ValFile(valFilePath));
+    }
+
+    public void runImport(ClinicalDataFile clinicalDataFile, ValFile valFile) throws Exception {
+        rro = new LoadRROTable();
+        rro.init(clinicalDataFile.getFilePathString());
+        importEverything(clinicalDataFile.getStudyName(), valFile.getFilePath(), rro.getHeaders());
+    }
+    static String RRO_FILE_PATH = "C:\\Projects\\cBioPortal\\data sample\\SECOND SAMPLES\\demo28092017\\H1700899-1A.aca_chuv.xlsx";
+    static String VAL_FILE_PATH = "C:\\Projects\\cBioPortal\\data sample\\SECOND SAMPLES\\demo28092017\\H1700899-1A.hg19_coding01.Val.xlsx";
 
     // static String SOURCE_FILE_DIR = "C:\\Projects\\cBioPortal\\data sample\\test\\";
     public static void main(String... args) throws Exception {
-        new CleanStudy().clean(RRO_STUDY_NAME);
-        new MyImportValWithClinicalDataFromWatch().runImport(RRO_FILE_PATH);
+        // new CleanStudy().clean(RRO_STUDY_NAME);
+        // new MyImportValWithClinicalDataFromWatch().runImport(RRO_FILE_PATH, Paths.get(VAL_FILE_PATH), new ClinicalDataFile(RRO_FILE_PATH).getStudyName());
+      new MyImportValWithClinicalDataFromWatch().runImport(new ClinicalDataFile(RRO_FILE_PATH), new ValFile(VAL_FILE_PATH));
+      //  new MyImportValWithClinicalDataFromWatch().runImport(RRO_FILE_PATH, VAL_FILE_PATH);
     }
 }
