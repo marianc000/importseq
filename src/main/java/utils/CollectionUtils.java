@@ -27,8 +27,8 @@ public class CollectionUtils {
         }
     }
 
-    public static void printCollection(Collection<String> l) {
-        for (String s : l) {
+    public static void printCollection(Collection  l) {
+        for (Object s : l) {
             System.out.println(s);
         }
     }
