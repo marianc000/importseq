@@ -114,7 +114,7 @@ public class DirectoryListener {
             newFiles.removeAll(previousSnapShot);
             previousSnapShot = newSnapshot;
             if (newFiles.isEmpty()) {
-                System.out.println("no change");
+             //   System.out.println("no change");
             } else {
                 processNewFiles(newFiles);
             }

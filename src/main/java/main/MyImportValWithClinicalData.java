@@ -35,7 +35,7 @@ public class MyImportValWithClinicalData {
 
     MyProperties p;
 
-    public MyImportValWithClinicalData()   {
+    public MyImportValWithClinicalData() {
 
     }
 
@@ -150,10 +150,10 @@ public class MyImportValWithClinicalData {
         importEverything(mutationFilePaths, refextNipMap, rro.getHeaders());
     }
 
-    static String RRO_FILE_PATH = "C:\\Projects\\cBioPortal\\data sample\\SECOND SAMPLES\\20170725 RRO CBIO exportMCunmodified.xlsx";
+    static String RRO_FILE_PATH = "C:\\Projects\\cBioPortal\\data sample\\NEW CLINICAL DATA\\20170824 Cbioportal export2.xlsx";
     // static String SOURCE_FILE_DIR = "C:\\Projects\\cBioPortal\\data sample\\SECOND SAMPLES\\corrected\\H1702318-1A.hg19_coding01.Tab.xlsx";
     static String SOURCE_FILE_DIR = "C:\\Projects\\cBioPortal\\data sample\\SECOND SAMPLES\\corrected\\";
-    public static String RRO_STUDY_NAME = "aca_chuv_val";
+    public static String RRO_STUDY_NAME = "chuv_val2";
 
     // static String SOURCE_FILE_DIR = "C:\\Projects\\cBioPortal\\data sample\\test\\";
     public static void main(String... args) throws Exception {

@@ -34,4 +34,9 @@ public class StringUtilsTest {
         assertEquals(StringUtils.truncate(s, 15), s);
     }
 
+    @Test
+    public void testQuoteAndJoinList() {
+        assertEquals(StringUtils.quoteAndJoinList(new String[]{"a", "b", "c"}), "'a','b','c'");
+    }
+
 }

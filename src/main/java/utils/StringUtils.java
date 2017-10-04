@@ -12,10 +12,17 @@ package utils;
 public class StringUtils {
 
     public static String truncate(String str, int maxLength) {
- 
+
         if (str.length() > maxLength) {
             return str.substring(0, maxLength);
         }
         return str;
+    }
+
+  public static String quoteAndJoinList(String[] strs) {
+        for (int i = 0; i < strs.length; i++) {
+            strs[i] = "'" + strs[i] + "'";
+        }
+        return String.join(",", strs);
     }
 }

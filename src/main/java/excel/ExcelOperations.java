@@ -5,10 +5,12 @@
  */
 package excel;
 
+import static excel.LoadRROTable.HEADERS_ARE_IN_ROW;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -25,6 +27,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import static utils.CollectionUtils.printCollection;
+import static utils.CollectionUtils.printListAsTabbedRow;
 
 /**
  *
@@ -32,6 +35,14 @@ import static utils.CollectionUtils.printCollection;
  */
 public class ExcelOperations {
 
+    int headersAreInRow = 0;
+
+    public ExcelOperations() {
+    }
+
+    public ExcelOperations(int headersAreInRow) {
+        this.headersAreInRow = headersAreInRow;
+    }
     // String sourceFilePath;
     //  static String sourceFilePath = "C:\\Projects\\cBioPortal\\data sample\\H1975.hg19_coding01.TabTest.xlsx";
     static String canonicalMapFileName = "/isoform_overrides_uniprot.txt";
@@ -57,9 +68,10 @@ public class ExcelOperations {
             }
             content.add(sb.toString());
         }
-        Files.write(path, content);
+        Files.write(path, content, StandardCharsets.UTF_8);
     }
 
+    // list of columns
     public List<String> getRow(int index) {
         List<String> row = new LinkedList<>();
 
@@ -68,6 +80,32 @@ public class ExcelOperations {
 
         }
         return row;
+    }
+
+    public void setRow(int index, List<String> row) {
+        List<String> oldRow = getRow(index);
+        if (row.size() != oldRow.size()) {
+            throw new RuntimeException("Old and new row sizes differ");
+        }
+        for (int c = 0; c < doc.size(); c++) {
+            doc.get(c).set(index, row.get(c));
+        }
+    }
+
+    public void setHeaders(List<String> row) {
+        setRow(headersAreInRow, row);
+    }
+
+    public List<String> getHeaders() {
+        return getRow(headersAreInRow);
+    }
+
+    String getHeader(int index) {
+        return getHeaders().get(index);
+    }
+
+    int getHeaderIndex(String header) {
+        return getHeaders().indexOf(header);
     }
 
     public void removeRow(int index) {
@@ -83,7 +121,7 @@ public class ExcelOperations {
         }
         switch (cell.getCellTypeEnum()) {
             case STRING:
-                return cell.getRichStringCellValue().getString();
+                return cell.getRichStringCellValue().getString().trim();
 
             case NUMERIC:
                 double d = cell.getNumericCellValue();
@@ -104,18 +142,14 @@ public class ExcelOperations {
 
     public List<String> getColumn(String header) {
         for (List<String> col : doc) {
-            if (col.get(0).equals(header)) {
+            if (col.get(headersAreInRow).equals(header)) {
                 return col;
             }
         }
         return null;
     }
 
- 
-
     Map<String, String> exonicFuncRefGene_VariantClassificationMap, sourceTargetHeaders;
-
- 
 
     public List<List<String>> loadDocument(String fileName) throws IOException, InvalidFormatException {
         doc = new LinkedList<>();
@@ -123,7 +157,7 @@ public class ExcelOperations {
 
         Sheet sheet = wb.getSheetAt(0);
 
-        Row headerRow = sheet.getRow(0);
+        Row headerRow = sheet.getRow(headersAreInRow);
 
         for (Cell cell : headerRow) {
             doc.add(new LinkedList<>());
@@ -131,7 +165,7 @@ public class ExcelOperations {
             col.add(cell.getStringCellValue());
         }
 
-        for (int rowNum = 1; rowNum <= sheet.getLastRowNum(); rowNum++) {
+        for (int rowNum = headersAreInRow + 1; rowNum <= sheet.getLastRowNum(); rowNum++) {
             Row row = sheet.getRow(rowNum);
             if (row != null) {
                 for (int colNum = 0; colNum < doc.size(); colNum++) {
@@ -140,11 +174,11 @@ public class ExcelOperations {
                     doc.get(colNum).add(cellVal);
                 }
             } else {
-               // System.out.println("!!!!!!!!!!!!!!!!!!!!!!!! row " + rowNum + " is null, total rows=" + sheet.getLastRowNum() + "; file=" + fileName);
+                // System.out.println("!!!!!!!!!!!!!!!!!!!!!!!! row " + rowNum + " is null, total rows=" + sheet.getLastRowNum() + "; file=" + fileName);
             }
         }
         wb.close();
-       // System.out.println("loaded rows: " + sheet.getLastRowNum());
+        // System.out.println("loaded rows: " + sheet.getLastRowNum());
         return doc;
     }
 
@@ -159,6 +193,10 @@ public class ExcelOperations {
             }
             System.out.println();
         }
+    }
+
+    public boolean removeColumn(int index) {
+        return doc.remove(index) != null;
     }
 
     public void filterColumns(Set<String> headerSet) {
@@ -191,6 +229,10 @@ public class ExcelOperations {
 
     void printDocument() {
         printDocument(doc);
+    }
+
+    void addColumn(String header) {
+        doc.add(createFilledColumn(header, ""));
     }
 
     void addColumn(String header, String value) {

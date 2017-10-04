@@ -6,7 +6,7 @@
 package contentsOfFirstValColumn;
 
 import excel.*;
-import static excel.LoadRROTable.printMap;
+ 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -16,6 +16,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import static utils.CollectionUtils.printMap;
 
 public class LoadVal {
 
