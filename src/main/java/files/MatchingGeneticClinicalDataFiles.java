@@ -68,26 +68,16 @@ public class MatchingGeneticClinicalDataFiles {
 
     void processFiles(MatchedValClinicalDataFiles m) {
         try {
-            if (importFiles(m)) {
-                m.moveToImported();
-            } else {
-                m.moveToFailed();
-            }
-        } catch (IOException ex) {
-            System.out.println("EX: " + ex);
-            ex.printStackTrace();
-        }
-    }
-
-    boolean importFiles(MatchedValClinicalDataFiles m) {
-        try {
-
-            new MyImportValWithClinicalDataFromWatch().runImport(m.getClinicalDataFile(), m.getValFile());
-            return true;
+            importFiles(m);
+            m.moveToImported();
         } catch (Exception ex) {
             System.out.println("EX: " + ex);
             ex.printStackTrace();
-            return false;
+            m.moveToFailed(ex );
         }
+    }
+
+    void importFiles(MatchedValClinicalDataFiles m) throws Exception {
+        new MyImportValWithClinicalDataFromWatch().runImport(m.getClinicalDataFile(), m.getValFile());
     }
 }

@@ -26,9 +26,19 @@ public class FileUtils {
         this.rejected = rejected;
     }
 
+    public static String REJECTED_FOLDER_NAME = "rejected", IMPORTED_FOLDER_NAME = "imported", ERROR_FILE_EXTENSION = ".err";
+
     public FileUtils(Path baseDir) {
-        this.imported = baseDir.resolve("imported");
-        this.rejected = baseDir.resolve("rejected");
+        this.imported = baseDir.resolve(IMPORTED_FOLDER_NAME);
+        this.rejected = baseDir.resolve(REJECTED_FOLDER_NAME);
+    }
+
+    void createParentDirIfDoesNotExist(Path filePath) throws IOException {
+        Path dirPath = filePath.getParent();
+        if (!Files.isDirectory(dirPath)) {
+            System.out.println(">Creating dir: " + dirPath);
+            Files.createDirectory(dirPath);
+        }
     }
 
     public Path getImported() {
@@ -41,6 +51,7 @@ public class FileUtils {
 
     void moveFile(Path filePath, Path destination) throws IOException {
         System.out.println(">moveFile: " + filePath + " -> " + destination);
+        createParentDirIfDoesNotExist(destination);
         Files.move(filePath, destination, REPLACE_EXISTING);
     }
 
@@ -52,6 +63,21 @@ public class FileUtils {
     public void moveFileToRejected(Path filePath) throws IOException {
         System.out.println(">moveFileToRejected");
         moveFile(filePath, rejected.resolve(filePath.getFileName()));
+    }
+
+  public  void saveStackTrace(Path filePath, Exception ex) throws IOException {
+
+        List<String> st = new LinkedList<>();
+        for (StackTraceElement e : ex.getStackTrace()) {
+            st.add(e.toString());
+        }
+        Path targetFilePath = getErrorFilePath(filePath);
+        createParentDirIfDoesNotExist(targetFilePath);
+        Files.write(targetFilePath, st);
+    }
+
+  public  Path getErrorFilePath(Path filePath) {
+        return rejected.resolve(filePath.getFileName() + ERROR_FILE_EXTENSION);
     }
 
     public static String getSampleName(Path path) {

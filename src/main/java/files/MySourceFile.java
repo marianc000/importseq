@@ -8,7 +8,10 @@ package files;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Objects;
+import java.nio.file.Files;
 
 import utils.FileUtils;
 
@@ -80,6 +83,11 @@ public class MySourceFile {
             return false;
         }
         return true;
+    }
+
+    @Override
+    public String toString() {
+        return filePath.toString();
     }
 
 }
